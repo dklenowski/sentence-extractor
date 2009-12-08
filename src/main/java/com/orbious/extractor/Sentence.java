@@ -10,6 +10,7 @@ import com.orbious.extractor.evaluator.Acronym;
 import com.orbious.extractor.evaluator.Evaluator;
 import com.orbious.extractor.evaluator.Name;
 import com.orbious.extractor.evaluator.Suspension;
+import com.orbious.extractor.evaluator.UrlText;
 import com.orbious.util.Helper;
 
 /**
@@ -46,7 +47,8 @@ public class Sentence {
 	
 	/**
 	 * Reloads the local copy of sentence ends from 
-	 * {@link com.orbious.separator.Config#SENTENCE_ENDS}.
+	 * {@link com.orbious.separator.Config#SENTENCE_ENDS}
+	 * and the default <code>Evaluator</code>'s.
 	 */
 	public static void reload() {
 		sentence_ends = Config.getSentenceEnds();
@@ -54,6 +56,10 @@ public class Sentence {
 		initDefaultEndEvaluators();
 	}
 	
+	/**
+	 * Initializes the <code>Evaluator</code>'s that are
+	 * used to determine whether a sentence start is valid.
+	 */
 	public static void initDefaultStartEvaluators() {
 		start_evaluators = new Vector<Evaluator>(
 				Arrays.asList( 	new Name(), 
@@ -61,6 +67,15 @@ public class Sentence {
 								new Acronym() ));
 	}
 
+	/**
+	 * Adds a non-default <code>Evaluator</code> to the list
+	 * of evaluators that are used to determine whether a sentence
+	 * start is valid.
+	 * 
+	 * @param evaluator		The <code>Evaluator</code> to add
+	 * 						for determining whether a sentence start 
+	 * 						is valid.
+	 */
 	public static void addStartEvaluator(Evaluator evaluator) {
 		if ( start_evaluators == null ) {
 			start_evaluators = new Vector<Evaluator>();
@@ -68,13 +83,26 @@ public class Sentence {
 		start_evaluators.add(evaluator);
 	}
 	
-	
+	/**
+	 * Initializes the <code>Evaluator</code>'s that are
+	 * used to determine whether a sentence end is valid.
+	 */
 	public static void initDefaultEndEvaluators() {
 		end_evaluators = new Vector<Evaluator>(
 				Arrays.asList( 	new Suspension(), 
-								new Acronym() ));		
+								new Acronym(),
+								new UrlText() ));		
 	}
-	
+
+	/**
+	 * Adds a non-default <code>Evaluator</code> to the list
+	 * of evaluators that are used to determine whether a sentence
+	 * end is valid.
+	 * 
+	 * @param evaluator		The <code>Evaluator</code> to add
+	 * 						for determining whether a sentence end 
+	 * 						is valid.
+	 */
 	public static void addEndEvaluator(Evaluator evaluator) {
 		if ( end_evaluators == null ) {
 			end_evaluators = new Vector<Evaluator>();

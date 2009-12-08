@@ -23,7 +23,6 @@ public class TextParserTest extends TestCase {
 		AllTests.initLogger();
 	}
 	
-	/*
 	public void test_readWithException() {
 		String fname = "asdfasdf";
 		TextParser parser = new TextParser(fname);
@@ -67,7 +66,7 @@ public class TextParserTest extends TestCase {
 		"ASCII *** START OF THIS PROJECT GUTENBERG EBOOK PUNCH, VOLUME 1 *** ";
 		
 		assertEquals(expected, str);
-	}*/
+	}
 	
 	public void test_Parse() {
 		System.out.println(System.getProperty("user.dir"));

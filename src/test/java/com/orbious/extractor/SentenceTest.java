@@ -19,7 +19,7 @@ public class SentenceTest extends TestCase {
 		super(name);
 		AllTests.initLogger();
 	}
-/*
+
 	public void test_BasicSentence() {	
 		String str = "sample. The cat sat.";
 		char[] buf = str.toCharArray();
@@ -117,7 +117,6 @@ public class SentenceTest extends TestCase {
 		assertEquals("_bananas_", sentence.get(4));
 		assertEquals(".", sentence.get(5));
 	}
-	*/
 
 	public void test_SentenceWithComplexPunctuation() {
 		String str = "\"HAL,\" noted Frank, \"said that everything was going extremely well.\"";
@@ -154,7 +153,7 @@ public class SentenceTest extends TestCase {
 			assertEquals(expected.get(i), sentence.get(i));
 		}
 	}
-/*
+
 	public void test_SentenceWithNumbers() {
 		String str;
 		char[] buf;
@@ -217,5 +216,4 @@ public class SentenceTest extends TestCase {
 			assertEquals(expected.get(i), sentence.get(i));
 		}
 	}
-	*/
 }

@@ -1,5 +1,9 @@
 package com.orbious.extractor.evaluator;
 
+import org.apache.log4j.Logger;
+
+import com.orbious.extractor.Config;
+
 /**
  * $Id$
  * <p>
@@ -29,6 +33,8 @@ public abstract class Evaluator {
 	 */
 	private String name;
 
+	protected static Logger logger;
+	
 	/**
 	 * Initializes a <code>Evaluator</code>.
 	 * 
@@ -37,6 +43,7 @@ public abstract class Evaluator {
 	 */
 	public Evaluator(String name) {
 		this.name = name;
+		logger = Logger.getLogger(Config.LOGGER_REALM);
 	}
 	
 	/**

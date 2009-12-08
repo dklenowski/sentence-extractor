@@ -7,6 +7,7 @@ import com.orbious.extractor.CleanserTest;
 import com.orbious.extractor.evaluator.NameTest;
 import com.orbious.extractor.evaluator.SuspensionTest;
 import com.orbious.extractor.evaluator.AcronymTest;
+import com.orbious.extractor.evaluator.UrlTextTest;
 import com.orbious.extractor.WordTest;
 import com.orbious.extractor.SentenceTest;
 import junit.framework.TestSuite;
@@ -34,9 +35,12 @@ public class AllTests {
 		TestSuite ts = new TestSuite("All Tests");
 		
 		ts.addTestSuite(HelperTest.class);
+		
+		ts.addTestSuite(NameTest.class);
 		ts.addTestSuite(SuspensionTest.class);
 		ts.addTestSuite(AcronymTest.class);
-		ts.addTestSuite(NameTest.class);
+		ts.addTestSuite(UrlTextTest.class);
+		
 		ts.addTestSuite(CleanserTest.class);
 		ts.addTestSuite(WordTest.class);
 		ts.addTestSuite(SentenceTest.class);

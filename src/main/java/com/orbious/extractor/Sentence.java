@@ -1,9 +1,16 @@
 package com.orbious.extractor;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Vector;
 import org.apache.log4j.Logger;
+
+import com.orbious.extractor.evaluator.Acronym;
+import com.orbious.extractor.evaluator.Evaluator;
+import com.orbious.extractor.evaluator.Name;
+import com.orbious.extractor.evaluator.Suspension;
+import com.orbious.util.Helper;
 
 /**
  * $Id$
@@ -22,11 +29,15 @@ public class Sentence {
 	 * {@link com.orbious.separator.Config#SENTENCE_ENDS}.
 	 */
 	private static HashSet<Character> sentence_ends = Config.getSentenceEnds();
-
+	
 	/**
 	 * Logger object.
 	 */
 	private static final Logger logger = Logger.getLogger(Config.LOGGER_REALM);
+	
+	private static Vector<Evaluator> start_evaluators;
+	
+	private static Vector<Evaluator> end_evaluators;
 	
 	/**
 	 * Private constructor.
@@ -39,6 +50,37 @@ public class Sentence {
 	 */
 	public static void reload() {
 		sentence_ends = Config.getSentenceEnds();
+		initDefaultStartEvaluators();
+		initDefaultEndEvaluators();
+	}
+	
+	public static void initDefaultStartEvaluators() {
+		start_evaluators = new Vector<Evaluator>(
+				Arrays.asList( 	new Name(), 
+								new Suspension(), 
+								new Acronym() ));
+	}
+
+	public static void addStartEvaluator(Evaluator evaluator) {
+		if ( start_evaluators == null ) {
+			start_evaluators = new Vector<Evaluator>();
+		}
+		start_evaluators.add(evaluator);
+	}
+	
+	
+	public static void initDefaultEndEvaluators() {
+		end_evaluators = new Vector<Evaluator>(
+				Arrays.asList( 	new Suspension(), 
+								new Acronym() ));		
+	}
+	
+	public static void addEndEvaluator(Evaluator evaluator) {
+		if ( end_evaluators == null ) {
+			end_evaluators = new Vector<Evaluator>();
+		}
+		
+		end_evaluators.add(evaluator);
 	}
 	
 	/**
@@ -51,7 +93,9 @@ public class Sentence {
 	 * @return		A <code>Vector</code> containing the words that constitute
 	 * 				a sentence.
 	 */
-	public static Vector<String> getPreviousSentence(char[] buf, int idx) {
+	public static Vector<String> getPreviousSentence(char[] buf, int idx)
+		throws SentenceException {
+		Evaluator evaluator;
 		Vector<String> words;
 		char ch;
 		boolean hasLetter;
@@ -65,6 +109,37 @@ public class Sentence {
 			throw new ArrayIndexOutOfBoundsException("Invalid index=" + idx);
 		}
 
+		if ( !sentence_ends.contains(buf[idx]) ) {
+			throw new SentenceException("Not sentence end at index=" + idx);
+		}
+		
+		if ( start_evaluators == null ) {
+			initDefaultStartEvaluators();
+		}
+		
+		if ( end_evaluators == null ) {
+			initDefaultEndEvaluators();
+		}
+		
+		//
+		// check the end first
+		//
+		for ( i = 0; i < end_evaluators.size(); i++ ) {
+			evaluator = end_evaluators.get(i);
+
+			if ( evaluator.evaluate(buf, idx) ) {
+				if ( logger.isDebugEnabled() ) {
+					logger.debug("End Evaluator '" + evaluator.name() + 
+							"' returned true for idx=" + idx + " buf=" +
+							Helper.getStringFromCharBuf(buf, idx, 20));
+				}
+				return(null);
+			}
+		}
+		
+		//
+		// now we need to find the start
+		//
 		words = new Vector<String>();
 		hasLetter = false;
 		fndStart = false;
@@ -81,27 +156,40 @@ public class Sentence {
 				hasLetter = true;
 				
 			} else if ( Character.isWhitespace(ch) ) {
-				//if ( hasLetter ) {
-					wd = new StringBuffer(reverseWd).reverse().toString();
-					words.add(wd);
+				wd = new StringBuffer(reverseWd).reverse().toString();
+				words.add(wd);
 					
-					reverseWd = "";
-					hasLetter = false;
+				reverseWd = "";
+				hasLetter = false;
 					
-					if ( logger.isDebugEnabled() ) {
-						debugStr += " idx=" + i + " wd=" + wd;
+				if ( logger.isDebugEnabled() ) {
+					debugStr += " idx=" + i + " wd=" + wd;
+				}
+					
+				if ( Character.isUpperCase(wd.charAt(0)) ) {
+					// capitalised, a potential start
+					//
+					fndStart = true;
+					for ( int j = 0; j < start_evaluators.size(); j++ ) {
+						evaluator = start_evaluators.get(j);
+						
+						if ( evaluator.evaluate(wd) ) {
+							if ( logger.isDebugEnabled() ) {
+								logger.debug("Start Evaluator '" + evaluator.name() + 
+										"' returned true for idx=" + idx + " wd=" + wd + 
+										" buf=" +
+										Helper.getStringFromCharBuf(buf, idx, 40));
+							}
+							fndStart = false;
+							break;	
+						}
 					}
 					
-					try {
-						if ( !Acronym.isAcronym(wd) && !Name.isName(wd) &&
-								Character.isUpperCase(wd.charAt(0)) ) {
-							// the start of a sentence .
-							debugStr += " sentStart=" + wd;
-							fndStart = true;
-							break;
-						}
-					} catch ( AcronymException ae ) { }
-				//}
+					if ( fndStart ) {
+						debugStr += " sentStart=" + wd;
+						break;
+					}
+				}
 			} else {
 				// if we get to here we have punctuation
 				if ( hasLetter ||

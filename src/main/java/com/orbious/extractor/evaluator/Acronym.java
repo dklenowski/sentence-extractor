@@ -1,19 +1,10 @@
-package com.orbious.extractor;
+package com.orbious.extractor.evaluator;
 
+import com.orbious.extractor.Config;
 import org.apache.log4j.Logger;
 
-/**
- * $Id: Acronym.java 11 2009-12-04 14:07:11Z app $
- * <p>
- * Provides static methods that are used to determine whether a word or
- * character buffer contains an acronym.
- * 
- * @author dave
- * @version 1.0
- * @since 1.0
- */
 
-public class Acronym {
+public class Acronym extends Evaluator {
 
 	/**
 	 * The minimum number of punctuation characters that constitute an acronym.
@@ -42,62 +33,29 @@ public class Acronym {
 	 * Logger object.
 	 */
 	private static Logger logger = Logger.getLogger(Config.LOGGER_REALM);
+
 	
 	/**
-	 * Private constructor.
+	 * Constructor, initializes the <code>Acronym</code> class.
 	 */
-	private Acronym() { }
-	
-	/**
-	 * Determines if the word is an acronym.
-	 * 
-	 * @param wd	A string containing a word to check if an acronym.
-	 * @return		<code>true</code> if the word is an acronym, 
-	 * 				<code>false</code> otherwise.
-	 * @throws AcronymException
-	 */
-	public static boolean isAcronym(String wd) 
-		throws AcronymException {
-		char[] buf = wd.toCharArray();
-		boolean result;
-		
-		for ( int i = 0; i < buf.length; i++ ) {
-			if ( !Character.isLetterOrDigit(buf[i]) &&
-					!Character.isWhitespace(buf[i]) ) {
-				try {
-					result = isAcronym(buf, i);
-					if ( result ) {
-						return(true);
-					}
-				} catch ( AcronymException ae ) {
-					throw ae;
-				}
-			}
-		}
-		
-		return(false);
+	public Acronym() {
+		super("Acronym");
 	}
 	
 	/**
-	 * Determines if the full stop is part of of an acronym. 
+	 * Determines if the full stop is part of of an acronym and therefore
+	 * not a sentence end.
 	 * 
 	 * @param buf	The buffer to examine.
 	 * @param idx	The position in the buffer where punctuation occurs.
-	 * @return		true	The full stop is part of a acronym.
-	 * 				false	The full stop is not part of an acronym.
-	 * @throws AcronymException 
+	 * 
+	 * @return		<code>true</code> if the full stop is part of an acronym,
+	 * 				and not a sentence end, <code>false</code> otherwise.
 	 */
-	public static boolean isAcronym(char[] buf, int idx) 
-		throws AcronymException {
+	public boolean evaluate(char[] buf, int idx) {
 
 		if ( (idx < 0) || (idx >= buf.length) ) {
 			throw new ArrayIndexOutOfBoundsException("Invalid index=" + idx);
-		}
-
-		if ( Character.isLetterOrDigit(buf[idx]) ||
-				Character.isWhitespace(buf[idx]) ) {
-			throw new AcronymException("Not punctuation at pos=" + idx + 
-					" ch=" + buf[idx]);
 		}
 		
 		// need to determine whether the full stop lies at the end of a acronym
@@ -113,6 +71,32 @@ public class Acronym {
 		
 		return(op.result);
 	}
+	
+    /**
+     * Determines if the word is an acronym and therefore not a sentence 
+     * start.
+     * 
+     * @param wd    A string containing a word to check if an acronym.
+     * @return      <code>true</code> if the word is an acronym and not
+     * 				a sentence end, <code>false</code> otherwise.
+     */
+    public boolean evaluate(String wd) {
+    	char[] buf = wd.toCharArray();
+    	boolean result;
+            
+    	for ( int i = 0; i < buf.length; i++ ) {
+    		if ( !Character.isLetterOrDigit(buf[i]) && 
+    				!Character.isWhitespace(buf[i]) ) {
+    			result = evaluate(buf, i);
+    			if ( result ) {
+    				return(result);
+    			}
+    		}
+    	}
+            
+    	return(false);
+    }
+
 	
 	/**
 	 * Checks the <code>buf</code> for oscillations of punctuation/letters
@@ -270,5 +254,7 @@ public class Acronym {
 			return(consecutiveCharCt);
 		}
 	}
+	
+
 	
 }

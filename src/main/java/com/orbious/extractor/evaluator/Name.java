@@ -1,54 +1,64 @@
-package com.orbious.extractor;
+package com.orbious.extractor.evaluator;
 
+import com.orbious.extractor.Config;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
-
 import org.apache.log4j.Logger;
 
 /**
- * $Id: Name.java 12 2009-12-05 11:40:44Z app $
+ * $Id$
  * <p>
- * Provides static methods to perform lookups of common first names and surnames.
+ * Implements the <code>SentenceStart</code> interface to determine
+ * if a possible sentence start is a common first name/surname.
  * 
  * @author dave
  * @version 1.0
  * @since 1.0
  */
 
-public class Name {
-	
-	/**
-	 * 
-	 */
-	private static HashSet<String> names;
+public class Name extends Evaluator {
 
 	/**
-	 * Private  Constructor
+	 * In memory list of names.
 	 */
-	private Name() { }
+	private static HashSet<String> names;
+	
+	public Name() {
+		super("Name");
+	}
 	
 	/**
-	 * Checks to see whether a word is a common name.
+	 * Note used, returns <code>false</code> because a common name
+	 * does not need to be evaluated as a sentence end.
 	 * 
-	 * @param wd	A word.
-	 * @return		Returns <code>true</code> if the word is a common name,
-	 * 				<code>false</code> otherwise.
+	 * @param buf
+	 * @param idx	
+	 * @return 		<code>false</code>.
 	 */
-	public static boolean isName(String wd) {
+	public boolean evaluate(char[] buf, int idx) {
+		return(false);
+	}	
+	
+	
+    /**
+     * Determines if the word is a common name and therefore 
+     * cannot be considered a sentence start.
+     * 
+     * @param wd    A string containing a word to check if an common name.
+     * @return      <code>true</code> if the word is an common name and not
+     * 				a sentence end, <code>false</code> otherwise.
+     */	
+	public boolean evaluate(String wd) {
 		if ( names == null ) {
 			init();
 		}
 		
-		if ( names.contains(wd) ) {
-			return(true);
-		}
-		
-		return(false);
+		return( names.contains(wd) );
 	}
-	
+
 	/**
 	 * Parses the {@link Config#NAMES_FILENAME} into memory.
 	 */
@@ -81,6 +91,4 @@ public class Name {
 		
 		logger.info("Initialized " + names.size() + " common names.");		
 	}
-	
-	
 }

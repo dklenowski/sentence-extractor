@@ -1,6 +1,7 @@
-package com.orbious.extractor;
+package com.orbious.extractor.evaluator;
 
 import com.orbious.AllTests;
+import com.orbious.extractor.evaluator.Name;
 import junit.framework.TestCase;
 
 /**
@@ -20,21 +21,25 @@ public class NameTest extends TestCase {
 	
 	public void test_isName() {
 		boolean ret;
+		Name name;
 		
-		ret = Name.isName("Abril");
+		name = new Name();
+		ret = name.evaluate("Abril");
 		assertEquals(true, ret);
-		
-		ret = Name.isName("Taylor");
+
+		ret = name.evaluate("Taylor");
 		assertEquals(true, ret);
 	}
 
 	public void test_isNotName() {
 		boolean ret;
+		Name name;
 		
-		ret = Name.isName("Tomato");
-		assertEquals(false, ret);
-		
-		ret = Name.isName("mr.");
+		name = new Name();
+		ret = name.evaluate("Tomato");		
 		assertEquals(false, ret);		
+
+		ret = name.evaluate("mr.");		
+		assertEquals(false, ret);	
 	}
 }

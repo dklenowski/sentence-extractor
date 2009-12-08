@@ -1,11 +1,11 @@
 package com.orbious.extractor;
 
 /**
- * $Id: AcronymException.java 11 2009-12-04 14:07:11Z app $
+ * $Id$
  * <p>
- * An <code>AcroynmException</code> exception occurs when:
+ * An <code>SentenceException</code> exception occurs when:
  * <ul>
- * <li>The <code>index</code> where the acronym matching begins is not 
+ * <li>The <code>index</code> where the sentence extraction begins is not 
  * punctuation.
  * 
  * @author dave
@@ -13,7 +13,8 @@ package com.orbious.extractor;
  * @since 1.0
  */
 
-public class AcronymException extends Exception {
+public class SentenceException extends Exception {
+	
 	/**
 	 * Version Identifier
 	 */
@@ -24,7 +25,7 @@ public class AcronymException extends Exception {
 	 * 
 	 * @param msg 	A message that identifies the <code>AcronymException</code>.
 	 */
-	public AcronymException(String msg) {
+	public SentenceException(String msg) {
 		super(msg);
 	}
 }

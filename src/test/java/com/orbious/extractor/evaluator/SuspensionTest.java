@@ -1,7 +1,6 @@
-package com.orbious.extractor;
+package com.orbious.extractor.evaluator;
 
 import com.orbious.AllTests;
-
 import junit.framework.TestCase;
 
 /**
@@ -20,19 +19,20 @@ public class SuspensionTest extends TestCase {
 	}
 	
 	public void test_isSuspension() {
-		boolean ret;
-			
-		ret = Suspension.isSuspension("Mr.");
+		Suspension suspension = new Suspension();
+		boolean ret = suspension.evaluate("Mr.");
 		assertEquals(true, ret);
 	}
 
 	public void test_notSuspension() {
 		boolean ret;
 
-		ret = Suspension.isSuspension("Tomato");
-		assertEquals(false, ret);
+		Suspension suspension = new Suspension();
 		
-		ret = Suspension.isSuspension("mr.");
-		assertEquals(false, ret);		
+		ret = suspension.evaluate("Tomato");
+		assertEquals(false, ret);
+
+		ret = suspension.evaluate("mr.");
+		assertEquals(false, ret);	
 	}
 }

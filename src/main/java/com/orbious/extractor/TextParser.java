@@ -148,7 +148,6 @@ public class TextParser {
 	public void parse() {
 		char ch;
 		char ch2;
-		String wd;
 		Vector<String> raw;
 		Vector<String> cleansed;
 		boolean fndLaterPunct;
@@ -179,23 +178,17 @@ public class TextParser {
 					raw = null;
 					cleansed = null;
 					
-					if ( ch != '.' ) {
+					try {
 						raw = Sentence.getPreviousSentence(buffer, i);
-						cleansed = Cleanser.cleanWords(raw);
-					} else {
-						wd = Word.getPreviousWord(buffer, i);
-						try {
-							if ( !Acronym.isAcronym(buffer, i) && !Suspension.isSuspension(wd) ) {
-								// a valid sentence end
-								raw = Sentence.getPreviousSentence(buffer, i);
-								cleansed = Cleanser.cleanWords(raw);
-							}
-						} catch ( AcronymException ae ) {
-							logger.fatal("Error parsing " + filename, ae);
-						}						
+					} catch ( SentenceException se ) {
+						logger.fatal("Logic Error, idx=" + i + 
+								"\nRaw=" + Helper.getStringFromCharBuf(buffer, i, 50),
+								se);
 					}
 					
-					if ( (raw != null) && (cleansed != null) ) {
+					if ( raw != null ) {
+						// we have a sentencer
+						cleansed = Cleanser.cleanWords(raw);
 						if ( logger.isDebugEnabled() ) {
 							logger.debug("SetenceEnd idx=" + i + 
 									"\nBuffer=" +
@@ -204,7 +197,7 @@ public class TextParser {
 									"\nCleansed=" + cleansed);
 						}
 
-						sentences.add(cleansed);						
+						sentences.add(cleansed);
 					}
 				}
 			}

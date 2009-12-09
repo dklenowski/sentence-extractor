@@ -14,18 +14,18 @@ package com.orbious.extractor;
  */
 
 public class SentenceException extends Exception {
-	
-	/**
-	 * Version Identifier
-	 */
-	private static final long serialVersionUID = 1L;
+  
+  /**
+   * Version Identifier
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param msg 	A message that identifies the <code>AcronymException</code>.
-	 */
-	public SentenceException(String msg) {
-		super(msg);
-	}
+  /**
+   * Constructor.
+   * 
+   * @param msg   A message that identifies the <code>AcronymException</code>.
+   */
+  public SentenceException(String msg) {
+    super(msg);
+  }
 }

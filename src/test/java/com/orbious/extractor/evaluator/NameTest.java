@@ -13,33 +13,33 @@ import junit.framework.TestCase;
  */
 
 public class NameTest extends TestCase {
-	
-	public NameTest(String name) {
-		super(name);
-		AllTests.initLogger();
-	}
-	
-	public void test_isName() {
-		boolean ret;
-		Name name;
-		
-		name = new Name();
-		ret = name.evaluate("Abril");
-		assertEquals(true, ret);
+  
+  public NameTest(String name) {
+    super(name);
+    AllTests.initLogger();
+  }
+  
+  public void test_isName() {
+    boolean ret;
+    Name name;
+    
+    name = new Name();
+    ret = name.evaluate("Abril");
+    assertEquals(true, ret);
 
-		ret = name.evaluate("Taylor");
-		assertEquals(true, ret);
-	}
+    ret = name.evaluate("Taylor");
+    assertEquals(true, ret);
+  }
 
-	public void test_isNotName() {
-		boolean ret;
-		Name name;
-		
-		name = new Name();
-		ret = name.evaluate("Tomato");		
-		assertEquals(false, ret);		
+  public void test_isNotName() {
+    boolean ret;
+    Name name;
+    
+    name = new Name();
+    ret = name.evaluate("Tomato");    
+    assertEquals(false, ret);   
 
-		ret = name.evaluate("mr.");		
-		assertEquals(false, ret);	
-	}
+    ret = name.evaluate("mr.");   
+    assertEquals(false, ret); 
+  }
 }

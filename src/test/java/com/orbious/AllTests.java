@@ -23,28 +23,28 @@ import junit.framework.Test;
 
 public class AllTests {
 
-	public static void initLogger() {
-		Logger root = Logger.getRootLogger();
-		if ( !root.getAllAppenders().hasMoreElements() ) {
-			DOMConfigurator.configure("resources/log4j.xml");
-		}		
-	}
-	
-	public static Test suite() {
-		initLogger();
-		TestSuite ts = new TestSuite("All Tests");
-		
-		ts.addTestSuite(HelperTest.class);
-		
-		ts.addTestSuite(NameTest.class);
-		ts.addTestSuite(SuspensionTest.class);
-		ts.addTestSuite(AcronymTest.class);
-		ts.addTestSuite(UrlTextTest.class);
-		
-		ts.addTestSuite(CleanserTest.class);
-		ts.addTestSuite(WordTest.class);
-		ts.addTestSuite(SentenceTest.class);
-		
-		return(ts);
-	}
+  public static void initLogger() {
+    Logger root = Logger.getRootLogger();
+    if ( !root.getAllAppenders().hasMoreElements() ) {
+      DOMConfigurator.configure("resources/log4j.xml");
+    }   
+  }
+  
+  public static Test suite() {
+    initLogger();
+    TestSuite ts = new TestSuite("All Tests");
+    
+    ts.addTestSuite(HelperTest.class);
+    
+    ts.addTestSuite(NameTest.class);
+    ts.addTestSuite(SuspensionTest.class);
+    ts.addTestSuite(AcronymTest.class);
+    ts.addTestSuite(UrlTextTest.class);
+    
+    ts.addTestSuite(CleanserTest.class);
+    ts.addTestSuite(WordTest.class);
+    ts.addTestSuite(SentenceTest.class);
+    
+    return(ts);
+  }
 }

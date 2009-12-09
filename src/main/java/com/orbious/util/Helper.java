@@ -12,46 +12,46 @@ package com.orbious.util;
 
 public class Helper {
 
-	/**
-	 * Private Constructor
-	 */
-	private Helper() { }
-	
-	/**
-	 * Returns a <code>String</code> containing text extracted from 
-	 * <code>buf</code> of size <code>size</code> relative to the position 
-	 * <code>pos</code>. <code>start</code> and <code>end</code> are 
-	 * automatically update to the <code>buf</code> 
-	 * extremium's if required.
-	 * 
-	 * @param buf		The buffer to extract text from.
-	 * @param pos		The <code>buf</code> array index specifying the 
-	 * 					middle point for extraction.
-	 * @param size		The length of the <code>String</code> to return.
-	 * @return			A <code>String</code> containing text extracted from 
-	 * 					<code>buf</code>.
-	 * 					
-	 */
-	public static String getStringFromCharBuf(char[] buf, int pos, int size) {
-		StringBuffer sb = new StringBuffer();
-		int start;
-		int end;
+  /**
+   * Private Constructor
+   */
+  private Helper() { }
+  
+  /**
+   * Returns a <code>String</code> containing text extracted from 
+   * <code>buf</code> of size <code>size</code> relative to the position 
+   * <code>pos</code>. <code>start</code> and <code>end</code> are 
+   * automatically update to the <code>buf</code> 
+   * extremium's if required.
+   * 
+   * @param buf   The buffer to extract text from.
+   * @param pos   The <code>buf</code> array index specifying the 
+   *          middle point for extraction.
+   * @param size    The length of the <code>String</code> to return.
+   * @return      A <code>String</code> containing text extracted from 
+   *          <code>buf</code>.
+   *          
+   */
+  public static String getStringFromCharBuf(char[] buf, int pos, int size) {
+    StringBuffer sb = new StringBuffer();
+    int start;
+    int end;
 
-		start = pos-(size/2);
-		if ( start < 0 ) {
-			size += Math.abs(start);
-			start = 0;
-		}
-		
-		end = pos+(size/2)+1;
-		if ( end >= buf.length ) {
-			end = buf.length;
-		}
-		
-		for ( int i = start; i < end; i++ ) {
-			sb.append(buf[i]);
-		}
-		
-		return(sb.toString());
-	}
+    start = pos-(size/2);
+    if ( start < 0 ) {
+      size += Math.abs(start);
+      start = 0;
+    }
+    
+    end = pos+(size/2)+1;
+    if ( end >= buf.length ) {
+      end = buf.length;
+    }
+    
+    for ( int i = start; i < end; i++ ) {
+      sb.append(buf[i]);
+    }
+    
+    return(sb.toString());
+  }
 }

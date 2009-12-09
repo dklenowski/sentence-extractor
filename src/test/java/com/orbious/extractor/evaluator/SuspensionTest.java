@@ -12,27 +12,27 @@ import junit.framework.TestCase;
  */
 
 public class SuspensionTest extends TestCase {
-	
-	public SuspensionTest(String name) {
-		super(name);
-		AllTests.initLogger();
-	}
-	
-	public void test_isSuspension() {
-		Suspension suspension = new Suspension();
-		boolean ret = suspension.evaluate("Mr.");
-		assertEquals(true, ret);
-	}
+  
+  public SuspensionTest(String name) {
+    super(name);
+    AllTests.initLogger();
+  }
+  
+  public void test_isSuspension() {
+    Suspension suspension = new Suspension();
+    boolean ret = suspension.evaluate("Mr.");
+    assertEquals(true, ret);
+  }
 
-	public void test_notSuspension() {
-		boolean ret;
+  public void test_notSuspension() {
+    boolean ret;
 
-		Suspension suspension = new Suspension();
-		
-		ret = suspension.evaluate("Tomato");
-		assertEquals(false, ret);
+    Suspension suspension = new Suspension();
+    
+    ret = suspension.evaluate("Tomato");
+    assertEquals(false, ret);
 
-		ret = suspension.evaluate("mr.");
-		assertEquals(false, ret);	
-	}
+    ret = suspension.evaluate("mr.");
+    assertEquals(false, ret); 
+  }
 }

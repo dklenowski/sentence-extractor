@@ -25,14 +25,14 @@ public enum Config {
   /**
    * All characters that are considered sentence ends.
    */
-  SENTENCE_ENDS(".!?"),
+  SENTENCE_ENDS(".!?\""),
   
   /**
    * Characters that should be preserved during the cleansing process.
    * This does not include punctuation that is part of a word (e.g. '.', '-' etc)
    * which is preserved by default.
    */
-  PRESERVED_PUNCTUATION("\"!?'?()$&,."),
+  PRESERVED_PUNCTUATION("\"!?'?()$&,"),
   
   /**
    * A regular expression to match URL's.

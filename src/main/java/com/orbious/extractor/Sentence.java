@@ -167,10 +167,16 @@ public class Sentence {
       if ( evaluator.evaluate(buf, idx) ) {
         if ( logger.isDebugEnabled() ) {
           logger.debug("End Evaluator '" + evaluator.name() + 
-              "' returned true for idx=" + idx + " buf=" +
+              "' returned TRUE for idx=" + idx + " buf=" +
               Helper.getStringFromCharBuf(buf, idx, 20));
         }
         return(null);
+      } else {
+          if ( logger.isDebugEnabled() ) {
+              logger.debug("End Evaluator '" + evaluator.name() + 
+                  "' returned FALSE for idx=" + idx + " buf=" +
+                  Helper.getStringFromCharBuf(buf, idx, 20));
+            }   	  
       }
     }
     
@@ -186,14 +192,19 @@ public class Sentence {
     
     while ( (i >= 0) && (i < buf.length) ) {
       ch = buf[i];
-      
+
       if ( Character.isLetterOrDigit(ch) ) {
         // a letter, add it to the word
         reverseWd += ch;
         hasLetter = true;
         
       } else if ( Character.isWhitespace(ch) ) {
-        wd = new StringBuffer(reverseWd).reverse().toString();
+     	wd = new StringBuffer(reverseWd).reverse().toString();
+        if ( wd.length() == 0 ) {
+    	  // there needs to be something in the buffer ..
+          i--;
+          continue;
+    	}
         words.add(wd);
           
         reverseWd = "";
@@ -202,7 +213,7 @@ public class Sentence {
         if ( logger.isDebugEnabled() ) {
           debugStr += " idx=" + i + " wd=" + wd;
         }
-          
+
         if ( Character.isUpperCase(wd.charAt(0)) ) {
           // capitalised, a potential start
           //
@@ -218,6 +229,7 @@ public class Sentence {
                     Helper.getStringFromCharBuf(buf, idx, 40));
               }
               fndStart = false;
+              System.out.println("Break 1");
               break;  
             }
           }
@@ -234,7 +246,9 @@ public class Sentence {
           // the punctuation is attached to the word e.g. type's, time-line
           // hasLetter assumes there is text to the right,
           // if that fails we need to test there is text to the left
-          if ( ch != ',' && !sentence_ends.contains(ch) ) {
+          if ( new UrlText().evaluate(buf, i) ) {
+        	  reverseWd += ch;
+          } else if ( ch != ',' && !sentence_ends.contains(ch) ) {
             reverseWd += ch;
           } else {
             // the exceptions are sentence ends are ','
@@ -266,10 +280,10 @@ public class Sentence {
       if ( logger.isDebugEnabled() ) {
         debugStr += " overfill=" + wd;
       }
-      
-      
     }
 
+    System.out.println("DEBUG" + debugStr);
+    
     Collections.reverse(words);
 
     if ( logger.isDebugEnabled() ) {

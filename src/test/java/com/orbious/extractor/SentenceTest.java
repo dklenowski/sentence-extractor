@@ -216,4 +216,34 @@ public class SentenceTest extends TestCase {
       assertEquals(expected.get(i), sentence.get(i));
     }
   }
+  
+  public void test_SentenceWithUrl() {
+    String str;
+	char[] buf;
+	Vector<String> sentence = null;
+	Vector<String> expected;
+	    
+	str = "For more information please visit www.google.com. .";
+	buf = str.toCharArray();
+
+	try {
+	  sentence = Sentence.getPreviousSentence(buf, 50);
+	} catch ( SentenceException se ) {
+	  fail(se.getMessage());
+	}
+
+	expected = new Vector<String>(
+	        Arrays.asList("For",
+	            "more",
+	            "information",
+	            "please",
+	            "visit",
+	            "www.google.com.",
+	            "."));
+	    
+	assertEquals(expected.size(), sentence.size());
+	for ( int i = 0; i < sentence.size(); i++ ) {
+	  assertEquals(expected.get(i), sentence.get(i));
+	}
+  }
 }

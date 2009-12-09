@@ -5,6 +5,8 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
+import com.orbious.util.Helper;
+
 /**
  * $Id: Cleanser.java 14 2009-12-06 10:03:53Z app $
  * <p>
@@ -22,26 +24,34 @@ public class Cleanser {
    * A local copy of preserved punctuation from 
    * {@link com.orbious.separator.Config#PRESERVED_PUNCTUATION}.
    */
-  private static HashSet<Character> preserved_punctuation = 
-    Config.getPreservedPunctuation();
+  private static HashSet<Character> preserved_punctuation;
   
   /**
    * Logger object.
    */
-  private static final Logger logger = Logger.getLogger(Config.LOGGER_REALM);
+  private static final Logger logger;
   
   /**
    * Private Constructor.
    */
   private Cleanser() { }
   
+  /**
+   * Static initializer block.
+   */
+  static {
+	  preserved_punctuation = Helper.cvtStringToHashSet(
+			  Config.PRESERVED_PUNCTUATION.get());
+	  logger =  Logger.getLogger(Config.LOGGER_REALM.get());
+  }
   
   /**
    * Reloads the local copy of preserved punctuation from 
    * {@link com.orbious.separator.Config#PRESERVED_PUNCTUATION}.
    */
   public static void reload() {
-    preserved_punctuation = Config.getPreservedPunctuation();
+	  preserved_punctuation = Helper.cvtStringToHashSet(
+			  Config.PRESERVED_PUNCTUATION.get());
   }
   
   /**

@@ -29,16 +29,24 @@ public class Sentence {
    * A local copy of sentence ends from 
    * {@link com.orbious.separator.Config#SENTENCE_ENDS}.
    */
-  private static HashSet<Character> sentence_ends = Config.getSentenceEnds();
+  private static HashSet<Character> sentence_ends;
   
   /**
    * Logger object.
    */
-  private static final Logger logger = Logger.getLogger(Config.LOGGER_REALM);
+  private static final Logger logger;
   
   private static Vector<Evaluator> start_evaluators;
   
   private static Vector<Evaluator> end_evaluators;
+  
+  /**
+   * Static Initializer block.
+   */
+  static {
+	  sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.get());
+	  logger = Logger.getLogger(Config.LOGGER_REALM.get());
+  }
   
   /**
    * Private constructor.
@@ -51,11 +59,11 @@ public class Sentence {
    * and the default <code>Evaluator</code>'s.
    */
   public static void reload() {
-    sentence_ends = Config.getSentenceEnds();
+    sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.get());
     initDefaultStartEvaluators();
     initDefaultEndEvaluators();
   }
-  
+
   /**
    * Initializes the <code>Evaluator</code>'s that are
    * used to determine whether a sentence start is valid.
@@ -72,9 +80,9 @@ public class Sentence {
    * of evaluators that are used to determine whether a sentence
    * start is valid.
    * 
-   * @param evaluator   The <code>Evaluator</code> to add
-   *            for determining whether a sentence start 
-   *            is valid.
+   * @param evaluator  The <code>Evaluator</code> to add
+   *                   for determining whether a sentence start 
+   *                   is valid.
    */
   public static void addStartEvaluator(Evaluator evaluator) {
     if ( start_evaluators == null ) {
@@ -99,9 +107,9 @@ public class Sentence {
    * of evaluators that are used to determine whether a sentence
    * end is valid.
    * 
-   * @param evaluator   The <code>Evaluator</code> to add
-   *            for determining whether a sentence end 
-   *            is valid.
+   * @param evaluator  The <code>Evaluator</code> to add
+   *                   for determining whether a sentence end 
+   *                   is valid.
    */
   public static void addEndEvaluator(Evaluator evaluator) {
     if ( end_evaluators == null ) {
@@ -114,12 +122,13 @@ public class Sentence {
   /**
    * Returns the previous sentence from a text buffer.
    * 
-   * @param buf The <code>Character</code> buffer to extract the previous 
-   *        sentence from.
-   * @param idx The index in the buffer <code>buf</code> to begin sentence 
-   *        extraction.
-   * @return    A <code>Vector</code> containing the words that constitute
-   *        a sentence.
+   * @param buf  The <code>Character</code> buffer to extract the previous 
+   *             sentence from.
+   * @param idx  The index in the buffer <code>buf</code> to begin sentence 
+   *             extraction.
+   *             
+   * @return  A <code>Vector</code> containing the words that constitute
+   *          a sentence.
    */
   public static Vector<String> getPreviousSentence(char[] buf, int idx)
     throws SentenceException {
@@ -280,8 +289,9 @@ public class Sentence {
    * Utility method, converts a <code>Vector</code> of words in a sentence
    * to a debugging string.
    * 
-   * @param words   A <code>Vector</code> containing words in a sentence.
-   * @return      The sentence converted to a debugging string.
+   * @param words  A <code>Vector</code> containing words in a sentence.
+   * 
+   * @return  The sentence converted to a debugging string.
    */
   public static String getSentenceAsDebugStr(Vector<String> words) {
     String str = "";

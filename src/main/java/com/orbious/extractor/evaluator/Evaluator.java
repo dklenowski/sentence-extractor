@@ -33,23 +33,25 @@ public abstract class Evaluator {
    */
   private String name;
 
-  protected static Logger logger;
+  /**
+   * Logger object.
+   */
+  protected static final Logger logger = Logger.getLogger(Config.LOGGER_REALM.get());
   
   /**
    * Initializes a <code>Evaluator</code>.
    * 
-   * @param name    The name of this <code>Evaluator</code>, used in 
-   *          debugging.
+   * @param name  The name of this <code>Evaluator</code>, used in 
+   *              debugging.
    */
   public Evaluator(String name) {
     this.name = name;
-    logger = Logger.getLogger(Config.LOGGER_REALM);
   }
   
   /**
    * Returns the name of this <code>Evaluator</code>.
    * 
-   * @return    The name of this <code>Evaluator</code>.
+   * @return  The name of this <code>Evaluator</code>.
    */
   public String name() {
     return(this.name);

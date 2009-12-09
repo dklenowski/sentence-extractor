@@ -1,6 +1,5 @@
 package com.orbious.extractor;
 
-import java.util.HashSet;
 
 /**
  * $Id: Config.java 14 2009-12-06 10:03:53Z app $
@@ -12,73 +11,77 @@ import java.util.HashSet;
  * @since 1.0
  */
 
-public class Config {
-
+public enum Config {
   /**
-   * The default log4j Logging Realm.
+   * The default log4j logging realm.
    */
-  public static String LOGGER_REALM = "SentenceExtractor";
+  LOGGER_REALM("sentence-extractor"),
   
   /**
    * All characters that are considered punctuation.
    */
-  public static String PUNCTUATION = "!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~";
+  PUNCTUATION("!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~"),
   
   /**
    * All characters that are considered sentence ends.
    */
-  public static char[] SENTENCE_ENDS = new char[] { '.', '"', '!', '?' };
+  SENTENCE_ENDS(".!?"),
   
   /**
-   * Characters that should be preserved when cleansing.
-   * This does not include punctuation that is part of a word (e.g. '.', '-')
+   * Characters that should be preserved during the cleansing process.
+   * This does not include punctuation that is part of a word (e.g. '.', '-' etc)
    * which is preserved by default.
    */
-  public static char[] PRESERVED_PUNCTUATION = 
-    new char[] { '"', '!', '?',  '\'', '?', '(', ')', '$', '&', ',' };
+  PRESERVED_PUNCTUATION("\"!?'?()$&,."),
   
   /**
-   * A text file containing a list of suspensions, each on a newline.
+   * A regular expression to match URL's.
    */
-  public static String SUSPENSION_FILENAME = "resources/suspensions.txt";
+  URL_REGEX("[a-zA-Z0-9\\-]+\\.(com|edu|gov|mil|net|org|biz|info|name|museum|us|ca|uk)"),
+  
+  /**
+   * A text file containing a list of suspensions (each suspension on a newline).
+   */
+  SUSPENSION_FILENAME("resources/suspensions.txt"),
   
   /**
    * A text file containing a list of common names, each on a newline.
-   * (Respects the use of comments which begin a line with a "#").
+   * Ignores lines that begin with "#" (i.e. comments).
    */
-  public static String NAMES_FILENAME = "resources/names.txt";
+  NAMES_FILENAME("resources/names.txt");
   
   /**
-   * Constructor, does nothing.
+   * The value for the enum. 
    */
-  private Config() { }
+  private String value;
+  
   
   /**
-   * Returns a list of valid ends (from {@link Config#SENTENCE_ENDS})
-   * as a <code>HashSet</code>.
+   * Constructor, set's the enum constant to <code>value</code>.
    * 
-   * @return    A list of valid sentence ends as a <code>HashSet</code>.
-   */ 
-  public static HashSet<Character> getSentenceEnds() {
-    HashSet<Character> ends = new HashSet<Character>();
-    for ( int i = 0; i < SENTENCE_ENDS.length; i++ ) {
-      ends.add(SENTENCE_ENDS[i]);
-    }
-    return(ends);
+   * @param value  The value to set the enum constant to.
+   */
+  private Config(String value) {
+	this.value = value;  
   }
   
   /**
-   * Returns a list of punctuation that should be preserved in sentence
-   * parsing (from {@link Config#PRESERVED_PUNCTUATION} as a <code>HashSet</code>.
+   * Returns the value of the enum constant.
    * 
-   * @return    A list of punctuation that should be preserved as a 
-   *        <code>HashSet</code>.
+   * @return  Retuns the value of the enum constant.
    */
-  public static HashSet<Character> getPreservedPunctuation() {
-    HashSet<Character> punct = new HashSet<Character>();
-    for ( int i = 0; i < PRESERVED_PUNCTUATION.length; i++ ) {
-      punct.add(PRESERVED_PUNCTUATION[i]);
-    }
-    return(punct);
+  public String get() {
+    return(value);
+  }
+  
+  /**
+   * Sets the enum constant to <code>value</code>.
+   * 
+   * @param value  The value of the enum constant.
+   */
+  public void put(String value) {
+    this.value = value;
   }
 }
+
+

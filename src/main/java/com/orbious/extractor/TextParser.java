@@ -56,14 +56,14 @@ public class TextParser {
    */
   public TextParser(String filename) {
     this.filename = filename;
-    logger = Logger.getLogger(Config.LOGGER_REALM);
-    sentence_ends = Config.getSentenceEnds();
+    logger = Logger.getLogger(Config.LOGGER_REALM.get());
+    sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.get());
   }
   
   /**
    * Accessor for {@link TextParser#buffer}.
    * 
-   * @return    {@link TextParser#buffer}.
+   * @return  {@link TextParser#buffer}.
    */
   public char[] getBuffer() {
     return(buffer);
@@ -72,7 +72,7 @@ public class TextParser {
   /**
    * Accessor for {@link TextParser#sentences}.
    * 
-   * @return    {@link TextParser#sentences}
+   * @return  {@link TextParser#sentences}
    */
   public Vector< Vector<String> > getSentences() {
     return(sentences);
@@ -82,7 +82,7 @@ public class TextParser {
    * Accessor for {@link TextParser#sentences} with the words in the sentences
    * converted to <code>String</code>'s.
    * 
-   * @return    {@link TextParser#sentences} with <code>String</code> sentences.
+   * @return  {@link TextParser#sentences} with <code>String</code> sentences.
    */
   public Vector<String> getSentencesAsStr() {
     Vector<String> sent = new Vector<String>();

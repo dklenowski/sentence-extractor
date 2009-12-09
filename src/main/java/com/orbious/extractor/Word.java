@@ -17,7 +17,7 @@ public class Word {
   /**
    * Logger object.
    */
-  private static Logger logger = Logger.getLogger(Config.LOGGER_REALM);
+  private static final Logger logger = Logger.getLogger(Config.LOGGER_REALM.get());
 
   /**
    * Private constructor.
@@ -27,9 +27,10 @@ public class Word {
   /**
    * Returns the previous word in <code>buf</code>.
    * 
-   * @param buf   Character buffer to extract words from.
-   * @param idx   Index in the buffer to begin word extraction.
-   * @return      <code>null</code> if no word was extracted, 
+   * @param buf  Character buffer to extract words from.
+   * @param idx  Index in the buffer to begin word extraction.
+   * 
+   * @return  <code>null</code> if no word was extracted, 
    *          otherwise the word extracted.
    */
   public static String getPreviousWord(char[] buf, int idx) {
@@ -47,10 +48,11 @@ public class Word {
    * of the <code>buf</code> is reached and no whitespace is encountered, 
    * the text is still treated as a word.
    * 
-   * @param buf   Character buffer to extract words from.
-   * @param idx   Index in the buffer to begin word extraction.
-   * @param num   The number of words to extract.
-   * @return      <code>null</code> if no word was extracted,  
+   * @param buf  Character buffer to extract words from.
+   * @param idx  Index in the buffer to begin word extraction.
+   * @param num  The number of words to extract.
+   * 
+   * @return  <code>null</code> if no word was extracted,  
    *          otherwise up to <code>num</code> number of words extracted.
    */
   public static String[] getPreviousWords(char[] buf, int idx, int num) {

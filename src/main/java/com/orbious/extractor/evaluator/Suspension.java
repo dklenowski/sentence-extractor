@@ -47,8 +47,8 @@ public class Suspension extends Evaluator {
    * @param buf The buffer to examine.
    * @param idx The position in the buffer where punctuation occurs.
    * 
-   * @return    <code>true</code> if the full stop is part of an suspension,
-   *        and not a sentence end, <code>false</code> otherwise.
+   * @return  <code>true</code> if the full stop is part of an suspension,
+   *          and not a sentence end, <code>false</code> otherwise.
    */
   public boolean evaluate(char[] buf, int idx) {
     String wd = Word.getPreviousWord(buf, idx);
@@ -64,9 +64,10 @@ public class Suspension extends Evaluator {
      * Determines if the word is an suspension and therefore not a sentence 
      * start.
      * 
-     * @param wd    A string containing a word to check if an suspension.
-     * @return      <code>true</code> if the word is an suspension and not
-     *        a sentence end, <code>false</code> otherwise.
+     * @param wd  A string containing a word to check if an suspension.
+     * 
+     * @return  <code>true</code> if the word is an suspension and not
+     *          a sentence end, <code>false</code> otherwise.
      */
   public boolean evaluate(String wd) {
     if ( suspensions == null ) {
@@ -83,10 +84,10 @@ public class Suspension extends Evaluator {
     Logger logger;
     BufferedReader br = null;
     
-    logger = Logger.getLogger(Config.LOGGER_REALM);
+    logger = Logger.getLogger(Config.LOGGER_REALM.get());
     try {
       br = new BufferedReader(
-          new FileReader(Config.SUSPENSION_FILENAME));
+          new FileReader(Config.SUSPENSION_FILENAME.get()));
     } catch ( FileNotFoundException fnfe ) {
       logger.fatal("Failed to open suspension file " + 
           Config.SUSPENSION_FILENAME, fnfe);

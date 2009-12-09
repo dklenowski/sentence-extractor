@@ -3,6 +3,8 @@ package com.orbious.extractor.evaluator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.orbious.extractor.Config;
+
 /**
  * $Id$
  * <p>
@@ -16,7 +18,9 @@ import java.util.regex.Pattern;
 
 public class UrlText extends Evaluator {
 
-  
+  /**
+   * The regular expression pattern that is used to match a URL.
+   */
   private Pattern url_pattern;
   
   /**
@@ -24,7 +28,7 @@ public class UrlText extends Evaluator {
    */
   public UrlText() {
     super("UrlText");
-    url_pattern = Pattern.compile("[a-zA-Z0-9\\-]+\\.(com|edu|gov|mil|net|org|biz|info|name|museum|us|ca|uk)");
+    url_pattern = Pattern.compile(Config.URL_REGEX.get());
   }
   
   public boolean evaluate(char[] buf, int idx) {

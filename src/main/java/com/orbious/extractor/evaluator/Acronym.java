@@ -32,7 +32,7 @@ public class Acronym extends Evaluator {
   /**
    * Logger object.
    */
-  private static Logger logger = Logger.getLogger(Config.LOGGER_REALM);
+  private static final Logger logger = Logger.getLogger(Config.LOGGER_REALM.get());
 
   
   /**
@@ -49,8 +49,8 @@ public class Acronym extends Evaluator {
    * @param buf The buffer to examine.
    * @param idx The position in the buffer where punctuation occurs.
    * 
-   * @return    <code>true</code> if the full stop is part of an acronym,
-   *        and not a sentence end, <code>false</code> otherwise.
+   * @return  <code>true</code> if the full stop is part of an acronym,
+   *          and not a sentence end, <code>false</code> otherwise.
    */
   public boolean evaluate(char[] buf, int idx) {
 
@@ -76,9 +76,9 @@ public class Acronym extends Evaluator {
      * Determines if the word is an acronym and therefore not a sentence 
      * start.
      * 
-     * @param wd    A string containing a word to check if an acronym.
-     * @return      <code>true</code> if the word is an acronym and not
-     *        a sentence end, <code>false</code> otherwise.
+     * @param wd  A string containing a word to check if an acronym.
+     * @return    <code>true</code> if the word is an acronym and not
+     *            a sentence end, <code>false</code> otherwise.
      */
     public boolean evaluate(String wd) {
       char[] buf = wd.toCharArray();
@@ -104,10 +104,10 @@ public class Acronym extends Evaluator {
    * 
    * @param buf   Character buffer to examine for acronym.
    * @param idx   Index in the buffer to begin acronym examination.
-   * @param dirn    The direction {@link Acronym#LEFT} or
-   *          {@link Acronym#RIGHT} to traverse in <code>buf</code>
-   *          for determine whether an acronym.
-   * @return      An {@link AcronymOp} containing the results of the 
+   * @param dirn  The direction {@link Acronym#LEFT} or
+   *              {@link Acronym#RIGHT} to traverse in <code>buf</code>
+   *              for determine whether an acronym.
+   * @return  An {@link AcronymOp} containing the results of the 
    *          oscillation check.
    */
   protected static AcronymOp isOscillating(char[] buf, int idx, int dirn) {
@@ -217,10 +217,10 @@ public class Acronym extends Evaluator {
     /**
      * Constructor, initializes the <code>AcronymOp</code> object.
      * 
-     * @param result        Whether or not an acronym was found.
-     * @param oscillatingCt     The number of punctuation characters.
-     * @param consecutiveCharCt   Maximum number of consecutive characters
-     *                found.
+     * @param result             Whether or not an acronym was found.
+     * @param oscillatingCt      The number of punctuation characters.
+     * @param consecutiveCharCt  Maximum number of consecutive characters
+     *                           found.
      */
     public AcronymOp(boolean result, int oscillatingCt, 
         int consecutiveCharCt) {
@@ -247,7 +247,7 @@ public class Acronym extends Evaluator {
 
     /**
      * @return  The maximum number of consecutive characters 
-     *      (letters or digits) found.
+     *          (letters or digits) found.
      */   
     @SuppressWarnings("unused")
     public int consecutiveCharCt() {

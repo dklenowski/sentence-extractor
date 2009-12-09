@@ -23,7 +23,7 @@ public class SentenceException extends Exception {
   /**
    * Constructor.
    * 
-   * @param msg   A message that identifies the <code>AcronymException</code>.
+   * @param msg  A message that identifies the <code>AcronymException</code>.
    */
   public SentenceException(String msg) {
     super(msg);

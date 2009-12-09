@@ -1,5 +1,7 @@
 package com.orbious.util;
 
+import java.util.HashSet;
+
 /**
  * $Id: Helper.java 11 2009-12-04 14:07:11Z app $
  * <p>
@@ -26,11 +28,11 @@ public class Helper {
    * 
    * @param buf   The buffer to extract text from.
    * @param pos   The <code>buf</code> array index specifying the 
-   *          middle point for extraction.
-   * @param size    The length of the <code>String</code> to return.
-   * @return      A <code>String</code> containing text extracted from 
-   *          <code>buf</code>.
-   *          
+   *              middle point for extraction.
+   * @param size  The length of the <code>String</code> to return.
+   * 
+   * @return  A <code>String</code> containing text extracted from 
+   *          <code>buf</code>.         
    */
   public static String getStringFromCharBuf(char[] buf, int pos, int size) {
     StringBuffer sb = new StringBuffer();
@@ -53,5 +55,24 @@ public class Helper {
     }
     
     return(sb.toString());
+  }
+  
+  /**
+   * Convert the contents of a <code>String</code> to a 
+   * <code>HashSet</code>.
+   * 
+   * @param str  The <code>String</code> to interrogate.
+   * @return     A <code>HashSet</code> containing the contents of the 
+   *             <code>String</code> <code>str</code>.
+   */
+  public static HashSet<Character> cvtStringToHashSet(String str) {
+	  char[] buf = str.toCharArray();
+	  HashSet<Character> hs = new HashSet<Character>();
+	  
+	  for ( int i = 0; i < buf.length; i++ ) {
+		hs.add(buf[i]);
+	  }
+	  
+	  return(hs);
   }
 }

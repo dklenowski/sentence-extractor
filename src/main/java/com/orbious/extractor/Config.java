@@ -40,6 +40,12 @@ public enum Config {
   URL_REGEX("[a-zA-Z0-9\\-]+\\.(com|edu|gov|mil|net|org|biz|info|name|museum|us|ca|uk)"),
   
   /**
+   * The maximum sentence length (in words), used as a cutoff value in 
+   * sentence extraction.
+   */
+  MAX_SENTENCE_LENGTH(100),
+  
+  /**
    * A text file containing a list of suspensions (each suspension on a newline).
    */
   SUSPENSION_FILENAME("resources/suspensions.txt"),
@@ -55,32 +61,58 @@ public enum Config {
    */
   private String value;
   
-  
   /**
-   * Constructor, set's the enum constant to <code>value</code>.
+   * Constructor, set's the enum constant.
    * 
-   * @param value  The value to set the enum constant to.
+   * @param value  The <code>String</code> value to set the enum constant to.
    */
   private Config(String value) {
-	this.value = value;  
+	this.value = value; 
+  }
+
+  /**
+   * Constructor, set's the enum constant.
+   * 
+   * @param value  The <code>int</code> value to set the enum constant to.
+   */
+  private Config(int value) {
+	  this.value = Integer.toString(value);
   }
   
   /**
-   * Returns the value of the enum constant.
+   * Returns the value of the enum constant as a <code>String</code>.
    * 
-   * @return  Retuns the value of the enum constant.
+   * @return  Retuns the value of the enum constant as a <code>String</code>.
    */
-  public String get() {
+  public String asStr() {
     return(value);
+  }
+
+  /**
+   * Returns the value of the enum constant as an <code>int</code>.
+   * 
+   * @return  Retuns the value of the enum constant as an <code>int</code>.
+   */
+  public int asInt() {
+	  return(Integer.parseInt(value));
+  }
+
+  /**
+   * Sets the enum constant to <code>value</code>.
+   * 
+   * @param value  The <code>String</code> value to set the enum constant to.
+   */
+  public void put(String value) {
+    this.value = value;
   }
   
   /**
    * Sets the enum constant to <code>value</code>.
    * 
-   * @param value  The value of the enum constant.
+   * @param value  The <code>String</code> value to set the enum constant to.
    */
-  public void put(String value) {
-    this.value = value;
+  public void put(int value) {
+	  this.value = Integer.toString(value);
   }
 }
 

@@ -1,6 +1,7 @@
 package com.orbious.util;
 
 import java.util.HashSet;
+import java.util.Vector;
 
 /**
  * $Id: Helper.java 11 2009-12-04 14:07:11Z app $
@@ -34,8 +35,9 @@ public class Helper {
    * @return  A <code>String</code> containing text extracted from 
    *          <code>buf</code>.         
    */
-  public static String getStringFromCharBuf(char[] buf, int pos, int size) {
+  public static String getDebugStringFromCharBuf(char[] buf, int pos, int size) {
     StringBuffer sb = new StringBuffer();
+    StringBuffer id = new StringBuffer();
     int start;
     int end;
 
@@ -52,14 +54,19 @@ public class Helper {
     
     for ( int i = start; i < end; i++ ) {
       sb.append(buf[i]);
+      if ( i == pos ) {
+        id.append("|");
+      } else {
+        id.append("-");
+      }
     }
-    
-    return(sb.toString());
+
+    return( sb.toString() + "\n" + id.toString() );
   }
   
   /**
    * Convert the contents of a <code>String</code> to a 
-   * <code>HashSet</code>.
+   * <code>HashSet</code> separated on <code>Character</code> boundaries.
    * 
    * @param str  The <code>String</code> to interrogate.
    * @return     A <code>HashSet</code> containing the contents of the 
@@ -74,5 +81,21 @@ public class Helper {
 	  }
 	  
 	  return(hs);
+  }
+  
+  
+  public static String cvtVectorToString(Vector<String> words) {
+    String str = "|";
+
+    for ( int i = 0; i < words.size(); i++ ) {
+      if ( i+1 < words.size() ) {
+        str += words.get(i) + " ";
+      } else {
+        str += words.get(i);
+      }
+    }
+
+    str += "|";
+    return(str);    
   }
 }

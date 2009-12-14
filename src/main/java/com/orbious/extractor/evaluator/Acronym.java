@@ -32,7 +32,7 @@ public class Acronym extends Evaluator {
   /**
    * Logger object.
    */
-  private static final Logger logger = Logger.getLogger(Config.LOGGER_REALM.get());
+  private static final Logger logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
 
   
   /**
@@ -52,7 +52,7 @@ public class Acronym extends Evaluator {
    * @return  <code>true</code> if the full stop is part of an acronym,
    *          and not a sentence end, <code>false</code> otherwise.
    */
-  public boolean evaluate(char[] buf, int idx) {
+  public boolean evaluate(final char[] buf, int idx) {
 
     if ( (idx < 0) || (idx >= buf.length) ) {
       throw new ArrayIndexOutOfBoundsException("Invalid index=" + idx);

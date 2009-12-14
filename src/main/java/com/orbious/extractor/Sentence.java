@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import com.orbious.extractor.evaluator.Acronym;
 import com.orbious.extractor.evaluator.Evaluator;
 import com.orbious.extractor.evaluator.Name;
+//import com.orbious.extractor.evaluator.Name;
 import com.orbious.extractor.evaluator.Suspension;
 import com.orbious.extractor.evaluator.UrlText;
 import com.orbious.util.Helper;
@@ -35,17 +36,24 @@ public class Sentence {
    * Logger object.
    */
   private static final Logger logger;
-  
-  private static Vector<Evaluator> start_evaluators;
-  
+
+  /**
+   * A list of <code>Evaluator</code>'s that are used to determine
+   * whether a sentence end is valid.
+   */
   private static Vector<Evaluator> end_evaluators;
+  
+  /**
+   * 
+   */
+  private static Vector<Evaluator> start_evaluators;
   
   /**
    * Static Initializer block.
    */
   static {
-	  sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.get());
-	  logger = Logger.getLogger(Config.LOGGER_REALM.get());
+	  sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
+	  logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
   }
   
   /**
@@ -59,35 +67,21 @@ public class Sentence {
    * and the default <code>Evaluator</code>'s.
    */
   public static void reload() {
-    sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.get());
-    initDefaultStartEvaluators();
-    initDefaultEndEvaluators();
+    sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
   }
-
-  /**
-   * Initializes the <code>Evaluator</code>'s that are
-   * used to determine whether a sentence start is valid.
-   */
+  
   public static void initDefaultStartEvaluators() {
     start_evaluators = new Vector<Evaluator>(
-        Arrays.asList(  new Name(), 
-                new Suspension(), 
-                new Acronym() ));
+        Arrays.asList(  new Suspension(),
+                new Acronym(),
+                new Name() )); 
   }
-
-  /**
-   * Adds a non-default <code>Evaluator</code> to the list
-   * of evaluators that are used to determine whether a sentence
-   * start is valid.
-   * 
-   * @param evaluator  The <code>Evaluator</code> to add
-   *                   for determining whether a sentence start 
-   *                   is valid.
-   */
+  
   public static void addStartEvaluator(Evaluator evaluator) {
     if ( start_evaluators == null ) {
       start_evaluators = new Vector<Evaluator>();
     }
+    
     start_evaluators.add(evaluator);
   }
   
@@ -120,75 +114,265 @@ public class Sentence {
   }
   
   /**
-   * Returns the previous sentence from a text buffer.
+   * Determines if the punctuation specified at <code>idx</code> in the 
+   * text buffer <code>buf</code> is a valid sentence end.
    * 
-   * @param buf  The <code>Character</code> buffer to extract the previous 
-   *             sentence from.
-   * @param idx  The index in the buffer <code>buf</code> to begin sentence 
-   *             extraction.
-   *             
-   * @return  A <code>Vector</code> containing the words that constitute
-   *          a sentence.
+   * The end algorithm:
+   * - If the next character is capitalized and not a name/acronym/suspension
+   *   consider a sentence end.
+   * - If we have reached the end of the buffer and the current punctuation mark
+   *   is not part of a name/acronym/suspension consider a sentence end.
+   *
+   * @param buf   Text buffer.
+   * @param idx   Position in the buffer where a sentence end exists.
+   * 
+   * @return      <code>true</code> if the position in the <code>buf</code>
+   *              is a valid sentence end, <code>false</code> otherwise.
    */
-  public static Vector<String> getPreviousSentence(char[] buf, int idx)
-    throws SentenceException {
+  protected static boolean isEnd(final char[] buf, int idx) { 
     Evaluator evaluator;
-    Vector<String> words;
-    char ch;
-    boolean hasLetter;
-    boolean fndStart;
-    String reverseWd;
-    String wd;
     String debugStr;
-    int i;
-    
-    if ( (idx < 0) || (idx > buf.length) ) {
-      throw new ArrayIndexOutOfBoundsException("Invalid index=" + idx);
-    }
 
-    if ( !sentence_ends.contains(buf[idx]) ) {
-      throw new SentenceException("Not sentence end at index=" + idx);
-    }
+    debugStr = "End Evaluation idx=" + idx + "\n" + 
+        Helper.getDebugStringFromCharBuf(buf, idx, 50) + "\n";
     
-    if ( start_evaluators == null ) {
-      initDefaultStartEvaluators();
+    if ( !hasUpper(buf, idx) ) {
+      if ( logger.isDebugEnabled() ) {
+        debugStr += "\thasUpper=FALSE\n";
+        logger.debug(debugStr);  
+      }
+
+      return(false);
     }
     
     if ( end_evaluators == null ) {
       initDefaultEndEvaluators();
     }
     
-    //
-    // check the end first
-    //
-    for ( i = 0; i < end_evaluators.size(); i++ ) {
+    for ( int i = 0; i < end_evaluators.size(); i++ ) {
       evaluator = end_evaluators.get(i);
 
       if ( evaluator.evaluate(buf, idx) ) {
         if ( logger.isDebugEnabled() ) {
-          logger.debug("End Evaluator '" + evaluator.name() + 
-              "' returned TRUE for idx=" + idx + " buf=" +
-              Helper.getStringFromCharBuf(buf, idx, 20));
+          debugStr += "\t" + evaluator.name() + " Result=TRUE\n";
+          logger.debug(debugStr);
         }
-        return(null);
+        return(false);
+        
       } else {
-          if ( logger.isDebugEnabled() ) {
-              logger.debug("End Evaluator '" + evaluator.name() + 
-                  "' returned FALSE for idx=" + idx + " buf=" +
-                  Helper.getStringFromCharBuf(buf, idx, 20));
-            }   	  
+        if ( logger.isDebugEnabled() ) {
+          debugStr += "\t" + evaluator.name() + " Result=FALSE\n";
+        }   	  
       }
     }
     
-    //
-    // now we need to find the start
-    //
-    words = new Vector<String>();
-    hasLetter = false;
+    if ( logger.isDebugEnabled() ) {
+    	logger.debug(debugStr);
+    }
+    
+    return(true);
+  }
+ 
+  /**
+   * Determines if the letter is capitalized after a potential end. If so,
+   * returns <code>true</code>, otherwise <code>false</code>.
+   * 
+   * @param buf   Text buffer.
+   * @param idx   Position in the buffer where a sentence end exists.
+   * 
+   * @return      The end of a capitalized word post the sentence end,
+   *              otherwise <code>idx</code>.
+   */
+  protected static boolean hasUpper(final char[] buf, int idx) {
+    int i;
+    boolean inWhitespace;
+    boolean fndUpper;
+    char ch;
+    
+    if ( idx+1 >= buf.length ) {
+      return(true);
+    }
+    
+    i = idx+1;
+    inWhitespace = false;
+    fndUpper = false;
+    
+    while ( i < buf.length ) {
+      ch = buf[i];
+      if ( Character.isWhitespace(ch) ) {
+        inWhitespace = true;
+      } else if ( Character.isLetter(ch) && inWhitespace ) {
+        if ( Character.isUpperCase(ch) ) {
+          fndUpper = true;
+        }
+        break;
+      }
+
+      i++;
+    }
+	
+    return(fndUpper);
+  }  
+  
+  /**
+   * The start algorithm:
+   * <ul>
+   * <li>If the word is capitalized and the previous character is a sentence end 
+   *   consider a sentence start.
+   * <li>If MAX_SENTENCE_LENGTH is exceeded during this process return false
+   *   (this check is performed in {@link Sentence#previous(char[], int)}).
+   *
+   * @param buf   Text buffer.
+   * @param idx   Position in the buffer for a potential sentence start.
+   * 
+   * @return    <code>true</code> if the sentence start is valid,
+   *            <code>false</code> otherwise.
+   */
+  protected static boolean isStart(final char[] buf, int idx) {
+	  boolean fndStart;
+	  boolean inWhitespace;
+	  int i;
+	  char ch;
+	  Evaluator evaluator;
+	  String debugStr;
+   
+    debugStr = "Start Evaluation idx=" + idx + "\n" + 
+      Helper.getDebugStringFromCharBuf(buf, idx, 50) + "\n";
+	  
+    if ( (idx-1) < 0 ) {
+      logger.debug(debugStr + "\tResult=TRUE (index=0).\n");
+    	return(true);
+    }
+
+    i = idx-1;
     fndStart = false;
-    reverseWd = "";
-    debugStr = "";
+    inWhitespace = false;
+      
+    while ( i >= 0 ) {
+    	ch = buf[i];
+    	if ( inWhitespace ) {
+    		if ( sentence_ends.contains(ch) ) {
+    			// a sentence start
+    			fndStart = true;
+    		}
+    		break;
+    	} else if ( Character.isWhitespace(ch) ) {
+    		inWhitespace = true;
+    	} 
+    	  
+    	i--;
+    }
+
+    debugStr += "\tStartResult=" + String.valueOf(fndStart).toUpperCase() + "\n";
+    
+    if ( !fndStart ) {
+      logger.debug(debugStr);     
+      return(fndStart);
+    }
+    
+    // now run some evaluators
+    if ( start_evaluators == null ) {
+      initDefaultStartEvaluators();
+    }
+    
+    for ( int j = 0; j < start_evaluators.size(); j++ ) {
+      evaluator = start_evaluators.get(j);
+      if ( evaluator.evaluate(buf, idx-1) ) {
+        if ( logger.isDebugEnabled() ) {
+          debugStr += "\t" + evaluator.name() + " Result=TRUE\n";
+          logger.debug(debugStr);
+        }
+        return(false);
+      } else {
+        if ( logger.isDebugEnabled() ) {
+          debugStr += "\t" + evaluator.name() + " Result=FALSE\n";
+        }         
+      }
+    }
+
+    if ( logger.isDebugEnabled() ) {
+      logger.debug(debugStr);
+    }
+    
+    return(fndStart);
+  }
+  
+  /**
+   * Determines if we have encountered a premature sentence end. For example, 
+   * where 2 sentence end's exist sequentially, optionally separated by a space.
+   * 
+   * @param buf   Text buffer.
+   * @param idx   Position in the buffer where a potential sentence end exists.
+   * 
+   * @return    <code>true</code> if a later potential sentence end was found,
+   *            <code>false</code> otherwise.
+   */
+  protected static boolean hasLaterPunctuation(final char[] buf, int idx) {
+    boolean fndLater;
+    boolean inWhitespace;
+    int i;
+    char ch;
+    
+    i = idx+1;
+    fndLater = false;
+    inWhitespace = false;
+    
+    while ( i < buf.length ) {
+      ch = buf[i];
+      
+      if ( sentence_ends.contains(ch) ) {
+        fndLater = true;
+        break;
+      
+      } else if ( Character.isLetterOrDigit(ch) ) {
+        break;
+        
+      } else if ( inWhitespace ) {
+        if ( Character.isWhitespace(ch) ) { 
+          continue;
+        }
+        
+        if ( sentence_ends.contains(ch) ) {
+          fndLater = true;
+        }
+        break;
+
+      } else if ( Character.isWhitespace(ch) ) {
+        if ( inWhitespace ) {
+          break;
+        }
+        inWhitespace = true;
+      } 
+
+      i++;
+    }
+    
+    return(fndLater);
+  }
+  
+  /**
+   * 
+   * @param buf
+   * @param idx
+   * @return
+   */
+  
+  protected static Vector<String> previous(final char[] buf, int idx) {
+    Vector<String> words;
+    char ch;
+    boolean hasLetter;
+    boolean hasStart;
+    String reverseWd;
+    String wd;
+    String debugStr;
+    int i;  
+    
+    words = new Vector<String>();
     i = idx;
+    reverseWd = "";
+    hasLetter = false;
+    hasStart = false;
+    debugStr = "\n";
     
     while ( (i >= 0) && (i < buf.length) ) {
       ch = buf[i];
@@ -199,43 +383,27 @@ public class Sentence {
         hasLetter = true;
         
       } else if ( Character.isWhitespace(ch) ) {
-     	wd = new StringBuffer(reverseWd).reverse().toString();
+        wd = new StringBuffer(reverseWd).reverse().toString();
         if ( wd.length() == 0 ) {
-    	  // there needs to be something in the buffer ..
-          i--;
-          continue;
-    	}
+          // there needs to be something in the buffer ..
+            i--;
+            continue;
+        }
         words.add(wd);
+        if ( words.size() >= Config.MAX_SENTENCE_LENGTH.asInt() ) {
+          debugStr += "\tMAX_SENTENCE_LENGTH exceeded\n";
+          break;
+        }
           
         reverseWd = "";
         hasLetter = false;
-          
-        if ( logger.isDebugEnabled() ) {
-          debugStr += " idx=" + i + " wd=" + wd;
-        }
-
+        
         if ( Character.isUpperCase(wd.charAt(0)) ) {
-          // capitalised, a potential start
+          // capitalised, a potential start, see if the previous character 
+          // is a sentence_end
           //
-          fndStart = true;
-          for ( int j = 0; j < start_evaluators.size(); j++ ) {
-            evaluator = start_evaluators.get(j);
-            
-            if ( evaluator.evaluate(wd) ) {
-              if ( logger.isDebugEnabled() ) {
-                logger.debug("Start Evaluator '" + evaluator.name() + 
-                    "' returned true for idx=" + idx + " wd=" + wd + 
-                    " buf=" +
-                    Helper.getStringFromCharBuf(buf, idx, 40));
-              }
-              fndStart = false;
-              System.out.println("Break 1");
-              break;  
-            }
-          }
-          
-          if ( fndStart ) {
-            debugStr += " sentStart=" + wd;
+          hasStart = isStart(buf, i+1);
+          if ( hasStart ) {
             break;
           }
         }
@@ -247,22 +415,16 @@ public class Sentence {
           // hasLetter assumes there is text to the right,
           // if that fails we need to test there is text to the left
           if ( new UrlText().evaluate(buf, i) ) {
-        	  reverseWd += ch;
+            reverseWd += ch;
           } else if ( ch != ',' && !sentence_ends.contains(ch) ) {
             reverseWd += ch;
           } else {
             // the exceptions are sentence ends are ','
             words.add(Character.toString(ch));
-            if ( logger.isDebugEnabled() ) {
-              debugStr += " punct [" + i + "]=" + ch; 
-            }
           } 
         } else {
           // punctuation, add as a separate 'wd'
           words.add(Character.toString(ch));
-          if ( logger.isDebugEnabled() ) {
-            debugStr += " punct [" + i + "]=" + ch; 
-          }
         }
       }
       
@@ -274,44 +436,65 @@ public class Sentence {
       words.add(wd); 
       
       if ( Character.isUpperCase(wd.charAt(0)) ) {
-        fndStart = true;
+        hasStart = isStart(buf, i);
       }
       
       if ( logger.isDebugEnabled() ) {
-        debugStr += " overfill=" + wd;
+        debugStr += "\tOverfill=" + wd + "\n";
       }
     }
 
-    System.out.println("DEBUG" + debugStr);
-    
     Collections.reverse(words);
 
     if ( logger.isDebugEnabled() ) {
       logger.debug(debugStr);
-      logger.debug(getSentenceAsDebugStr(words));
+      logger.debug(Helper.cvtVectorToString(words));
     }
     
-    if ( !fndStart ) {
+    if ( !hasStart ) {
       logger.warn("Failed to find sentence start for " + 
-          getSentenceAsDebugStr(words));
+          Helper.cvtVectorToString(words));
     }
     
-    return(words);  
+    return(words);
   }
-  
+
   /**
-   * Utility method, converts a <code>Vector</code> of words in a sentence
-   * to a debugging string.
+   * Returns the previous sentence from a text buffer.
    * 
-   * @param words  A <code>Vector</code> containing words in a sentence.
-   * 
-   * @return  The sentence converted to a debugging string.
+   * @param buf   Text buffer.
+   * @param idx   Position in the buffer where a sentence end exists.
+   *             
+   * @return    A <code>Vector</code> containing the words that constitute
+   *            a sentence or <code>null</code> if a sentence could not be formed.
    */
-  public static String getSentenceAsDebugStr(Vector<String> words) {
-    String str = "";
-    for ( int i = 0; i < words.size(); i++ ) {
-      str += "[" + i + "]=" + words.get(i) + " ";
+  public static Vector<String> getPreviousSentence(final char[] buf, int idx) 
+  	throws SentenceException {
+	
+    boolean endResult;
+    boolean endLater;
+	
+    if ( logger.isDebugEnabled() ) {
+      logger.debug("Beginning EXTRACTION for idx=" + idx + "\n" + 
+          Helper.getDebugStringFromCharBuf(buf, idx, 100));
     }
-    return(str);
+    
+    if ( (idx < 0) || (idx > buf.length) ) {
+      throw new ArrayIndexOutOfBoundsException("Invalid index=" + idx);
+    } else if ( !sentence_ends.contains(buf[idx]) ) {
+      throw new SentenceException("Not sentence end at index=" + idx);
+    }
+
+    endResult = isEnd(buf, idx);
+    if ( !endResult ) {
+    	return(null);
+    }    
+
+    endLater = hasLaterPunctuation(buf, idx);
+    if ( endLater ) {
+      return(null);
+    }
+    
+    return(previous(buf, idx));
   }
 }

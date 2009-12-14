@@ -39,7 +39,7 @@ public class Name extends Evaluator {
    *  
    * @return    <code>false</code>.
    */
-  public boolean evaluate(char[] buf, int idx) {
+  public boolean evaluate(final char[] buf, int idx) {
     return(false);
   } 
   
@@ -68,10 +68,10 @@ public class Name extends Evaluator {
     Logger logger;
     BufferedReader br = null;
     
-    logger = Logger.getLogger(Config.LOGGER_REALM.get());
+    logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
     try {
       br = new BufferedReader(
-          new FileReader(Config.NAMES_FILENAME.get()));
+          new FileReader(Config.NAMES_FILENAME.asStr()));
     } catch ( FileNotFoundException fnfe ) {
       logger.fatal("Failed to open names file " + 
           Config.NAMES_FILENAME, fnfe);

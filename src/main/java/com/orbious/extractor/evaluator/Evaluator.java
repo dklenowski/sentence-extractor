@@ -36,7 +36,7 @@ public abstract class Evaluator {
   /**
    * Logger object.
    */
-  protected static final Logger logger = Logger.getLogger(Config.LOGGER_REALM.get());
+  protected static final Logger logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
   
   /**
    * Initializes a <code>Evaluator</code>.
@@ -68,7 +68,7 @@ public abstract class Evaluator {
    * @return      <code>true</code> if the position in the buffer is
    *          not a sentence end, <code>false</code> otherwise.
    */
-  public abstract boolean evaluate(char[] buf, int idx);  
+  public abstract boolean evaluate(final char[] buf, int idx);  
   
   /**
    * Runs an evaluation on the word <code>wd</code>. If the 

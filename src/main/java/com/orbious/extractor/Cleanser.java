@@ -41,8 +41,8 @@ public class Cleanser {
    */
   static {
 	  preserved_punctuation = Helper.cvtStringToHashSet(
-			  Config.PRESERVED_PUNCTUATION.get());
-	  logger =  Logger.getLogger(Config.LOGGER_REALM.get());
+			  Config.PRESERVED_PUNCTUATION.asStr());
+	  logger =  Logger.getLogger(Config.LOGGER_REALM.asStr());
   }
   
   /**
@@ -51,7 +51,7 @@ public class Cleanser {
    */
   public static void reload() {
 	  preserved_punctuation = Helper.cvtStringToHashSet(
-			  Config.PRESERVED_PUNCTUATION.get());
+			  Config.PRESERVED_PUNCTUATION.asStr());
   }
   
   /**
@@ -145,8 +145,9 @@ public class Cleanser {
     }
     
     if ( logger.isDebugEnabled() ) {
-      logger.debug("Idx=" + idx + " Cleansed=|" + str + 
-          "|\nOriginal=" + text.get(idx) + "|");
+      logger.debug("Idx=" + idx + 
+          "\n\tCleansed=|" + str + 
+          "|\n\tOriginal=|" + text.get(idx) + "|");
     }
     return(str);
   }
@@ -218,27 +219,8 @@ public class Cleanser {
     }
     
     if ( logger.isDebugEnabled() ) {
-      String debugStr = "Original=";
-      for ( int i = 0; i < words.size(); i++ ) {
-        debugStr += "[" + i + "]=|" + words.get(i);
-        if ( i+1 >= words.size() ) {
-          debugStr += "|\n";
-        } else {
-          debugStr += "| ";
-        }
-      }
-      
-      debugStr += "Cleansed=|";
-      for ( int i = 0; i < cleansed.size(); i++ ) {
-        debugStr += "[" + i + "]=|" + cleansed.get(i);
-        if ( i+1 >= cleansed.size() ) {
-          debugStr += "|\n";
-        } else {
-          debugStr += "| ";
-        }
-      }
-      
-      logger.debug(debugStr);
+      logger.debug("\n\tOriginal=" + Helper.cvtVectorToString(words) + "\n" +
+           "\tCleansed=" + Helper.cvtVectorToString(words));
     }
   
     return(cleansed);   

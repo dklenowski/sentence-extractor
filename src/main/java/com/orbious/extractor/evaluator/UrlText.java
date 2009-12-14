@@ -28,15 +28,26 @@ public class UrlText extends Evaluator {
    */
   public UrlText() {
     super("UrlText");
-    url_pattern = Pattern.compile(Config.URL_REGEX.get());
+    url_pattern = Pattern.compile(Config.URL_REGEX.asStr());
   }
   
-  public boolean evaluate(char[] buf, int idx) {
+  public boolean evaluate(final char[] buf, int idx) {
     String str;
     char ch;
     int i;
     
     str = "";
+    
+    // if the next character is punctuation, then return false
+    // this handles the special case of www.google.com.'.' (i.e. the second 
+    // stop)
+    if ( (idx-1 >= 0) && !Character.isWhitespace(buf[idx-1]) &&
+    		!Character.isLetterOrDigit(buf[idx-1]) ) {
+      if ( logger.isDebugEnabled() ) {
+        logger.debug("Extracted (ch)=" + buf[idx-1] + " idx=" + idx + " Result=FALSE");
+      }
+    	return(false);
+    }
     
     // add from idx-1 to a whitespace
     if ( (idx-1) >= 0 ) {
@@ -70,7 +81,8 @@ public class UrlText extends Evaluator {
     boolean result = matcher.find();
     
     if ( logger.isDebugEnabled() ) {
-      logger.debug("ExtractedString=" + str + " Match=" + result);
+      logger.debug("Extracted=" + str + " Match=" + 
+          String.valueOf(result).toUpperCase());
     }
 
     return(result);

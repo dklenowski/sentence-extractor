@@ -17,7 +17,7 @@ public class Word {
   /**
    * Logger object.
    */
-  private static final Logger logger = Logger.getLogger(Config.LOGGER_REALM.get());
+  private static final Logger logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
 
   /**
    * Private constructor.
@@ -33,7 +33,7 @@ public class Word {
    * @return  <code>null</code> if no word was extracted, 
    *          otherwise the word extracted.
    */
-  public static String getPreviousWord(char[] buf, int idx) {
+  public static String getPreviousWord(final char[] buf, int idx) {
     String[] words = getPreviousWords(buf, idx, 1);
     if ( words.length == 0 ) {
       return(null);
@@ -55,7 +55,7 @@ public class Word {
    * @return  <code>null</code> if no word was extracted,  
    *          otherwise up to <code>num</code> number of words extracted.
    */
-  public static String[] getPreviousWords(char[] buf, int idx, int num) {
+  public static String[] getPreviousWords(final char[] buf, int idx, int num) {
     String[] tmpwords;
     char ch;
     boolean hasLetter;
@@ -90,6 +90,11 @@ public class Word {
             break;
           }
         }
+      } else {
+        // punctuation, check if the punctuation is part of the word
+        if ( (i-1 >= 0) && Character.isLetterOrDigit(buf[i-1]) ) {
+          reverseWd += ch;
+        }
       }
 
       i--;
@@ -111,10 +116,10 @@ public class Word {
     if ( logger.isDebugEnabled() ) {
       StringBuffer sb = new StringBuffer();
       for ( i = 0; i < tmpwords.length; i++ ) {
-        sb.append(i + "= |" + tmpwords[i] + "|\n");
+        sb.append("\t" + i + "=|" + tmpwords[i] + "|\n");
       }
       
-      logger.debug(sb.toString());
+      logger.debug("Words extraction:\n" + sb.toString());
     }
     
     return(tmpwords);

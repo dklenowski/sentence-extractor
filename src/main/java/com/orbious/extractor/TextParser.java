@@ -56,8 +56,8 @@ public class TextParser {
    */
   public TextParser(String filename) {
     this.filename = filename;
-    logger = Logger.getLogger(Config.LOGGER_REALM.get());
-    sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.get());
+    logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
+    sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
   }
   
   /**
@@ -146,61 +146,38 @@ public class TextParser {
   
   
   public void parse() {
-    char ch;
-    char ch2;
     Vector<String> raw;
     Vector<String> cleansed;
-    boolean fndLaterPunct;
-    int i, j;
+    int i;
     
     sentences = new Vector< Vector<String> >();
     i = 0;
     
     while ( i < buffer.length ) {
-      ch = buffer[i];
-      if ( sentence_ends.contains(ch) ) {
-        // check the sentence end is not terminated later
-        j = i+1;
-        fndLaterPunct = false;
-        while ( j < buffer.length ) {
-          ch2 = buffer[j];
-          if ( Character.isWhitespace(ch2) || 
-              Character.isLetterOrDigit(ch2) ) {
-            break;
-          } else if ( sentence_ends.contains(ch2) ) {
-            fndLaterPunct = true;
-            break;
-          } 
-          j++;
+      if ( sentence_ends.contains(buffer[i]) ) {
+        raw = null;
+        try {
+          raw = Sentence.getPreviousSentence(buffer, i);
+        } catch ( SentenceException se ) {
+          logger.fatal("Logic Error, idx=" + i + 
+              "\nRaw=" + Helper.getDebugStringFromCharBuf(buffer, i, 50),
+              se);
         }
-        
-        if ( !fndLaterPunct ) {
-          raw = null;
-          cleansed = null;
+    
+        if ( raw != null ) {
+          cleansed = Cleanser.cleanWords(raw);
           
-          try {
-            raw = Sentence.getPreviousSentence(buffer, i);
-          } catch ( SentenceException se ) {
-            logger.fatal("Logic Error, idx=" + i + 
-                "\nRaw=" + Helper.getStringFromCharBuf(buffer, i, 50),
-                se);
-          }
-          
-          if ( raw != null ) {
-            // we have a sentencer
-            cleansed = Cleanser.cleanWords(raw);
-            if ( logger.isDebugEnabled() ) {
-              logger.debug("SetenceEnd idx=" + i + 
-                  "\nBuffer=" +
-                  Helper.getStringFromCharBuf(buffer, i, 50) + 
-                  "\nRaw=" + Sentence.getSentenceAsDebugStr(raw) + 
-                  "\nCleansed=" + cleansed);
+          if ( logger.isDebugEnabled() ) {
+            logger.debug("SetenceEnd idx=" + i + 
+                "\nBuffer:\n" +
+                Helper.getDebugStringFromCharBuf(buffer, i, 50) + 
+                "\t\nRaw     =" + raw + 
+                "\t\nCleansed=" + cleansed + "\n\n");
             }
 
             sentences.add(cleansed);
           }
         }
-      }
       
       i++;
     }

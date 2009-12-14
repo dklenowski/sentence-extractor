@@ -50,7 +50,7 @@ public class Suspension extends Evaluator {
    * @return  <code>true</code> if the full stop is part of an suspension,
    *          and not a sentence end, <code>false</code> otherwise.
    */
-  public boolean evaluate(char[] buf, int idx) {
+  public boolean evaluate(final char[] buf, int idx) {
     String wd = Word.getPreviousWord(buf, idx);
 
     if ( suspensions == null ) {
@@ -84,10 +84,10 @@ public class Suspension extends Evaluator {
     Logger logger;
     BufferedReader br = null;
     
-    logger = Logger.getLogger(Config.LOGGER_REALM.get());
+    logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
     try {
       br = new BufferedReader(
-          new FileReader(Config.SUSPENSION_FILENAME.get()));
+          new FileReader(Config.SUSPENSION_FILENAME.asStr()));
     } catch ( FileNotFoundException fnfe ) {
       logger.fatal("Failed to open suspension file " + 
           Config.SUSPENSION_FILENAME, fnfe);

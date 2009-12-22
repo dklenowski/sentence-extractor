@@ -3,6 +3,16 @@ package com.orbious.extractor.evaluator;
 import com.orbious.extractor.Config;
 import org.apache.log4j.Logger;
 
+/**
+ * $Id$
+ * <p>
+ * Determines whether a word/position in a text buffer is considered 
+ * an Acronym and therefore not a valid sentence start/end.
+ * 
+ * @author dave
+ * @version 1.0
+ * @since 1.0
+ */
 
 public class Acronym extends Evaluator {
 
@@ -36,7 +46,7 @@ public class Acronym extends Evaluator {
 
   
   /**
-   * Constructor, initializes the <code>Acronym</code> class.
+   * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
    */
   public Acronym() {
     super("Acronym");
@@ -46,11 +56,11 @@ public class Acronym extends Evaluator {
    * Determines if the full stop is part of of an acronym and therefore
    * not a sentence end.
    * 
-   * @param buf The buffer to examine.
-   * @param idx The position in the buffer where punctuation occurs.
+   * @param buf   Text Buffer.
+   * @param idx   Position in <code>buf</code> where a fullstop occurs.
    * 
-   * @return  <code>true</code> if the full stop is part of an acronym,
-   *          and not a sentence end, <code>false</code> otherwise.
+   * @return    <code>true</code> if the full stop is part of an acronym,
+   *            and not a sentence end, <code>false</code> otherwise.
    */
   public boolean evaluate(final char[] buf, int idx) {
 
@@ -71,44 +81,45 @@ public class Acronym extends Evaluator {
     
     return(op.result);
   }
-  
-    /**
-     * Determines if the word is an acronym and therefore not a sentence 
-     * start.
-     * 
-     * @param wd  A string containing a word to check if an acronym.
-     * @return    <code>true</code> if the word is an acronym and not
-     *            a sentence end, <code>false</code> otherwise.
-     */
-    public boolean evaluate(String wd) {
-      char[] buf = wd.toCharArray();
-      boolean result;
-            
-      for ( int i = 0; i < buf.length; i++ ) {
-        if ( !Character.isLetterOrDigit(buf[i]) && 
-            !Character.isWhitespace(buf[i]) ) {
-          result = evaluate(buf, i);
-          if ( result ) {
-            return(result);
-          }
+
+  /**
+   * Determines if the word is an acronym and therefore not a sentence end.
+   * 
+   * @param wd   A word.
+   * 
+   * @return    <code>true</code> if the word is part of an acronym,
+   *            and not a sentence end, <code>false</code> otherwise.
+   */
+  public boolean evaluate(String wd) {
+    char[] buf = wd.toCharArray();
+    boolean result;
+    
+    for ( int i = 0; i < buf.length; i++ ) {
+      if ( !Character.isLetterOrDigit(buf[i]) && 
+          !Character.isWhitespace(buf[i]) ) {
+        result = evaluate(buf, i);
+        if ( result ) {
+          return(result);
         }
       }
-            
-      return(false);
     }
+    
+    return(false);
+  }
 
   
   /**
    * Checks the <code>buf</code> for oscillations of punctuation/letters
    * to determine whether or not an acronym.
    * 
-   * @param buf   Character buffer to examine for acronym.
-   * @param idx   Index in the buffer to begin acronym examination.
-   * @param dirn  The direction {@link Acronym#LEFT} or
-   *              {@link Acronym#RIGHT} to traverse in <code>buf</code>
-   *              for determine whether an acronym.
-   * @return  An {@link AcronymOp} containing the results of the 
-   *          oscillation check.
+   * @param buf    Text buffer.
+   * @param idx    Index in the buffer to begin acronym examination.
+   * @param dirn   The direction {@link Acronym#LEFT} or
+   *               {@link Acronym#RIGHT} to traverse in <code>buf</code>
+   *               to search for an acronym.
+   *               
+   * @return    An {@link AcronymOp} containing the results of the 
+   *            oscillation check.
    */
   protected static AcronymOp isOscillating(char[] buf, int idx, int dirn) {
     boolean result = false;
@@ -217,10 +228,10 @@ public class Acronym extends Evaluator {
     /**
      * Constructor, initializes the <code>AcronymOp</code> object.
      * 
-     * @param result             Whether or not an acronym was found.
-     * @param oscillatingCt      The number of punctuation characters.
-     * @param consecutiveCharCt  Maximum number of consecutive characters
-     *                           found.
+     * @param result               Whether or not an acronym was found.
+     * @param oscillatingCt        The number of punctuation characters.
+     * @param consecutiveCharCt    Maximum number of consecutive characters
+     *                             found.
      */
     public AcronymOp(boolean result, int oscillatingCt, 
         int consecutiveCharCt) {
@@ -230,7 +241,7 @@ public class Acronym extends Evaluator {
     }
     
     /**
-     * @return  Returns whether or not an acronym was found.
+     * @return    Returns whether or not an acronym was found.
      */
     @SuppressWarnings("unused")
     public boolean result() {
@@ -238,7 +249,7 @@ public class Acronym extends Evaluator {
     }
     
     /**
-     * @return  The number of punctuation characters found.
+     * @return    The number of punctuation characters found.
      */
     @SuppressWarnings("unused")
     public int oscillatingCt() {
@@ -246,8 +257,8 @@ public class Acronym extends Evaluator {
     }
 
     /**
-     * @return  The maximum number of consecutive characters 
-     *          (letters or digits) found.
+     * @return    The maximum number of consecutive characters 
+     *            (letters or digits) found.
      */   
     @SuppressWarnings("unused")
     public int consecutiveCharCt() {

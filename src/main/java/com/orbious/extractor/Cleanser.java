@@ -2,16 +2,14 @@ package com.orbious.extractor;
 
 import java.util.HashSet;
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
-
 import com.orbious.util.Helper;
 
 /**
  * $Id: Cleanser.java 14 2009-12-06 10:03:53Z app $
  * <p>
  * Provides static methods for cleaning up text within a document
- * ready for preparation for sentence separation.
+ * in preparation for sentence separation.
  * 
  * @author dave
  * @version 1.0
@@ -41,7 +39,7 @@ public class Cleanser {
    */
   static {
 	  preserved_punctuation = Helper.cvtStringToHashSet(
-			  Config.PRESERVED_PUNCTUATION.asStr());
+        Config.PRESERVED_PUNCTUATION.asStr());
 	  logger =  Logger.getLogger(Config.LOGGER_REALM.asStr());
   }
   
@@ -51,7 +49,7 @@ public class Cleanser {
    */
   public static void reload() {
 	  preserved_punctuation = Helper.cvtStringToHashSet(
-			  Config.PRESERVED_PUNCTUATION.asStr());
+        Config.PRESERVED_PUNCTUATION.asStr());
   }
   
   /**
@@ -59,15 +57,15 @@ public class Cleanser {
    * in <code>lines</code>. All multiple occurrences of whitespace are 
    * replaced with a single whitespace and newlines are removed completely.
    * 
-   * @param text  A <code>Vector</code> of raw text.
-   * @param idx The index in <code>Vector</code> to remove unnecessary 
-   *        whitespace.
+   * @param text   A <code>Vector</code> of raw text.
+   * @param idx    The index in <code>Vector</code> to remove unnecessary 
+   *               whitespace.
    * 
    * @return  <code>null</code> if the line contains no letters, digits,
    *          punctuation, otherwise the line with multiple whitespace
    *          and newlines removed.
    */
-  public static String removeWhitespace(Vector<String> text, int idx) { 
+  public static String removeWhitespace(final Vector<String> text, int idx) { 
     boolean inWhitespace;
     boolean hasText;
     boolean fndHyphen;
@@ -154,7 +152,7 @@ public class Cleanser {
 
   /**
    * Clean's a <code>Vector</code> of <code>String</code> words
-   * in preparation for programmatic analysis. 
+   * in preparation for programmatic analysis. In particular:
    * <ul>
    * <li>All punctuation is separated by spaces.
    * <li>Punctuation at either ends (e.g. '_' is removed from '_space_')
@@ -162,10 +160,11 @@ public class Cleanser {
    * <li>Punctuation within a word or an apostrophe at the 
    *     end of a word (e.g. 'Fred's, boys', time-line) is preserved.
    *     
-   * @param words   A list of words to process.
-   * @return      A <code>Vector</code> of <code>String</code>'s 
-   *          representing a cleansed version
-   *          of the <code>words</code>.
+   * @param words    A list of words to process.
+   *
+   * @return    A <code>Vector</code> of <code>String</code>'s 
+   *            representing a cleansed version
+   *            of the <code>words</code>.
    */
   
   public static Vector<String> cleanWords(Vector<String> words) {
@@ -227,18 +226,12 @@ public class Cleanser {
   }
   
   /**
-   * Clean's a <code>Vector</code> of <code>String</code> words
-   * in preparation for programmatic analysis. 
-   * <ul>
-   * <li>All punctuation is separated by spaces.
-   * <li>Punctuation at either ends (e.g. '_' is removed from '_space_')
-   *     is removed.
-   * <li>Punctuation within a word or an apostrophe at the 
-   *     end of a word (e.g. 'Fred's, boys', time-line) is preserved.
-   *     
-   * @param words   A list of words to process.
-   * @return      A <code>String</code> representing a cleansed version
-   *          of the <code>words</code>.
+   * Runs the same algorithm as @{link Cleanser#cleanWords}
+   * and return's those words in a string with whitespace separators.
+   * 
+   * @param words    A list of words to process.
+   *
+   * @return    A cleansed version in a <code>String</code> format.
    */
   public static String cleanWordsAsStr(Vector<String> words) {
     Vector<String> cleansed = cleanWords(words);

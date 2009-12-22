@@ -1,10 +1,9 @@
 package com.orbious.extractor;
 
-
 /**
  * $Id: Config.java 14 2009-12-06 10:03:53Z app $
  * <p>
- * Provides constants that are shared across <code>DocumentSeparator</code>.
+ * Shared Constants.
  * 
  * @author dave
  * @version 1.0
@@ -64,7 +63,7 @@ public enum Config {
   /**
    * Constructor, set's the enum constant.
    * 
-   * @param value  The <code>String</code> value to set the enum constant to.
+   * @param value    The <code>String</code> value to set the enum constant to.
    */
   private Config(String value) {
 	this.value = value; 
@@ -73,7 +72,7 @@ public enum Config {
   /**
    * Constructor, set's the enum constant.
    * 
-   * @param value  The <code>int</code> value to set the enum constant to.
+   * @param value    The <code>int</code> value to set the enum constant to.
    */
   private Config(int value) {
 	  this.value = Integer.toString(value);
@@ -82,7 +81,7 @@ public enum Config {
   /**
    * Returns the value of the enum constant as a <code>String</code>.
    * 
-   * @return  Retuns the value of the enum constant as a <code>String</code>.
+   * @return    Retuns the value of the enum constant as a <code>String</code>.
    */
   public String asStr() {
     return(value);
@@ -91,7 +90,7 @@ public enum Config {
   /**
    * Returns the value of the enum constant as an <code>int</code>.
    * 
-   * @return  Retuns the value of the enum constant as an <code>int</code>.
+   * @return    Retuns the value of the enum constant as an <code>int</code>.
    */
   public int asInt() {
 	  return(Integer.parseInt(value));
@@ -100,7 +99,7 @@ public enum Config {
   /**
    * Sets the enum constant to <code>value</code>.
    * 
-   * @param value  The <code>String</code> value to set the enum constant to.
+   * @param value    The <code>int</code> value to set the enum constant to.
    */
   public void put(String value) {
     this.value = value;
@@ -109,7 +108,7 @@ public enum Config {
   /**
    * Sets the enum constant to <code>value</code>.
    * 
-   * @param value  The <code>String</code> value to set the enum constant to.
+   * @param value    The <code>int</code> value to set the enum constant to.
    */
   public void put(int value) {
 	  this.value = Integer.toString(value);

@@ -1,10 +1,7 @@
 package com.orbious.extractor;
 
-import java.util.Arrays;
-import java.util.Vector;
 import com.orbious.AllTests;
 import com.orbious.extractor.Sentence.StartOp;
-
 import junit.framework.TestCase;
 
 /**
@@ -21,7 +18,7 @@ public class SentenceTest extends TestCase {
     super(name);
     AllTests.initLogger();
   }
-/*
+
   //
   // isEnd
   //
@@ -144,9 +141,6 @@ public class SentenceTest extends TestCase {
     str = "sample.    The";
     buf = str.toCharArray();
 
-    for ( int i = 0; i < buf.length; i++ ) {
-      System.out.println(i + "=" + buf[i]);
-    }
     assertEquals(11, Sentence.hasUpper(buf, 6));    
   }
   
@@ -163,19 +157,15 @@ public class SentenceTest extends TestCase {
 
     assertEquals(true, Sentence.isStart(buf, 8).isStart());    
   }
-  */  
+  
   public void test_isStartWithPunct() { 
     String str;
     char[] buf;
     
     str = "Mr. McGoo";
     buf = str.toCharArray();
-    
-    for ( int i = 0; i < buf.length; i++ ) {
-      System.out.println(i + "=" + buf[i]);
-    }
 
     StartOp op = Sentence.isStart(buf, 4);
-    assertEquals(true, op.isStart());    
+    assertEquals(false, op.isStart());    
   }
 }

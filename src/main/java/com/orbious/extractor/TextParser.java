@@ -9,7 +9,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import com.orbious.extractor.Sentence.EndOp;
 import com.orbious.extractor.Sentence.StartOp;
-import com.orbious.extractor.SentenceMapEntry.Likelyhood;
+import com.orbious.extractor.SentenceMapEntry.Likelihood;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntrySubType;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntryType;
 import com.orbious.extractor.evaluator.UrlText;
@@ -177,7 +177,7 @@ public class TextParser {
       type = entry.type();
       
       if ( type == SentenceEntryType.START ) {
-        if ( entry.likelyhood() == Likelyhood.UNLIKELY ) {
+        if ( entry.likelihood() == Likelihood.UNLIKELY ) {
           unlikelyStartIdx = i;
         } else {
           if ( (startIdx != -1) && (unlikelyEndIdx != -1) ) {
@@ -196,7 +196,7 @@ public class TextParser {
           }
         }
       } else if ( type == SentenceEntryType.END ) {
-        if ( entry.likelyhood() == Likelyhood.UNLIKELY ) {
+        if ( entry.likelihood() == Likelihood.UNLIKELY ) {
           unlikelyEndIdx = i;
         } else if ( (startIdx == -1) && (unlikelyStartIdx == -1) ) {
           if ( logger.isDebugEnabled() ) {
@@ -249,12 +249,12 @@ public class TextParser {
         // check for ends
         endOp = Sentence.isEnd(buffer, i);
         if ( !endOp.isEnd() ) {
-          addToMap(i, Likelyhood.UNLIKELY, SentenceEntryType.END, null);
+          addToMap(i, Likelihood.UNLIKELY, SentenceEntryType.END, null);
         } else {
-          addToMap(i, Likelyhood.LIKELY, SentenceEntryType.END, null);
+          addToMap(i, Likelihood.LIKELY, SentenceEntryType.END, null);
           
           if ( endOp.startIdx() >= 0 ) {
-            addToMap(endOp.startIdx(), Likelyhood.LIKELY, 
+            addToMap(endOp.startIdx(), Likelihood.LIKELY, 
                 SentenceEntryType.START, SentenceEntrySubType.START_FROM_END);
           }
         }
@@ -267,12 +267,12 @@ public class TextParser {
         startOp = Sentence.isStart(buffer, i);
         if ( startOp != null ) {
           if ( !startOp.isStart() ) {
-            addToMap(i, Likelyhood.UNLIKELY, SentenceEntryType.START, null);
+            addToMap(i, Likelihood.UNLIKELY, SentenceEntryType.START, null);
           } else {
-            addToMap(i, Likelyhood.LIKELY, SentenceEntryType.START, null);
+            addToMap(i, Likelihood.LIKELY, SentenceEntryType.START, null);
           
             if ( startOp.stopIdx() >= 0 ) {
-              addToMap(startOp.stopIdx(), Likelyhood.LIKELY, 
+              addToMap(startOp.stopIdx(), Likelihood.LIKELY, 
                   SentenceEntryType.START, SentenceEntrySubType.END_FROM_START);
             }
           }
@@ -293,7 +293,7 @@ public class TextParser {
    * @param type
    * @param subtype
    */
-  private void addToMap(int idx, Likelyhood likelyhood, SentenceEntryType type, 
+  private void addToMap(int idx, Likelihood likelihood, SentenceEntryType type, 
       SentenceEntrySubType subtype) {
     SentenceMapEntry old;
     SentenceMapEntry entry;
@@ -304,13 +304,13 @@ public class TextParser {
     if ( old == null ) {
       replace = true;
     } else {
-      if ( old.likelyhood() == Likelyhood.UNLIKELY ) {
+      if ( old.likelihood() == Likelihood.UNLIKELY ) {
         replace = true;
       }
     }
 
     if ( replace ) {
-      entry = new SentenceMapEntry(likelyhood, type, subtype);
+      entry = new SentenceMapEntry(likelihood, type, subtype);
       sentence_map[idx] = entry;
     }
     

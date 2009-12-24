@@ -6,8 +6,8 @@ import org.apache.log4j.Logger;
 /**
  * $Id$
  * <p>
- * Consistently removes whitespace characters.
- * 
+ * Provides static methods to remove whitespace.
+ * <p>
  * @author dave
  * @version 1.0
  * @since 1.0
@@ -15,15 +15,33 @@ import org.apache.log4j.Logger;
 
 public class WhitespaceRemover {
 
+  /**
+   * The logger object.
+   */
   private static Logger logger;
   
   static {
     logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
   }
   
+  /**
+   * Private constructor.
+   */
   private WhitespaceRemover() { }
   
   
+  /**
+   * Removes excessive whitespace characters from position <code>idx</code>
+   * in the <code>Vector</code> <code>text</code>. If the <code>String</code>
+   * in <code>text</code> has a hyphen at the end with not append
+   * a whitespace to the end of the returned <code>String</code>.
+   * 
+   * @param text  A <code>Vector</code> containing text.
+   * @param idx   The position <code>idx</code> in <code>text</code>.
+   *    
+   * @return    Return's <code>null</code> if no text was found, otherwise 
+   *            returns a <code>String</code> with excessive whitespace removed.
+   */
   public static String remove(final Vector<String> text, int idx) {
     boolean inWhitespace;
     boolean hasText;
@@ -93,6 +111,14 @@ public class WhitespaceRemover {
     return(str);
   }
   
+  /**
+   * Checks for hyphenation at the end of a string.
+   * 
+   * @param str   A text <code>String</code>.
+   * @return      <code>true</code> if the <code>String</code> has a hyphen
+   *              at the last non whitespace character, <code>false</code>
+   *              otherwise.
+   */
   private static int hasHyphenAtEnd(final String str) {
     char[] buf;
     int ct;

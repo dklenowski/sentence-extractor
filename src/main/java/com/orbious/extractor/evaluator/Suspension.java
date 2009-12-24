@@ -8,6 +8,8 @@ import com.orbious.util.Helper;
 /**
 * $Id$
 * <p>
+* Determines if a position/word in a text buffer is considered a Suspension
+* and therefore not a 
 * The <code>Suspension</code> <code>Evaluator</code> determines if a word 
 * is a suspension and cannot be considered a sentence start/end. i.e. 
 * <ul>
@@ -24,8 +26,7 @@ import com.orbious.util.Helper;
 public class Suspension extends Evaluator {
 
   /**
-   * In memory list of suspension extracted from 
-   * {@link Config#SUSPENSION_FILENAME}.
+   * In memory list of suspensions.
    */
   private static HashSet<String> suspensions;
   
@@ -37,14 +38,16 @@ public class Suspension extends Evaluator {
   }
   
   /**
-   * Determines if the full stop is part of of an suspension and therefore
-   * not a sentence end.
+   * Determines if the previous word from <code>idx</code>
+   * in the buffer <code>buf</code> is a suspension and therefore 
+   * not a likely sentence start/end.
    * 
-   * @param buf The buffer to examine.
-   * @param idx The position in the buffer where punctuation occurs.
+   * @param buf   Text buffer.
+   * @param idx   Position in buffer where evaluation begins.
    * 
-   * @return  <code>true</code> if the full stop is part of an suspension,
-   *          and not a sentence end, <code>false</code> otherwise.
+   * @return    <code>true</code> if the previous word is a suspension and 
+   *            therefore not a likely sentence start/end, 
+   *            <code>false</code> otherwise.
    */
   public boolean evaluate(final char[] buf, int idx) {
     String wd = Word.getPreviousWord(buf, idx);
@@ -56,13 +59,13 @@ public class Suspension extends Evaluator {
   }
   
     /**
-     * Determines if the word is an suspension and therefore not a sentence 
-     * start.
+     * Determines if the word is an suspension and therefore not a
+     * likely sentence start/end.
      * 
-     * @param wd  A string containing a word to check if an suspension.
+     * @param wd  A word.
      * 
-     * @return  <code>true</code> if the word is an suspension and not
-     *          a sentence end, <code>false</code> otherwise.
+     * @return    <code>true</code> if the word is an suspension and not
+     *            a likely sentence end, <code>false</code> otherwise.
      */
   public boolean evaluate(String wd) {
     if ( suspensions == null ) {

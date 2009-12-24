@@ -15,7 +15,7 @@ import com.orbious.util.Helper;
  * $Id$
  * <p>
  * Provides static methods for Sentence operations.
- * 
+ * <p>
  * @author dave
  * @version 1.0
  * @since 1.0
@@ -25,7 +25,7 @@ public class Sentence {
   
   /**
    * A local copy of sentence ends from 
-   * {@link com.orbious.separator.Config#SENTENCE_ENDS}.
+   * {@link com.orbious.extractor.Config#SENTENCE_ENDS}.
    */
   private static HashSet<Character> allowable_ends;
   
@@ -45,9 +45,6 @@ public class Sentence {
    */
   private static Vector<Evaluator> start_evaluators;
   
-  /**
-   * Static Initializer block.
-   */
   static {
     allowable_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
     logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
@@ -59,14 +56,16 @@ public class Sentence {
   private Sentence() { }
   
   /**
-   * Reloads the local copy of sentence ends from 
-   * {@link com.orbious.separator.Config#SENTENCE_ENDS}
-   * and the default <code>Evaluator</code>'s.
+   * Reloads the local copy of allowable ends.
    */
   public static void reload() {
     allowable_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
   }
   
+  /**
+   * Initializes the <code>Evaluator</code>'s that are used for determining
+   * the likelihood of sentence starts.
+   */
   public static void initDefaultStartEvaluators() {
     start_evaluators = new Vector<Evaluator>(
         Arrays.asList(  new Suspension(),
@@ -74,6 +73,12 @@ public class Sentence {
                 new Name() )); 
   }
   
+  /**
+   * Adds an evaluate to the <code>Vector</code> of <code>Evaluator</code>'s
+   * that are used for determining the likelihood of sentence starts.
+   * 
+   * @param evaluator   The <code>Evaluator</code> to add.
+   */
   public static void addStartEvaluator(Evaluator evaluator) {
     if ( start_evaluators == null ) {
       start_evaluators = new Vector<Evaluator>();
@@ -83,8 +88,8 @@ public class Sentence {
   }
   
   /**
-   * Initializes the <code>Evaluator</code>'s that are
-   * used to determine whether a sentence end is valid.
+   * Initializes the <code>Evaluator</code>'s that are used for determining
+   * the likelihood of sentence ends.
    */
   public static void initDefaultEndEvaluators() {
     end_evaluators = new Vector<Evaluator>(
@@ -94,13 +99,10 @@ public class Sentence {
   }
 
   /**
-   * Adds a non-default <code>Evaluator</code> to the list
-   * of evaluators that are used to determine whether a sentence
-   * end is valid.
+   * Adds an evaluate to the <code>Vector</code> of <code>Evaluator</code>'s
+   * that are used for determining the likelihood of sentence ends.
    * 
-   * @param evaluator  The <code>Evaluator</code> to add
-   *                   for determining whether a sentence end 
-   *                   is valid.
+   * @param evaluator   The <code>Evaluator</code> to add.
    */
   public static void addEndEvaluator(Evaluator evaluator) {
     if ( end_evaluators == null ) {
@@ -112,19 +114,14 @@ public class Sentence {
   
   /**
    * Determines if the punctuation specified at <code>idx</code> in the 
-   * text buffer <code>buf</code> is a valid sentence end.
+   * text buffer <code>buf</code> is a likely sentence end.
    * 
-   * The end algorithm:
-   * - If the next character is capitalized and not a name/acronym/suspension
-   *   consider a sentence end.
-   * - If we have reached the end of the buffer and the current punctuation mark
-   *   is not part of a name/acronym/suspension consider a sentence end.
-   *
    * @param buf   Text buffer.
    * @param idx   Position in the buffer where a sentence end exists.
    * 
-   * @return      <code>true</code> if the position in the <code>buf</code>
-   *              is a valid sentence end, <code>false</code> otherwise.
+   * @return      <code>true</code> if the position specified by <code>idx</code>
+   *              in the <code>buf</code> is a likely sentence end, 
+   *              <code>false</code> otherwise.
    */
   public static EndOp isEnd(final char[] buf, int idx) { 
     Evaluator evaluator;
@@ -247,10 +244,12 @@ public class Sentence {
    * @param buf   Text buffer.
    * @param idx   Position in the buffer where a sentence end exists.
    * 
-   * @return      <code>-1</code> if the extremium's were reached.
-   *              <code>-2</code> if no uppercase was found
-   *              <code>idx</code> position in the buffer where the potential
-   *              start was found.
+   * @return    
+   * <ul>
+   * <li><code>-1</code> if the extremium's were reached.
+   * <li><code>-2</code> if no uppercase character was found.
+   * <li>Otherwise returns the position in the buffer where the potential
+   * sentence start was found.
    */
   protected static int hasUpper(final char[] buf, int idx) {
     int i;
@@ -276,20 +275,17 @@ public class Sentence {
     
     return(-2);
   }  
-    
+
   /**
-   * The start algorithm:
-   * <ul>
-   * <li>If the word is capitalized and the previous character is a sentence end 
-   *   consider a sentence start.
-   * <li>If MAX_SENTENCE_LENGTH is exceeded during this process return false
-   *   (this check is performed in {@link Sentence#previous(char[], int)}).
-   *
-   * @param buf   Text buffer.
-   * @param idx   Position in the buffer for a potential sentence start.
+   * Determines if the punctuation specified at <code>idx</code> in the 
+   * text buffer <code>buf</code> is a likely sentence start.
    * 
-   * @return    <code>true</code> if the sentence start is valid,
-   *            <code>false</code> otherwise.
+   * @param buf   Text buffer.
+   * @param idx   Position in the buffer where a potential sentence start exists.
+   * 
+   * @return      <code>true</code> if the position specified by <code>idx</code>
+   *              in the <code>buf</code> is a likely sentence start, 
+   *              <code>false</code> otherwise.
    */
   public static StartOp isStart(final char[] buf, int idx) {
     int stopIdx;
@@ -355,10 +351,17 @@ public class Sentence {
   }
 
   /**
+   * Finds the previous sentence end for a likely sentence start.
    * 
-   * @param buf
-   * @param idx
+   * @param buf   Text buffer.
+   * @param idx   Position in the buffer where a likely sentence start exists
+   * 
    * @return
+   * <ul>
+   * <li><code>-1<code> if the extremium's were reached.
+   * <li><code>-2</code> if no sentence end was found.
+   * <li>Otherwise returns the position in teh buffer where the potential
+   * sentence end was found.
    */
   protected static int hasStop(final char[] buf, int idx) {
     int i;
@@ -388,57 +391,137 @@ public class Sentence {
   }
   
   
+  /**
+   * An inner class used to return the results of {@link isStart}.
+   */
+  
   static class StartOp {
+    /**
+     * Whether or not a likely sentence start was found.
+     */
     private boolean isStart;
+    
+    /**
+     * The previous sentence end for a likely sentence start.
+     */
     private int stopIdx;
 
+    /**
+     * Initializes an empty <code>StartOp</code>.
+     */
     public StartOp() { }
-    
+
+    /**
+     * Initializes the <code>StartOp</code>.
+     * 
+     * @param isStart   Whether or not a likely sentence start was found.
+     * @param stopIdx   The previous end for a likely sentence start.
+     */
     public StartOp(boolean isStart, int stopIdx) {
       this.isStart = isStart;
       this.stopIdx = stopIdx;
     }
     
+    /**
+     * Accessor for <code>isStart</code>.
+     * 
+     * @return    <code>isStart</code>  
+     */
     public boolean isStart() {
       return(isStart);
     }
     
+    /**
+     * Setter for <code>isStart</code>.
+     * 
+     * @param isStart   Sets <code>isStart</code>.
+     */
     public void isStart(boolean isStart) {
       this.isStart = isStart;
     }
     
+    /**
+     * Accessor for <code>stopIdx</code>.
+     * 
+     * @return    <code>stopIdx</code>
+     */
     public int stopIdx() {
       return(stopIdx);
     }
     
+    /**
+     * Setter for <code>stopIdx</code>.
+     * 
+     * @param stopIdx   Sets <code>stopIdx</code>.
+     */
     public void stopIdx(int stopIdx) {
       this.stopIdx = stopIdx;
     }
   }
   
+  /**
+   * An inner class used to return the results of {@link isEnd}.
+   */
+  
   static class EndOp {
+    /**
+     * Whether or not a likely sentence end was found.
+     */
     private boolean isEnd;
+    
+    /**
+     * The next sentence start for a likely sentence end.
+     */
     private int startIdx;
     
+    /**
+     * Initializes an empty <code>EndOp</code>.
+     */
     public EndOp() { }
     
+    /**
+     * Initializes the <code>StartOp</code>.
+     * 
+     * @param isEnd   Whether or not a likely sentence end was found.
+     * @param startIdx   The next sentence start for a likely sentence end.
+     */
     public EndOp(boolean isEnd, int startIdx) { 
       this.isEnd = isEnd;
       this.startIdx = startIdx;
     }
     
+    /**
+     * Accessor for <code>isEnd</code>.
+     * 
+     * @return    <code>isEnd</code>  
+     */
     public boolean isEnd() {
       return(isEnd);
     }
     
+    /**
+     * Setter for <code>isEnd</code>.
+     * 
+     * @param isEnd   Sets <code>isEnd</code>.
+     */
     public void isEnd(boolean isEnd) {
       this.isEnd = isEnd;
     }
     
+    /**
+     * Accessor for <code>startIdx</code>.
+     * 
+     * @return    <code>startIdx</code>
+     */
     public int startIdx() {
       return(startIdx);
     }
     
+    /**
+     * Setter for <code>startIdx</code>.
+     * 
+     * @param startIdx   Sets <code>startIdx</code>.
+     */
     public void startIdx(int startIdx) {
       this.startIdx = startIdx;
     }

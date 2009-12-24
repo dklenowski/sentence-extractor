@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
  * $Id: Word.java 12 2009-12-05 11:40:44Z app $
  * <p>
  * Provides various static word operation methods.
- * 
+ * <p>
  * @author dave
  * @version 1.0
  * @since 1.0
@@ -27,11 +27,11 @@ public class Word {
   /**
    * Returns the previous word in <code>buf</code>.
    * 
-   * @param buf  Character buffer to extract words from.
-   * @param idx  Index in the buffer to begin word extraction.
+   * @param buf   Character buffer to extract words from.
+   * @param idx   Index in the buffer to begin word extraction.
    * 
-   * @return  <code>null</code> if no word was extracted, 
-   *          otherwise the word extracted.
+   * @return    <code>null</code> if no word was extracted, 
+   *            otherwise the word extracted.
    */
   public static String getPreviousWord(final char[] buf, int idx) {
     String[] words = getPreviousWords(buf, idx, 1);
@@ -48,12 +48,12 @@ public class Word {
    * of the <code>buf</code> is reached and no whitespace is encountered, 
    * the text is still treated as a word.
    * 
-   * @param buf  Character buffer to extract words from.
-   * @param idx  Index in the buffer to begin word extraction.
-   * @param num  The number of words to extract.
+   * @param buf   Character buffer to extract words from.
+   * @param idx    Index in the buffer to begin word extraction.
+   * @param num   The number of words to extract.
    * 
-   * @return  <code>null</code> if no word was extracted,  
-   *          otherwise up to <code>num</code> number of words extracted.
+   * @return    <code>null</code> if no word was extracted,  
+   *            otherwise up to <code>num</code> number of words extracted.
    */
   public static String[] getPreviousWords(final char[] buf, int idx, int num) {
     String[] tmpwords;
@@ -124,6 +124,4 @@ public class Word {
     
     return(tmpwords);
   }
-  
-
 }

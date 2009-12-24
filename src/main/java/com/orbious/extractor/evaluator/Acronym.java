@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
  * <p>
  * Determines whether a word/position in a text buffer is considered 
  * an Acronym and therefore not a valid sentence start/end.
- * 
+ * <p>
  * @author dave
  * @version 1.0
  * @since 1.0
@@ -53,14 +53,15 @@ public class Acronym extends Evaluator {
   }
   
   /**
-   * Determines if the full stop is part of of an acronym and therefore
-   * not a sentence end.
+   * Determines if the previous word from <code>idx</code> in the buffer
+   * <code>buf</code> is part of an acronym and therefore not a likely
+   * sentence start/end.
    * 
    * @param buf   Text Buffer.
-   * @param idx   Position in <code>buf</code> where a fullstop occurs.
+   * @param idx   Position in <code>buf</code> where evaluation begins.
    * 
-   * @return    <code>true</code> if the full stop is part of an acronym,
-   *            and not a sentence end, <code>false</code> otherwise.
+   * @return    <code>true</code> if the word is part of an acronym,
+   *            and not a likely sentence start/end, <code>false</code> otherwise.
    */
   public boolean evaluate(final char[] buf, int idx) {
 
@@ -83,12 +84,12 @@ public class Acronym extends Evaluator {
   }
 
   /**
-   * Determines if the word is an acronym and therefore not a sentence end.
+   * Determines if the word is an acronym and therefore not a likely sentence end.
    * 
-   * @param wd   A word.
+   * @param wd    A word.
    * 
    * @return    <code>true</code> if the word is part of an acronym,
-   *            and not a sentence end, <code>false</code> otherwise.
+   *            and not a likely sentence start/end, <code>false</code> otherwise.
    */
   public boolean evaluate(String wd) {
     char[] buf = wd.toCharArray();
@@ -112,11 +113,11 @@ public class Acronym extends Evaluator {
    * Checks the <code>buf</code> for oscillations of punctuation/letters
    * to determine whether or not an acronym.
    * 
-   * @param buf    Text buffer.
-   * @param idx    Index in the buffer to begin acronym examination.
-   * @param dirn   The direction {@link Acronym#LEFT} or
-   *               {@link Acronym#RIGHT} to traverse in <code>buf</code>
-   *               to search for an acronym.
+   * @param buf   Text buffer.
+   * @param idx   Index in the buffer to begin acronym examination.
+   * @param dirn  The direction {@link Acronym#LEFT} or
+   *              {@link Acronym#RIGHT} to traverse in <code>buf</code>
+   *              to search for an acronym.
    *               
    * @return    An {@link AcronymOp} containing the results of the 
    *            oscillation check.
@@ -207,7 +208,7 @@ public class Acronym extends Evaluator {
    * @version 1.0
    * @since 1.0
    */
-  private static class AcronymOp {
+  static class AcronymOp {
   
     /**
      * Whether or not an acronym was found.
@@ -228,10 +229,10 @@ public class Acronym extends Evaluator {
     /**
      * Constructor, initializes the <code>AcronymOp</code> object.
      * 
-     * @param result               Whether or not an acronym was found.
-     * @param oscillatingCt        The number of punctuation characters.
-     * @param consecutiveCharCt    Maximum number of consecutive characters
-     *                             found.
+     * @param result    Whether or not an acronym was found.
+     * @param oscillatingCt   The number of punctuation characters.
+     * @param consecutiveCharCt   Maximum number of consecutive characters
+     *                            found.
      */
     public AcronymOp(boolean result, int oscillatingCt, 
         int consecutiveCharCt) {
@@ -243,7 +244,6 @@ public class Acronym extends Evaluator {
     /**
      * @return    Returns whether or not an acronym was found.
      */
-    @SuppressWarnings("unused")
     public boolean result() {
       return(result);
     }
@@ -251,7 +251,6 @@ public class Acronym extends Evaluator {
     /**
      * @return    The number of punctuation characters found.
      */
-    @SuppressWarnings("unused")
     public int oscillatingCt() {
       return(oscillatingCt);
     }
@@ -260,12 +259,8 @@ public class Acronym extends Evaluator {
      * @return    The maximum number of consecutive characters 
      *            (letters or digits) found.
      */   
-    @SuppressWarnings("unused")
     public int consecutiveCharCt() {
       return(consecutiveCharCt);
     }
   }
-  
-
-  
 }

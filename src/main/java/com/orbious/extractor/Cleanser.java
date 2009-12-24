@@ -10,7 +10,7 @@ import com.orbious.util.Helper;
  * <p>
  * Provides static methods for cleaning up text within a document
  * in preparation for sentence separation.
- * 
+ * <p>
  * @author dave
  * @version 1.0
  * @since 1.0
@@ -20,7 +20,7 @@ public class Cleanser {
 
   /**
    * A local copy of preserved punctuation from 
-   * {@link com.orbious.separator.Config#PRESERVED_PUNCTUATION}.
+   * {@link com.orbious.extractor.Config#PRESERVED_PUNCTUATION}.
    */
   private static HashSet<Character> preserved_punctuation;
   
@@ -28,6 +28,12 @@ public class Cleanser {
    * Logger object.
    */
   private static final Logger logger;
+
+  static {
+    preserved_punctuation = Helper.cvtStringToHashSet(
+        Config.PRESERVED_PUNCTUATION.asStr());
+    logger =  Logger.getLogger(Config.LOGGER_REALM.asStr());
+  }
   
   /**
    * Private Constructor.
@@ -35,17 +41,8 @@ public class Cleanser {
   private Cleanser() { }
   
   /**
-   * Static initializer block.
-   */
-  static {
-	  preserved_punctuation = Helper.cvtStringToHashSet(
-        Config.PRESERVED_PUNCTUATION.asStr());
-	  logger =  Logger.getLogger(Config.LOGGER_REALM.asStr());
-  }
-  
-  /**
    * Reloads the local copy of preserved punctuation from 
-   * {@link com.orbious.separator.Config#PRESERVED_PUNCTUATION}.
+   * {@link com.orbious.extractir.Config#PRESERVED_PUNCTUATION}.
    */
   public static void reload() {
 	  preserved_punctuation = Helper.cvtStringToHashSet(
@@ -57,13 +54,13 @@ public class Cleanser {
    * in <code>lines</code>. All multiple occurrences of whitespace are 
    * replaced with a single whitespace and newlines are removed completely.
    * 
-   * @param text   A <code>Vector</code> of raw text.
-   * @param idx    The index in <code>Vector</code> to remove unnecessary 
-   *               whitespace.
+   * @param text    A <code>Vector</code> of raw text.
+   * @param idx     The index in <code>Vector</code> to remove unnecessary 
+   *                whitespace.
    * 
-   * @return  <code>null</code> if the line contains no letters, digits,
-   *          punctuation, otherwise the line with multiple whitespace
-   *          and newlines removed.
+   * @return    <code>null</code> if the line contains no letters, digits,
+   *            punctuation, otherwise the line with multiple whitespace
+   *            and newlines removed.
    */
   public static String removeWhitespace(final Vector<String> text, int idx) { 
     boolean inWhitespace;
@@ -160,7 +157,7 @@ public class Cleanser {
    * <li>Punctuation within a word or an apostrophe at the 
    *     end of a word (e.g. 'Fred's, boys', time-line) is preserved.
    *     
-   * @param words    A list of words to process.
+   * @param words   A list of words to process.
    *
    * @return    A <code>Vector</code> of <code>String</code>'s 
    *            representing a cleansed version
@@ -229,7 +226,7 @@ public class Cleanser {
    * Runs the same algorithm as @{link Cleanser#cleanWords}
    * and return's those words in a string with whitespace separators.
    * 
-   * @param words    A list of words to process.
+   * @param words   A list of words to process.
    *
    * @return    A cleansed version in a <code>String</code> format.
    */

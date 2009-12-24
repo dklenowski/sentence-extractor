@@ -6,12 +6,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
-
 import com.orbious.extractor.Config;
 import com.orbious.extractor.SentenceMapEntry;
-import com.orbious.extractor.SentenceMapEntry.Likelyhood;
+import com.orbious.extractor.SentenceMapEntry.Likelihood;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntrySubType;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntryType;
 
@@ -40,13 +38,13 @@ public class Helper {
    * automatically update to the <code>buf</code> 
    * extremium's if required.
    * 
-   * @param buf    Text buffer.
-   * @param idx    The <code>buf</code> array index specifying the 
-   *               middle point for extraction.
-   * @param size   The length of the <code>String</code> to return.
+   * @param buf   Text buffer.
+   * @param idx   The <code>buf</code> array index specifying the 
+   *              middle point for extraction.
+   * @param size    The length of the <code>String</code> to return.
    * 
    * @return    A <code>String</code> containing text extracted from 
-   *           <code>buf</code>.
+   *            <code>buf</code>.
    */
   public static String getDebugStringFromCharBuf(char[] buf, int idx, int size) {
     StringBuffer sb;
@@ -81,23 +79,30 @@ public class Helper {
   }
   
   /**
+   * Returns a debugging string for an array of <code>SentenceMapEntry</code>'s.
    * 
-   * @param template
-   * @param buf
-   * @param idx
-   * @param size
-   * @param width
-   * @return
+   * @param template    A text buffer of the same size as <code>buf</code>
+   *                    used to insert whitespace characters.
+   * @param buf   An array of <code>SentenceMapEntry</code>'s.
+   * @param idx   The position in <code>buf</code> to begin writing
+   *              the debug string.
+   * @param size    The number of entries to examing in <code>buf</code>.     
+   * @param width   The width of the debug string where a newline
+   *                is inserted at each length <code>width</code> in the debug
+   *                string. If <code>-1</code>, no newline is inserted.
+   * 
+   * @return    A debug string for <code>buf</code>.
    */
   public static String getDebugStringFromSentenceMap(final char[] template,
       final SentenceMapEntry[] buf, int idx, int size, int width) { 
     String str;
     int modct;
     SentenceMapEntry entry;
-    str = "";
-    modct = 1;
     int start;
     int end;
+    
+    str = "";
+    modct = 1;
     
     start = idx-(size/2);
     if ( start < 0 ) {
@@ -123,7 +128,7 @@ public class Helper {
             str += "e";
           } else {
             // 
-            if ( entry.likelyhood() == Likelyhood.LIKELY ) {
+            if ( entry.likelihood() == Likelihood.LIKELY ) {
               str += "E";
             } else {
               str += "U";
@@ -134,7 +139,7 @@ public class Helper {
             // always likely 
             str += "s";
           } else {
-            if ( entry.likelyhood() == Likelyhood.LIKELY ) {
+            if ( entry.likelihood() == Likelihood.LIKELY ) {
               str += "S";
             } else {
               str += "n";
@@ -157,9 +162,10 @@ public class Helper {
    * Convert the contents of a <code>String</code> to a 
    * <code>HashSet</code> separated on <code>Character</code> boundaries.
    * 
-   * @param str    The <code>String</code> to interrogate.
-   * @return       A <code>HashSet</code> containing the contents of the 
-   *               <code>String</code> <code>str</code>.
+   * @param str   The <code>String</code> to interrogate.
+   * 
+   * @return    A <code>HashSet</code> containing the contents of the 
+   *            <code>String</code> <code>str</code>.
    */
   public static HashSet<Character> cvtStringToHashSet(String str) {
     char[] buf = str.toCharArray();
@@ -178,8 +184,9 @@ public class Helper {
    * file occupying an entry in the <code>HashSet</code>.
    * 
    * @param filename    The absolute filename to parse.
-   * @return            A <code>HashSet</code> containing the contents
-   *                    of <code>filename</code>.
+   * 
+   * @return    A <code>HashSet</code> containing the contents
+   *            of <code>filename</code>.
    */
   public static HashSet<String> cvtFileToHashSet(String filename) {
     Logger logger;
@@ -221,8 +228,9 @@ public class Helper {
    * <code>String</code> separated by whitespace.
    * 
    * @param words    A list of <code>String</code>'s to convert.
-   * @return        The <code>Vector</code> with its <code>String</code>
-   *                contents appended to a <code>String</code>.
+   * 
+   * @return    The <code>Vector</code> with its <code>String</code>
+   *            contents appended to a <code>String</code>.
    */
   
   public static String cvtVectorToString(Vector<String> words) {

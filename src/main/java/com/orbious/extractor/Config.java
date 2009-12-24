@@ -1,7 +1,7 @@
 package com.orbious.extractor;
 
 /**
- * $Id: Config.java 14 2009-12-06 10:03:53Z app $
+ * $Id$
  * <p>
  * Shared Constants.
  * 

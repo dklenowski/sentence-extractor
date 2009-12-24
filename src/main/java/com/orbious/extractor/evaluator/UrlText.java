@@ -8,9 +8,10 @@ import com.orbious.extractor.Config;
 /**
  * $Id$
  * <p>
- * Implements the <code>SentenceStart</code> interface to determine
- * if a possible sentence start is a common first name/surname.
- * 
+ * Determines whether a position/word in a text buffer is considered
+ * a url and therefore "full stops" are not considered a likely 
+ * sentence end.
+ * <p>
  * @author dave
  * @version 1.0
  * @since 1.0
@@ -24,13 +25,24 @@ public class UrlText extends Evaluator {
   private Pattern url_pattern;
   
   /**
-   * Initializes the <code>UrlText</code>.
+   * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
    */
   public UrlText() {
     super("UrlText");
     url_pattern = Pattern.compile(Config.URL_REGEX.asStr());
   }
   
+  /**
+   * Determines if the previous word from <code>idx</code>
+   * in the buffer <code>buf</code> is a url and therefore not a
+   * likely sentence end.
+   * 
+   * @param buf   Text buffer.
+   * @param idx   Position in <code>buf</code> where evaluation begins.
+   * 
+   * @return    <code>true</code> if the word is a url and not
+   *            a likely sentence end, <code>false</code> otherwise.
+   */  
   public boolean evaluate(final char[] buf, int idx) {
     String str;
     char ch;
@@ -77,23 +89,25 @@ public class UrlText extends Evaluator {
       i++;
     }
 
-    Matcher matcher = url_pattern.matcher(str);
-    boolean result = matcher.find();
-    
-    if ( logger.isDebugEnabled() ) {
-      logger.debug("Extracted=" + str + " Match=" + 
-          String.valueOf(result).toUpperCase());
-    }
-
-    return(result);
+    return( evaluate(str) );
   }
-  
+
+  /**
+   * Determines if the word is a url and therefore not a
+   * likely sentence end.
+   * 
+   * @param wd    A word.
+   * 
+   * @return    <code>true</code> if the word is a url and not
+   *            a likely sentence start, <code>false</code> otherwise.
+   */
   public boolean evaluate(String wd) {
     Matcher matcher = url_pattern.matcher(wd);
     boolean result = matcher.find();
     
     if ( logger.isDebugEnabled() ) {
-      logger.debug("Word=" + wd + " Match=" + result);
+      logger.debug("Word=" + wd + " Match=" + 
+          String.valueOf(result).toUpperCase());
     }
 
     return(result);

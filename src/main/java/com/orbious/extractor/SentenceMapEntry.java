@@ -1,10 +1,10 @@
 package com.orbious.extractor;
 
+// $Id$
+
 /**
- * $Id$
- * <p>
  * Used by TextParser to store information for potential sentence start/ends.
- * <p>
+ *
  * @author dave
  * @version 1.0
  * @since 1.0

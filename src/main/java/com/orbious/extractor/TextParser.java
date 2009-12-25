@@ -1,5 +1,7 @@
 package com.orbious.extractor;
 
+// $Id: TextParser.java 14 2009-12-06 10:03:53Z app $
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,43 +18,41 @@ import com.orbious.extractor.evaluator.UrlText;
 import com.orbious.util.Helper;
 
 /**
- * $Id: TextParser.java 14 2009-12-06 10:03:53Z app $
- * <p>
  * Parser a text document into sentences.
  * 
  * @author dave
  * @version 1.0
  */
+
 public class TextParser {
   
   /**
-   * The plain-text file we wish to extract sentences from.
+   * A plain text file.
    */
   private String filename;
 
   /**
-   * 
+   * In memory representation of the text file with whitespace removed.
    */
   private char[] buffer;
   
   /**
-   * 
+   * List of allowable sentence ends.
    */
   private HashSet<Character> allowable_ends;
   
   /**
-   * 
+   * A buffer that contains entries for likely/unlikely sentence start's/end's.
    */
   private SentenceMapEntry[] sentence_map;
   
   /**
-   * A <code>Vector</code> of <code>Vector</code> words for 
-   * sentences that were found in {@link TextParser#filename}.
+   * Contains a list of sentences extracted from <code>filename</code>.
    */
   private Vector< Vector<String> > sentences;
   
   /**
-   * A <code>Logger</code> object.
+   * Logger object.
    */
   private Logger logger;
   
@@ -68,26 +68,38 @@ public class TextParser {
   }
 
   /**
-   * 
-   * @return
+   * Returns the in-memory representation of {@link TextParser#filename} as a 
+   * <code>char</code> array with whitespace removed.
+   * <p>
+   * @return  The parsed <code>char</code> buffer.
    */
-  public char[] buffer() {
+  protected char[] buffer() {
     return(buffer);
   }
   
   /**
+   * Returns a <code>Vector</code> of sentences extracted from 
+   * {@link TextParser#filename}. Each sentence put into a <code>Vector</code>, 
+   * where each entry contains a word.
    * 
-   * @return
+   * @return    A list of sentences extracted from <code>filename</code>
+   *            with each sentence returned as a <code>Vector</code> of words.
    */
   public Vector< Vector<String> > sentences() {
     return(sentences);
   }
   
   /**
+   * Returns the same as @{link TextParser#sentences} with the <code>Vector</code>
+   * list's of words converted to <code>String</code>'s. These string's are
+   * run through the @{link {@link Cleanser#cleanWordsAsStr(Vector)} to
+   * generate the <code>String</code> values.
+   * 
    * Accessor for {@link TextParser#sentences} with the words in the sentences
    * converted to <code>String</code>'s.
    * 
-   * @return  {@link TextParser#sentences} with <code>String</code> sentences.
+   * @return    A list of sentences extracted from <code>filename</code>
+   *            with each sentence returned as a <code>String</code>.
    */
   public Vector<String> sentencesAsStr() {
     Vector<String> sent = new Vector<String>();
@@ -100,6 +112,9 @@ public class TextParser {
   }
   
   /**
+   * Parses {@link TextParser#filename} into memory. This method also calls 
+   * {@link WhitespaceRemover#remove(Vector, int)} on each line
+   * before adding to memory.
    * 
    * @throws FileNotFoundException
    * @throws IOException
@@ -149,7 +164,8 @@ public class TextParser {
   }
  
   /**
-   * 
+   * Runs the sentence extraction algorithm to generate the sentences
+   * for {@link TextParser#sentences}.
    */
   public void genSentences() {
     int startIdx;
@@ -282,16 +298,21 @@ public class TextParser {
 
     if ( logger.isDebugEnabled() ) {
       logger.debug("SentenceMap\n" + 
-          Helper.getDebugStringFromSentenceMap(buffer, sentence_map, 0, buffer.length, 100));
+          Helper.getDebugStringFromSentenceMap(buffer, sentence_map, 0, 
+              buffer.length, 100));
     }    
   }
 
   /**
+   * Adds a likely/unlikely sentence start/end to the 
+   * {@link TextParser#sentence_map}. If the entry specified at <code>idx</code>
+   * is not null, will only add if the new entry replaces a 
+   * {@link SentenceMapEntry.Likelihood} of <code>LIKELY</code>.
    * 
-   * @param idx
-   * @param likelyhood
-   * @param type
-   * @param subtype
+   * @param idx   The index in {@link TextParser#sentence_map}.
+   * @param likelihood    The likelihood of this <code>SentenceMapEntry</code>. 
+   * @param type    The type of this <code>SentenceMapEntry</code>.
+   * @param subtype   Optional, The subtype of this <code>SentenceMapEntry</code>.
    */
   private void addToMap(int idx, Likelihood likelihood, SentenceEntryType type, 
       SentenceEntrySubType subtype) {
@@ -316,6 +337,14 @@ public class TextParser {
     
   }
   
+  /**
+   * Extract a <code>Vector</code> of words from {@link TextParser#buffer}.
+   * 
+   * @param startIdx    The start index to begin extraction.
+   * @param endIdx    The end index to stop extraction.
+   * 
+   * @return    A <code>Vector</code> of words.
+   */
   protected Vector<String> extract(int startIdx, int endIdx) {
     Vector<String> words;
     String wd;

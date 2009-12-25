@@ -1,5 +1,7 @@
 package com.orbious;
 
+// $Id: AllTests.java 14 2009-12-06 10:03:53Z app $
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import com.orbious.util.HelperTest;
@@ -16,8 +18,6 @@ import junit.framework.TestSuite;
 import junit.framework.Test;
 
 /**
- * $Id: AllTests.java 14 2009-12-06 10:03:53Z app $
- * <p>
  * @author dave
  * @version 1.0
  * @since 1.0

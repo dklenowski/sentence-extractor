@@ -1,5 +1,7 @@
 package com.orbious.util;
 
+// $Id: Helper.java 11 2009-12-04 14:07:11Z app $
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -15,8 +17,6 @@ import com.orbious.extractor.SentenceMapEntry.SentenceEntryType;
 
 
 /**
- * $Id: Helper.java 11 2009-12-04 14:07:11Z app $
- * <p>
  * Static helper methods.
  * 
  * @author dave

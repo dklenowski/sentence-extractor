@@ -1,17 +1,17 @@
 package com.orbious.extractor.evaluator;
 
+// $Id$
+
 import com.orbious.extractor.Config;
 import com.orbious.extractor.Word;
 import com.orbious.util.Helper;
 import java.util.HashSet;
 
 /**
- * $Id$
- * <p>
  * Determines whether a position/word in a text buffer is considered
  * a Name and therefore not a likely sentence start. This class should only 
  * be used for evaluating the start of a sentence.
- * <p>
+ * 
  * @author dave
  * @version 1.0
  * @since 1.0

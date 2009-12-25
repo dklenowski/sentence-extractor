@@ -1,12 +1,12 @@
 package com.orbious.extractor;
 
+// $Id: SentenceTest.java 14 2009-12-06 10:03:53Z app $
+
 import com.orbious.AllTests;
 import com.orbious.extractor.Sentence.StartOp;
 import junit.framework.TestCase;
 
 /**
- * $Id: SentenceTest.java 14 2009-12-06 10:03:53Z app $
- * <p>
  * @author dave
  * @version 1.0
  * @since 1.0

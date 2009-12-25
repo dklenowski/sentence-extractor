@@ -1,17 +1,16 @@
 package com.orbious.extractor.evaluator;
 
+// $Id$
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import com.orbious.extractor.Config;
 
 /**
- * $Id$
- * <p>
  * Determines whether a position/word in a text buffer is considered
  * a url and therefore "full stops" are not considered a likely 
  * sentence end.
- * <p>
+ * 
  * @author dave
  * @version 1.0
  * @since 1.0

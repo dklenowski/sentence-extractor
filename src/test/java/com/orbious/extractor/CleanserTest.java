@@ -1,15 +1,13 @@
 package com.orbious.extractor;
 
+// $Id: CleanserTest.java 14 2009-12-06 10:03:53Z app $
+
 import java.util.Arrays;
 import java.util.Vector;
-
 import com.orbious.AllTests;
-
 import junit.framework.TestCase;
 
 /**
- * $Id: CleanserTest.java 14 2009-12-06 10:03:53Z app $
- * <p>
  * @author dave
  * @version 1.0
  * @since 1.0

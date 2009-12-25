@@ -1,12 +1,12 @@
 package com.orbious.extractor;
 
+// $Id: Word.java 12 2009-12-05 11:40:44Z app $
+
 import org.apache.log4j.Logger;
 
 /**
- * $Id: Word.java 12 2009-12-05 11:40:44Z app $
- * <p>
  * Provides various static word operation methods.
- * <p>
+ * 
  * @author dave
  * @version 1.0
  * @since 1.0

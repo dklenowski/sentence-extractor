@@ -1,16 +1,16 @@
 package com.orbious.extractor;
 
+// $Id: Cleanser.java 14 2009-12-06 10:03:53Z app $
+
 import java.util.HashSet;
 import java.util.Vector;
 import org.apache.log4j.Logger;
 import com.orbious.util.Helper;
 
 /**
- * $Id: Cleanser.java 14 2009-12-06 10:03:53Z app $
- * <p>
  * Provides static methods for cleaning up text within a document
  * in preparation for sentence separation.
- * <p>
+ * 
  * @author dave
  * @version 1.0
  * @since 1.0
@@ -42,7 +42,7 @@ public class Cleanser {
   
   /**
    * Reloads the local copy of preserved punctuation from 
-   * {@link com.orbious.extractir.Config#PRESERVED_PUNCTUATION}.
+   * {@link com.orbious.extractor.Config#PRESERVED_PUNCTUATION}.
    */
   public static void reload() {
 	  preserved_punctuation = Helper.cvtStringToHashSet(

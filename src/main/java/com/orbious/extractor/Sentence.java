@@ -1,5 +1,7 @@
 package com.orbious.extractor;
 
+// $Id$
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Vector;
@@ -12,10 +14,8 @@ import com.orbious.extractor.evaluator.UrlText;
 import com.orbious.util.Helper;
 
 /**
- * $Id$
- * <p>
  * Provides static methods for Sentence operations.
- * <p>
+ * 
  * @author dave
  * @version 1.0
  * @since 1.0
@@ -36,12 +36,13 @@ public class Sentence {
 
   /**
    * A list of <code>Evaluator</code>'s that are used to determine
-   * whether a sentence end is valid.
+   * whether a sentence end is likely.
    */
   private static Vector<Evaluator> end_evaluators;
   
   /**
-   * 
+   * A list of <code>Evaluator</code>'s that are used to determine
+   * whether a sentence start is likely.
    */
   private static Vector<Evaluator> start_evaluators;
   
@@ -392,9 +393,9 @@ public class Sentence {
   
   
   /**
-   * An inner class used to return the results of {@link isStart}.
+   * An inner class used to return the results of 
+   * {@link Sentence#isStart(char[], int)}.
    */
-  
   static class StartOp {
     /**
      * Whether or not a likely sentence start was found.
@@ -459,10 +460,11 @@ public class Sentence {
     }
   }
   
-  /**
-   * An inner class used to return the results of {@link isEnd}.
-   */
   
+  /**
+   * An inner class used to return the results of 
+   * {@link Sentence#isEnd(char[], int)}.
+   */
   static class EndOp {
     /**
      * Whether or not a likely sentence end was found.

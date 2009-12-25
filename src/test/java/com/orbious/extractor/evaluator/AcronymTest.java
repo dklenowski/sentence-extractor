@@ -1,13 +1,12 @@
 package com.orbious.extractor.evaluator;
 
+// $Id: AcronymTest.java 12 2009-12-05 11:40:44Z app $
+
 import com.orbious.AllTests;
 import com.orbious.extractor.evaluator.Acronym;
-
 import junit.framework.TestCase;
 
 /**
- * $Id: AcronymTest.java 12 2009-12-05 11:40:44Z app $
- * <p>
  * @author dave
  * @version 1.0
  * @since 1.0

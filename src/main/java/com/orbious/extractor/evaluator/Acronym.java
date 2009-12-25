@@ -1,14 +1,14 @@
 package com.orbious.extractor.evaluator;
 
+// $Id$
+
 import com.orbious.extractor.Config;
 import org.apache.log4j.Logger;
 
 /**
- * $Id$
- * <p>
  * Determines whether a word/position in a text buffer is considered 
  * an Acronym and therefore not a valid sentence start/end.
- * <p>
+ * 
  * @author dave
  * @version 1.0
  * @since 1.0

@@ -1,13 +1,13 @@
 package com.orbious.extractor;
 
+// $Id$
+
 /**
- * $Id$
- * <p>
  * A <code>SentenceException</code> exception occurs when:
  * <ul>
  * <li>The <code>index</code> where the sentence extraction begins is not 
  * punctuation.
- * <p>
+ * 
  * @author dave
  * @version 1.0
  * @since 1.0

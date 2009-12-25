@@ -1,8 +1,8 @@
 package com.orbious.extractor;
 
+// $Id$
+
 /**
- * $Id$
- * <p>
  * Shared Constants.
  * 
  * @author dave

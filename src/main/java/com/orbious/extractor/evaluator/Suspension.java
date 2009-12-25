@@ -1,13 +1,13 @@
 package com.orbious.extractor.evaluator;
 
+// $Id$
+
 import java.util.HashSet;
 import com.orbious.extractor.Config;
 import com.orbious.extractor.Word;
 import com.orbious.util.Helper;
 
 /**
-* $Id$
-* <p>
 * Determines if a position/word in a text buffer is considered a Suspension
 * and therefore not a 
 * The <code>Suspension</code> <code>Evaluator</code> determines if a word 
@@ -16,7 +16,7 @@ import com.orbious.util.Helper;
 * <li>A suspension can be capitalized and It can be capitalized and not be a sentence start.
 * <li>It can be terminated with a fullstop and not be a sentence end.
 * </ul>
-* 
+*
 * @author dave
 * @version 1.0
 * @since 1.0

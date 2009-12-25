@@ -1,13 +1,13 @@
 package com.orbious.extractor;
 
+// $Id$
+
 import java.util.Vector;
 import org.apache.log4j.Logger;
 
 /**
- * $Id$
- * <p>
  * Provides static methods to remove whitespace.
- * <p>
+ * 
  * @author dave
  * @version 1.0
  * @since 1.0

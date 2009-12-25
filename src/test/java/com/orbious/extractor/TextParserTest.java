@@ -1,21 +1,18 @@
 package com.orbious.extractor;
 
+// $Id: TextParserTest.java 12 2009-12-05 11:40:44Z app $
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Vector;
-
 import name.fraser.neil.plaintext.diff_match_patch;
 import name.fraser.neil.plaintext.diff_match_patch.Diff;
-
 import com.orbious.AllTests;
-
 import junit.framework.TestCase;
 
 /**
- * $Id: TextParserTest.java 12 2009-12-05 11:40:44Z app $
- * <p>
  * @author dave
  * @version 1.0
  * @since 1.0

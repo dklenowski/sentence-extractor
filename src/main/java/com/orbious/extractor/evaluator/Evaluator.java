@@ -1,18 +1,17 @@
 package com.orbious.extractor.evaluator;
 
-import org.apache.log4j.Logger;
+// $Id$
 
+import org.apache.log4j.Logger;
 import com.orbious.extractor.Config;
 
 /**
- * $Id$
- * <p>
  * A class that is sub-class for running evaluations on sentence start/ends.
  * <p>
- * If the overidden <code>evaluate</code> method returns <code>true</code>,
+ * If the overridden <code>evaluate</code> method returns <code>true</code>,
  * the implementing <code>Evaluator</code> believes the passed in parameters
  * are unlikely to be a sentence start/end.
- * <p>
+ * 
  * @author dave
  * @version 1.0
  * @since 1.0

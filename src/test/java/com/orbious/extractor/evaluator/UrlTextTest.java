@@ -1,11 +1,11 @@
 package com.orbious.extractor.evaluator;
 
+// $Id$
+
 import com.orbious.AllTests;
 import junit.framework.TestCase;
 
 /**
- * $Id$
- * <p>
  * @author dave
  * @version 1.0
  * @since 1.0

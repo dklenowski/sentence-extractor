@@ -47,17 +47,17 @@ public class Helper {
    *            <code>buf</code>.
    */
   public static String getDebugStringFromCharBuf(char[] buf, int idx, int size) {
-    StringBuffer sb;
-    StringBuffer id;
+    String str;
+    String id;
     int start;
     int end;
 
-    sb = new StringBuffer();
-    id = new StringBuffer();
-    
+    str = "";
+    id = "";
+
     start = idx-(size/2);
     if ( start < 0 ) {
-      size += Math.abs(start);
+      size += Math.abs(start*2);
       start = 0;
     }
     
@@ -67,15 +67,115 @@ public class Helper {
     }
     
     for ( int i = start; i < end; i++ ) {
-      sb.append(buf[i]);
+      str += buf[i];
       if ( i == idx ) {
-        id.append("|");
+        id += "|";
       } else {
-        id.append("-");
+        id += "-";
       }
     }
 
-    return( sb.toString() + "\n" + id.toString() );
+    return( str + "\n" + id );
+  }
+  
+  /**
+   * 
+   * @param buf
+   * @param idx
+   * @param size
+   * @param width
+   * @return
+   */
+  public static String getDebugStringFromCharBuf(final char[] buf,
+      int idx, int size, int width) { 
+    String str;
+    int modct;
+    int start;
+    int end;
+    
+    str = "";
+    modct = 1;
+    
+    start = idx-(size/2);
+    if ( start < 0 ) {
+      size += Math.abs(start*2);
+      start = 0;
+    }
+    
+    end = idx+(size/2)+1;
+    if ( end > buf.length ) {
+      end = buf.length;
+    }
+ 
+    for ( int i = start; i < end; i++ ) {
+      str += buf[i];
+      
+      if ( (width != -1) && (modct % width == 0) ) {
+        str += "\n";
+      }
+      modct++;
+    }
+    
+    str += "\n";
+    return(str);        
+  }
+  
+  /**
+   * Returns a debugging string for an array of <code>boolean</code>'s 
+   * (which is used in the sentence extraction algorithm).
+   * 
+   * @param template    A text buffer of the same size as <code>buf</code>
+   *                    used to insert whitespace characters.    
+   * @param buf   An array of <code>boolean</code>'s.
+   * @param idx   The position in <code>buf</code> to begin writing
+   *              the debug string.
+   * @param size    The number of entries to examine in <code>buf</code>.     
+   * @param width   The width of the debug string where a newline
+   *                is inserted at each length <code>width</code> in the debug
+   *                string. If <code>-1</code>, no newline is inserted.
+   * 
+   * @return    A debug string for <code>buf</code>.
+   */
+  public static String getDebugStringFromBoolBuf(final char[] template, 
+      final boolean[] buf, int idx, int size, int width) { 
+    String str;
+    int modct;
+    int start;
+    int end;
+    
+    str = "";
+    modct = 1;
+    
+    start = idx-(size/2);
+    if ( start < 0 ) {
+      size += Math.abs(start*2);
+      start = 0;
+    }
+    
+    end = idx+(size/2)+1;
+    if ( end > buf.length ) {
+      end = buf.length;
+    }
+ 
+    for ( int i = start; i < end; i++ ) {
+      if ( Character.isWhitespace(template[i]) ) {
+        str += " ";
+      } else {
+        if ( buf[i] ) {
+          str += "-";
+        } else {
+          str += ".";
+        }
+      }
+      
+      if ( (width != -1) && (modct % width == 0) ) {
+        str += "\n";
+      }
+      modct++;
+    }
+    
+    str += "\n";
+    return(str);    
   }
   
   /**
@@ -86,7 +186,7 @@ public class Helper {
    * @param buf   An array of <code>SentenceMapEntry</code>'s.
    * @param idx   The position in <code>buf</code> to begin writing
    *              the debug string.
-   * @param size    The number of entries to examing in <code>buf</code>.     
+   * @param size    The number of entries to examine in <code>buf</code>.     
    * @param width   The width of the debug string where a newline
    *                is inserted at each length <code>width</code> in the debug
    *                string. If <code>-1</code>, no newline is inserted.
@@ -106,7 +206,7 @@ public class Helper {
     
     start = idx-(size/2);
     if ( start < 0 ) {
-      size += Math.abs(start);
+      size += Math.abs(start*2);
       start = 0;
     }
     
@@ -115,6 +215,12 @@ public class Helper {
       end = buf.length;
     }
     
+    // e - Likely end from start
+    // E - likely end
+    // U - unlikely end
+    // s - Likely start from end
+    // S - likely start
+    // u - unlikely start
     for ( int i = start; i < end; i++ ) {
       if ( Character.isWhitespace(template[i]) ) {
         str += " ";

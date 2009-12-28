@@ -30,6 +30,12 @@ public class Sentence {
   private static HashSet<Character> allowable_ends;
   
   /**
+   * A local copy of punctuation from
+   * {@link com.orbious.extractor.Config#PUNCTUATION}
+   */
+  private static HashSet<Character> punctuation;
+  
+  /**
    * Logger object.
    */
   private static final Logger logger;
@@ -48,6 +54,7 @@ public class Sentence {
   
   static {
     allowable_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
+    punctuation = Helper.cvtStringToHashSet(Config.PUNCTUATION.asStr());
     logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
   }
   
@@ -135,9 +142,18 @@ public class Sentence {
     
     op = new EndOp(false, -1);
     
-    if ( hasLaterPunctuation(buf, idx) ) {
+    if ( hasLaterEnd(buf, idx) ) {
       if ( logger.isDebugEnabled() ) {
-        debugStr += "\thasLaterPunctuation=TRUE\n";
+        debugStr += "\thasLaterEnd=TRUE\n";
+        logger.debug(debugStr);
+      }
+      
+      return(op);
+    }
+    
+    if ( (buf[idx] == '"') && hasLaterQuotation(buf, idx) ) {
+      if ( logger.isDebugEnabled() ) {
+        debugStr += "\thasLaterQuotation=TRUE\n";
         logger.debug(debugStr);
       }
       
@@ -195,10 +211,11 @@ public class Sentence {
    * @return    <code>true</code> if a later potential sentence end was found,
    *            <code>false</code> otherwise.
    */
-  protected static boolean hasLaterPunctuation(final char[] buf, int idx) {
+  protected static boolean hasLaterEnd(final char[] buf, int idx) {
     boolean fndLater;
     boolean inWhitespace;
     int i;
+    int j;
     char ch;
     
     i = idx+1;
@@ -209,8 +226,37 @@ public class Sentence {
       ch = buf[i];
 
       if ( allowable_ends.contains(ch) ) {
-        fndLater = true;
-        break;
+        // the special case is " 
+        // e.g.
+        // drum and cymbals. "Punch" himself
+        // we need to check which sentence the " belongs to
+        if ( ch != '"' ) {
+          fndLater = true;
+          break;
+        } else {
+          j = i+1;
+          while ( j < buf.length ) {
+            ch = buf[j];
+            if ( ch == '"' ) {
+              // we have found another " before a sentence end
+              // therefore we use the existing punctuation
+              break;
+            } else if ( allowable_ends.contains(ch) ) {
+              // we have not found another ", therefore the "
+              // must be tied to the existing sentence
+              fndLater = true;
+              break;
+            }
+            j++;
+          }
+          if ( j == (i+1) ) {
+            // we are near the end of the buffer,
+            // and could not tie " to a sentence
+            // therefore consider later punctuation
+            fndLater = true;
+          }
+          break;
+        }
       
       } else if ( Character.isLetterOrDigit(ch) ) {
         break;
@@ -232,6 +278,34 @@ public class Sentence {
         inWhitespace = true;
       } 
 
+      i++;
+    }
+    
+    return(fndLater);
+  }
+  
+  /**
+   * 
+   * @param buf
+   * @param idx
+   * @return
+   */
+  protected static boolean hasLaterQuotation(final char[] buf, int idx) {
+    int i;
+    boolean fndLater;
+    char ch;
+    
+    i = idx+1;
+    fndLater = false;
+    
+    while ( i < buf.length ) {
+      ch = buf[i];
+      if ( ch == '"' ) {
+        fndLater = true;
+        break;
+      } else if ( allowable_ends.contains(ch) ) {
+        break;
+      }
       i++;
     }
     
@@ -262,7 +336,8 @@ public class Sentence {
     
     i = idx+1;
     ch = buf[i];
-    while ( Character.isWhitespace(ch) ) {
+    while ( Character.isWhitespace(ch) || 
+          punctuation.contains(ch) ) {
       i++;
       if ( i >= buf.length ) {
         return(-1);

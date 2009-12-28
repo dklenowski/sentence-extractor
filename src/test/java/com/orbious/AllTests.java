@@ -24,13 +24,6 @@ import junit.framework.Test;
  */
 
 public class AllTests {
-
-  public static void initLogger() {
-    Logger root = Logger.getRootLogger();
-    if ( !root.getAllAppenders().hasMoreElements() ) {
-      DOMConfigurator.configure("resources/log4j.xml");
-    }   
-  }
   
   public static Test suite() {
     initLogger();
@@ -50,5 +43,12 @@ public class AllTests {
     ts.addTestSuite(TextParserTest.class);
     
     return(ts);
+  }
+  
+  public static void initLogger() {
+    Logger root = Logger.getRootLogger();
+    if ( !root.getAllAppenders().hasMoreElements() ) {
+      DOMConfigurator.configure("resources/log4j.xml");
+    }   
   }
 }

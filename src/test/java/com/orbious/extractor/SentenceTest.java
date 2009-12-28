@@ -65,7 +65,7 @@ public class SentenceTest extends TestCase {
     str = "fantastic. The";
     buf = str.toCharArray();
     
-    assertEquals(false, Sentence.hasLaterPunctuation(buf, 9));  
+    assertEquals(false, Sentence.hasLaterEnd(buf, 9));  
   }
 
   public void test_hasLaterPunctuationPunct() {
@@ -75,8 +75,8 @@ public class SentenceTest extends TestCase {
     str = "google.com..";
     buf = str.toCharArray();
 
-    assertEquals(true, Sentence.hasLaterPunctuation(buf, 10)); 
-    assertEquals(false, Sentence.hasLaterPunctuation(buf, 11));      
+    assertEquals(true, Sentence.hasLaterEnd(buf, 10)); 
+    assertEquals(false, Sentence.hasLaterEnd(buf, 11));      
   }
   
   public void test_hasLaterPunctuationPunct2() {
@@ -86,8 +86,8 @@ public class SentenceTest extends TestCase {
     str = "google.com. .";
     buf = str.toCharArray();
 
-    assertEquals(true, Sentence.hasLaterPunctuation(buf, 10));  
-    assertEquals(false, Sentence.hasLaterPunctuation(buf, 12));  
+    assertEquals(true, Sentence.hasLaterEnd(buf, 10));  
+    assertEquals(false, Sentence.hasLaterEnd(buf, 12));  
   }
 
   public void test_hasPunctuationLaterPunctWithLetters() {
@@ -97,7 +97,7 @@ public class SentenceTest extends TestCase {
     str = "google.com. and";
     buf = str.toCharArray();
 
-    assertEquals(false, Sentence.hasLaterPunctuation(buf, 10));   
+    assertEquals(false, Sentence.hasLaterEnd(buf, 10));   
   }
   
   //

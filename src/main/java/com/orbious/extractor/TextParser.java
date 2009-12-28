@@ -47,6 +47,16 @@ public class TextParser {
   private SentenceMapEntry[] sentence_map;
   
   /**
+   * A buffer that contains all the points that have been extracted.
+   */
+  private boolean[] extraction_map;
+  
+  /**
+   * 
+   */
+  private Vector< TextParserOp > parser_map;
+  
+  /**
    * Contains a list of sentences extracted from <code>filename</code>.
    */
   private Vector< Vector<String> > sentences;
@@ -171,13 +181,18 @@ public class TextParser {
     int startIdx;
     int unlikelyStartIdx;
     int unlikelyEndIdx;
+    int idx;
     SentenceMapEntry entry;
     SentenceEntryType type;
+    TextParserOp op;
     String debugStr;
+    Vector<String> sentence;
     
-    generateSentenceMap();    
+    genSentenceMap();    
 
     sentences = new Vector< Vector<String> >();
+    extraction_map = new boolean[buffer.length];
+    parser_map = new Vector<TextParserOp>();
    
     startIdx = -1;
     unlikelyStartIdx = -1;
@@ -196,45 +211,67 @@ public class TextParser {
         if ( entry.likelihood() == Likelihood.UNLIKELY ) {
           unlikelyStartIdx = i;
         } else {
-          if ( (startIdx != -1) && (unlikelyEndIdx != -1) ) {
-            // special case, we have a start index and no end index
-            // use the unlikely end idx
-            if ( logger.isDebugEnabled() ) {
-              logger.debug("Using unlikely: StartIdx=" + startIdx + 
-                  " UnlikelyEndIdx=" + unlikelyEndIdx);
+          // check if we have anything already parsed, 
+          // if so add a sentence begin/end
+          // otherwise just record the start idx
+          if ( unlikelyEndIdx != -1 ) {
+            idx = -1;
+            if ( startIdx != -1 ) {
+              idx = startIdx;
+              startIdx = -1;
+              if ( logger.isDebugEnabled() ) {
+                debugStr += " StartIdx=" + idx;
+              }
+            } else if ( unlikelyStartIdx != -1 ) {
+              idx = unlikelyStartIdx;
+              unlikelyStartIdx = -1;
+              if ( logger.isDebugEnabled() ) {
+                debugStr += " UnlikelyStartIdx=" + idx;
+              }
             }
-            sentences.add(extract(unlikelyStartIdx, i));
-            unlikelyEndIdx = -1;
+            
+            if ( idx != -1 ) {
+              if ( logger.isDebugEnabled() ) {
+                debugStr += " UnlikelyEndIdx=" + unlikelyEndIdx;
+              }
+              
+              recordSentence(idx, unlikelyEndIdx);
+              unlikelyEndIdx = -1;
+            }
           }
-          startIdx = i;
-          if ( logger.isDebugEnabled() ) {
-            debugStr =  "StartIdx=" + startIdx;
+          
+          if ( startIdx == -1 ) {
+            startIdx = i;
+            if ( logger.isDebugEnabled() ) {
+              debugStr =  " StartIdx=" + startIdx;
+            }
           }
         }
       } else if ( type == SentenceEntryType.END ) {
         if ( entry.likelihood() == Likelihood.UNLIKELY ) {
           unlikelyEndIdx = i;
-        } else if ( (startIdx == -1) && (unlikelyStartIdx == -1) ) {
-          if ( logger.isDebugEnabled() ) {
-            debugStr = "No StartIdx for endIdx=" + i;
-          }
-          // store for later
         } else {
-          if ( startIdx == -1 ) {
-            // no concrete startIdx use unlikelyStartIdx
+          idx = -1;
+          if ( startIdx != -1 ) {
+            idx = startIdx;
+            startIdx = -1;
             if ( logger.isDebugEnabled() ) {
-              debugStr = "Using unlikely: UnlikelyStartIdx=" + unlikelyStartIdx + 
-                  " EndIdx=" + i;
+              debugStr += " StartIdx=" + idx;
             }
-            sentences.add(extract(unlikelyStartIdx, i));
+          } else if ( unlikelyStartIdx != -1 ) {
+            idx = unlikelyStartIdx;
             unlikelyStartIdx = -1;
-          } else {
             if ( logger.isDebugEnabled() ) {
-              debugStr = "Using likely: StartIdx=" + startIdx + 
-                  " EndIdx=" + i;
+              debugStr += " UnlikelyStartIdx=" + idx;
             }
-            sentences.add(extract(startIdx, i));
-            startIdx = -1;          
+          }
+          
+          if ( idx != -1 ) {
+            if ( logger.isDebugEnabled() ) {
+              debugStr += " EndIdx=" + i;
+            }
+            recordSentence(idx, i);
+            unlikelyEndIdx = -1;
           }
         }
       }
@@ -246,12 +283,46 @@ public class TextParser {
         debugStr = "";
       }
     }
+    
+    for ( int i = 0; i < parser_map.size(); i++ ) {
+      op = parser_map.get(i);
+      sentence = extract(op.start, op.end);
+      if ( sentence.size() > Config.MIN_SENTENCE_LENGTH.asInt() ) {
+        sentences.add(sentence);
+      }
+    }
+       
+    if ( logger.isDebugEnabled() ) {
+      logger.debug("Buffer:\n" + 
+          Helper.getDebugStringFromCharBuf(buffer, 0, buffer.length, 100) +
+          "SentenceMap:\n" + 
+          Helper.getDebugStringFromSentenceMap(buffer, sentence_map, 0, 
+              sentence_map.length, 100) +
+          "ExtractionMap:\n" +
+          Helper.getDebugStringFromBoolBuf(buffer, extraction_map, 0, 
+              extraction_map.length, 100));
+    }
   }
   
   /**
    * 
+   * @param start
+   * @param end
    */
-  protected void generateSentenceMap() {
+  private void recordSentence(int start, int end) {
+    parser_map.add(new TextParserOp(start, end));
+    for ( int i = start; i <= end; i++ ) {
+      extraction_map[i] = true;
+    }
+  }
+  
+  
+  /**
+   * Internal method to generate a sentence map that is used by
+   * {@link TextParser#genSentences()} to find the begin and start 
+   * indexes for sentences.
+   */
+  protected void genSentenceMap() {
     char ch;
     EndOp endOp;
     StartOp startOp;
@@ -264,16 +335,19 @@ public class TextParser {
       if ( allowable_ends.contains(ch) ) {
         // check for ends
         endOp = Sentence.isEnd(buffer, i);
-        if ( !endOp.isEnd() ) {
-          addToMap(i, Likelihood.UNLIKELY, SentenceEntryType.END, null);
-        } else {
-          addToMap(i, Likelihood.LIKELY, SentenceEntryType.END, null);
-          
-          if ( endOp.startIdx() >= 0 ) {
-            addToMap(endOp.startIdx(), Likelihood.LIKELY, 
-                SentenceEntryType.START, SentenceEntrySubType.START_FROM_END);
+        if ( endOp != null ) {
+          if ( !endOp.isEnd() ) {
+            addToMap(i, Likelihood.UNLIKELY, SentenceEntryType.END, null);
+          } else {
+            addToMap(i, Likelihood.LIKELY, SentenceEntryType.END, null);
+            
+            if ( endOp.startIdx() >= 0 ) {
+              addToMap(endOp.startIdx(), Likelihood.LIKELY, 
+                  SentenceEntryType.START, SentenceEntrySubType.START_FROM_END);
+            }
           }
         }
+
       } else {
         // run a quick check to reduce the workload
         if ( !Character.isUpperCase(ch) ) {
@@ -296,11 +370,11 @@ public class TextParser {
       }
     }
 
-    if ( logger.isDebugEnabled() ) {
+    /*if ( logger.isDebugEnabled() ) {
       logger.debug("SentenceMap\n" + 
           Helper.getDebugStringFromSentenceMap(buffer, sentence_map, 0, 
               buffer.length, 100));
-    }    
+    } */   
   }
 
   /**
@@ -324,17 +398,14 @@ public class TextParser {
     replace = false;
     if ( old == null ) {
       replace = true;
-    } else {
-      if ( old.likelihood() == Likelihood.UNLIKELY ) {
-        replace = true;
-      }
+    } else if ( old.likelihood() == Likelihood.UNLIKELY ) {
+      replace = true;
     }
 
     if ( replace ) {
       entry = new SentenceMapEntry(likelihood, type, subtype);
       sentence_map[idx] = entry;
     }
-    
   }
   
   /**
@@ -350,17 +421,46 @@ public class TextParser {
     String wd;
     char ch;
     boolean hasLetter;
+    int adjustedStartIdx;
+    int adjustedEndIdx;
+
+    // adjust the indexes so we can get any additional punctuation
+    //
+    adjustedStartIdx = startIdx-1;
+    while ( (adjustedStartIdx > 0) &&
+        !extraction_map[adjustedStartIdx] &&
+        !Character.isLetterOrDigit(buffer[adjustedStartIdx]) ) {
+      adjustedStartIdx--;
+    } 
     
+    if ( adjustedStartIdx != startIdx ) {
+      adjustedStartIdx++;
+    }
+  
+    adjustedEndIdx = endIdx+1;
+    while ( (adjustedEndIdx < buffer.length) &&
+        !extraction_map[adjustedEndIdx] &&
+        !Character.isLetterOrDigit(buffer[adjustedEndIdx]) ) {
+      adjustedEndIdx++;
+    }
+    if ( adjustedEndIdx != endIdx ) {
+      adjustedEndIdx--;
+    }
+
     words = new Vector<String>();
     wd = "";
     hasLetter = false;
     
     if ( logger.isDebugEnabled() ) {
-      logger.debug("Beginning extract startIdx=" + startIdx + " endIdx=" + endIdx);
+      logger.debug("Beginning extract startIdx=" + startIdx + 
+          " adjustedStartIdx=" + adjustedStartIdx +
+          " endIdx=" + endIdx +
+          " adjustedEndIdx=" + adjustedEndIdx + " BUFFER LENGTH=" + buffer.length);
     }
     
-    for ( int i = startIdx; i <= endIdx; i++ ) {
+    for ( int i = adjustedStartIdx; i <= adjustedEndIdx; i++ ) {
       ch = buffer[i];
+
       if ( Character.isLetterOrDigit(ch) ) {
         wd += ch;
         hasLetter = true;
@@ -370,7 +470,6 @@ public class TextParser {
         }
         
         words.add(wd);
-        System.out.println("CASE 1 WORD="+ wd);
         wd = "";
         hasLetter = false;
         
@@ -383,10 +482,11 @@ public class TextParser {
           // if that fails we need to test there is text to the left
           if ( new UrlText().evaluate(buffer, i) ) {
             wd += ch;
-          } else if ( ch != ',' && !allowable_ends.contains(ch) ) {
+          } else if ( ch != '_' && ch != ',' && !allowable_ends.contains(ch) ) {
             wd += ch;
           } else {
             // the exceptions are sentence ends are ','
+            // and underscores (which appear allot in gutenberg texts)
             if ( wd.length() != 0 ) {
               words.add(wd);
             }
@@ -401,7 +501,7 @@ public class TextParser {
           }
           words.add(Character.toString(ch));
           wd = "";
-          hasLetter = false;;
+          hasLetter = false;
         }
       }
     }
@@ -411,9 +511,27 @@ public class TextParser {
     }
     
     if ( logger.isDebugEnabled() ) {
-      logger.debug(Helper.cvtVectorToString(words));
+      logger.debug("Extracted = " + Helper.cvtVectorToString(words));
     }
     
     return(words);
+  }
+  
+  static class TextParserOp {
+    private int start;
+    private int end;
+    
+    public TextParserOp(int start, int end) {
+      this.start = start;
+      this.end = end;
+    }
+    
+    public int start() {
+      return(start);
+    }
+    
+    public int end() {
+      return(end);
+    }
   }
 }

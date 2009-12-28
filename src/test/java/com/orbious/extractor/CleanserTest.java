@@ -3,7 +3,12 @@ package com.orbious.extractor;
 // $Id: CleanserTest.java 14 2009-12-06 10:03:53Z app $
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Vector;
+
+import name.fraser.neil.plaintext.diff_match_patch;
+import name.fraser.neil.plaintext.diff_match_patch.Diff;
+
 import com.orbious.AllTests;
 import junit.framework.TestCase;
 
@@ -36,10 +41,19 @@ public class CleanserTest extends TestCase {
             "wouldn't",
             "survive",
             "."));
-  
+
     String sentence = Cleanser.cleanWordsAsStr(words);
-    assertEquals("Schrodinger's cat sat on the time-line , who knew the cat wouldn't survive",
-        sentence);
+    String expected = "Schrodinger's cat sat on the time-line , who knew the cat wouldn't survive .";
+
+    if (!expected.equals(sentence) ) {
+      diff_match_patch dmp = new diff_match_patch();
+      LinkedList<Diff> d = dmp.diff_main(expected, sentence);
+
+      System.out.println("Expected=|" + expected + "|\n" +
+                         "Actual  =|" + sentence + "|\n" + 
+                         "Diff    =" + d);
+      fail();
+    }
   }
   
   public void test_CleanWordsComplex() {
@@ -61,9 +75,19 @@ public class CleanserTest extends TestCase {
             "well",
             ".",
             "\""));
-    String sentence = Cleanser.cleanWordsAsStr(words);  
-    assertEquals("HAL \" , \" noted Frank , said \" that everything was going extremely well \"",
-        sentence);
+    
+    String sentence = Cleanser.cleanWordsAsStr(words); 
+    String expected = "HAL \" , \" noted Frank , said \" that everything was going extremely well . \"";
+
+    if (!expected.equals(sentence) ) {
+      diff_match_patch dmp = new diff_match_patch();
+      LinkedList<Diff> d = dmp.diff_main(expected, sentence);
+
+      System.out.println("Expected=|" + expected + "|\n" +
+                         "Actual  =|" + sentence + "|\n" + 
+                         "Diff    =" + d);
+      fail();
+    }
   }
   
   public void test_CleanWordsWithNumbers() {
@@ -80,6 +104,16 @@ public class CleanserTest extends TestCase {
             "mood",
             "."));    
     String sentence = Cleanser.cleanWordsAsStr(words);
-    assertEquals("The sun sets at 6:00pm , irrespective of the mood", sentence);
+    String expected = "The sun sets at 6:00pm , irrespective of the mood .";
+    
+    if (!expected.equals(sentence) ) {
+      diff_match_patch dmp = new diff_match_patch();
+      LinkedList<Diff> d = dmp.diff_main(expected, sentence);
+
+      System.out.println("Expected=|" + expected + "|\n" +
+                         "Actual  =|" + sentence + "|\n" + 
+                         "Diff    =" + d);
+      fail();
+    }
   }
 }

@@ -25,6 +25,11 @@ public class Cleanser {
   private static HashSet<Character> preserved_punctuation;
   
   /**
+   * A local copy of sentence ends 
+   */
+  private static HashSet<Character> sentence_ends;
+  
+  /**
    * Logger object.
    */
   private static final Logger logger;
@@ -32,6 +37,8 @@ public class Cleanser {
   static {
     preserved_punctuation = Helper.cvtStringToHashSet(
         Config.PRESERVED_PUNCTUATION.asStr());
+    sentence_ends = Helper.cvtStringToHashSet(
+        Config.SENTENCE_ENDS.asStr());
     logger =  Logger.getLogger(Config.LOGGER_REALM.asStr());
   }
   
@@ -186,7 +193,7 @@ public class Cleanser {
           // we have punctuation
           // we want to remove any punctuation from either end
           // 
-          if ( preserved_punctuation.contains(ch) ) {
+          if ( preserved_punctuation.contains(ch) || sentence_ends.contains(ch) ) {
             wd += ch;
             hasData = true;
           } else if ( ch == '\'' ) {

@@ -31,7 +31,7 @@ public enum Config {
    * This does not include punctuation that is part of a word (e.g. '.', '-' etc)
    * which is preserved by default.
    */
-  PRESERVED_PUNCTUATION("\"!?'?()$&,"),
+  PRESERVED_PUNCTUATION(SENTENCE_ENDS + "'[]:()$&,"),
   
   /**
    * A regular expression to match URL's.
@@ -53,7 +53,13 @@ public enum Config {
    * A text file containing a list of common names, each on a newline.
    * Ignores lines that begin with "#" (i.e. comments).
    */
-  NAMES_FILENAME("resources/names.txt");
+  NAMES_FILENAME("resources/names.txt"),
+  
+  /**
+   * Minimum sentence length (in words), note any internal sentence punctuation
+   * (e.g. ',') are considered punctuation.
+   */
+  MIN_SENTENCE_LENGTH(3);
   
   /**
    * The value for the enum. 

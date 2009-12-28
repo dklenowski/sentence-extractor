@@ -6,7 +6,8 @@
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>sentence-extractor</name>
-  <url>http://maven.apache.org</url>
+  <description>Sentence Extraction API.</description>
+  <url>http://code.google.com/p/sentence-extractor/</url>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -38,6 +39,15 @@
       </exclusions>
     </dependency>
   </dependencies>
+  <issueManagement>
+  	<system>google code</system>
+  	<url>http://code.google.com/p/sentence-extractor/issues/list</url>
+  </issueManagement>
+  <scm>
+  	<connection>https://sentence-extractor.googlecode.com/svn/trunk/</connection>
+  	<developerConnection>David Klenowski</developerConnection>
+  	<url>http://sentence-extractor.googlecode.com/svn/trunk/</url>
+  </scm>
   <build>
     <plugins>
       <plugin>

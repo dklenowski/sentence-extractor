@@ -279,7 +279,7 @@ public class TextParser {
       if ( (debugStr.length() != 0) && logger.isDebugEnabled() ) {
         logger.debug(debugStr + "\n" + 
             Helper.getDebugStringFromSentenceMap(buffer, sentence_map, i, 200, -1) + "\n" +
-            Helper.getDebugStringFromCharBuf(buffer, i, 200) + "\n");
+            Helper.getDebugStringFromCharBuf(buffer, i, 200, -1) + "\n");
         debugStr = "";
       }
     }

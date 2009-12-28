@@ -285,10 +285,13 @@ public class Sentence {
   }
   
   /**
+   * Determines if a punctuation mark is defined before a sentence boundary.
    * 
-   * @param buf
-   * @param idx
-   * @return
+   * @param buf   Text buffer.
+   * @param idx   Position in the buffer where a quotation mark.
+   * 
+   * @return     <code>true</code> if a quotation mark appears before a sentence 
+   *              end, <code>false</code> otherwise.
    */
   protected static boolean hasLaterQuotation(final char[] buf, int idx) {
     int i;
@@ -313,7 +316,7 @@ public class Sentence {
   }
   
   /**
-   * Determines if the letter is capitalized (i.e. a potential start) 
+   * Determines if a letter is capitalized (i.e. a potential start) 
    * after a potential end.
    * 
    * @param buf   Text buffer.

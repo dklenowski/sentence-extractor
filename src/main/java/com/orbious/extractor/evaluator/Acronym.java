@@ -119,7 +119,8 @@ public class Acronym extends Evaluator {
    *              {@link Acronym#RIGHT} to traverse in <code>buf</code>
    *              to search for an acronym.
    *               
-   * @return    An {@link AcronymOp} containing the results of the 
+   * @return    An {@link com.orbious.extractor.evaluator.Acronym.AcronymOp} 
+   *            containing the results of the 
    *            oscillation check.
    */
   protected static AcronymOp isOscillating(char[] buf, int idx, int dirn) {

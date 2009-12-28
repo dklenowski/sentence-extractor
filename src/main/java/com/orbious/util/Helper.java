@@ -34,7 +34,9 @@ public class Helper {
   /**
    * Returns a <code>String</code> containing text extracted from 
    * <code>buf</code> of size <code>size</code> relative to the position 
-   * <code>pos</code>. <code>start</code> and <code>end</code> are 
+   * <code>pos</code>. Also includes a string specifying the location
+   * of <code>idx</code>.
+   * <code>start</code> and <code>end</code> are 
    * automatically update to the <code>buf</code> 
    * extremium's if required.
    * 
@@ -46,6 +48,7 @@ public class Helper {
    * @return    A <code>String</code> containing text extracted from 
    *            <code>buf</code>.
    */
+
   public static String getDebugStringFromCharBuf(char[] buf, int idx, int size) {
     String str;
     String id;
@@ -79,12 +82,21 @@ public class Helper {
   }
   
   /**
+   * Returns a <code>String</code> containing text extracted from 
+   * <code>buf</code> of size <code>size</code> relative to the position 
+   * <code>pos</code>. <code>start</code> and <code>end</code> are 
+   * automatically update to the <code>buf</code> 
+   * extremium's if required.
    * 
-   * @param buf
-   * @param idx
-   * @param size
-   * @param width
-   * @return
+   * @param buf   Text buffer.
+   * @param idx   The <code>buf</code> array index specifying the 
+   *              middle point for extraction.
+   * @param size    The length of the <code>String</code> to return.
+   * @param width   The width of the debug string where a newline is inserted
+   *                at each length <code>width</code> in the debug string.
+   *                If <code>-1</code>, no newline is inserted.
+   * @return    A <code>String</code> containing text extracted from 
+   *            <code>buf</code>.
    */
   public static String getDebugStringFromCharBuf(final char[] buf,
       int idx, int size, int width) { 

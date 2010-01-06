@@ -69,9 +69,9 @@ public class Suspension extends Evaluator {
      */
   public boolean evaluate(String wd) {
     if ( suspensions == null ) {
-      suspensions = Helper.cvtFileToHashSet(Config.SUSPENSION_FILENAME.asStr());
+      suspensions = Helper.cvtFileToHashSet(Config.SUSPENSION_FILENAME.asStr(), true);
     }
 
-    return( suspensions.contains(wd) );
+    return( suspensions.contains(wd.toLowerCase()) );
   }
 }

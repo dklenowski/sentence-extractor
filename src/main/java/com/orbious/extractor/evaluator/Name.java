@@ -63,7 +63,7 @@ public class Name extends Evaluator {
    */ 
   public boolean evaluate(String wd) {
     if ( names == null ) {
-      names = Helper.cvtFileToHashSet(Config.NAMES_FILENAME.asStr());
+      names = Helper.cvtFileToHashSet(Config.NAMES_FILENAME.asStr(), false);
     }
     
     return( names.contains(wd) );

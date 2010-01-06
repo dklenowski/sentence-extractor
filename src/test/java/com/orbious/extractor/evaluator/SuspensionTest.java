@@ -32,7 +32,7 @@ public class SuspensionTest extends TestCase {
     ret = suspension.evaluate("Tomato");
     assertEquals(false, ret);
 
-    ret = suspension.evaluate("mr.");
+    ret = suspension.evaluate("empty.");
     assertEquals(false, ret); 
   }
 }

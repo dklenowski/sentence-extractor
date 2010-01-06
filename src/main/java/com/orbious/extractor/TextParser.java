@@ -18,10 +18,12 @@ import com.orbious.extractor.evaluator.UrlText;
 import com.orbious.util.Helper;
 
 /**
- * Parser a text document into sentences.
+ * Parser a text document into sentences. This class is the central class
+ * for the <code>sentence-extractor</code> package.
  * 
  * @author dave
  * @version 1.0
+ * @since 1.0
  */
 
 public class TextParser {
@@ -42,17 +44,40 @@ public class TextParser {
   private HashSet<Character> allowable_ends;
   
   /**
+   * List of inner punctuation.
+   */
+  private HashSet<Character> inner_punctuation;
+  
+  /**
+   * 
+   */
+  private HashSet<Character> preserved_punctuation;
+  
+  /**
+   * 
+   */
+  private HashSet<Character> left_punctuation_marks;
+  
+  /**
+   * 
+   */
+  private HashSet<Character> right_punctuation_marks;  
+  
+  /**
    * A buffer that contains entries for likely/unlikely sentence start's/end's.
    */
   private SentenceMapEntry[] sentence_map;
   
   /**
-   * A buffer that contains all the points that have been extracted.
+   * A buffer that contains a record of all the characters that have
+   * been extracted and is used for index adjustments of the start/end indexes
+   * (i.e. {@link TextParser#adjustIndexes(int, int)}).
    */
   private boolean[] extraction_map;
   
   /**
-   * 
+   * A <code>Vector</code> of <code>TextParserOp</code> containing sentence
+   * start/ends.
    */
   private Vector< TextParserOp > parser_map;
   
@@ -60,6 +85,26 @@ public class TextParser {
    * Contains a list of sentences extracted from <code>filename</code>.
    */
   private Vector< Vector<String> > sentences;
+  
+  /**
+   * The most recent sentence start index found in <code>buffer</code>.
+   */
+  private int sent_start_idx;
+  
+  /**
+   * The most recent unlikely sentence start index found in <code>buffer</code>.
+   */
+  private int sent_unlikely_start_idx;
+  
+  /**
+   * The most recent sentence end index found in <code>buffer</code>.
+   */
+  private int sent_end_idx;
+  
+  /**
+   * The most recent unlikely sentence end index found in <code>buffer</code>.
+   */
+  private int sent_unlikely_end_idx;
   
   /**
    * Logger object.
@@ -74,7 +119,14 @@ public class TextParser {
   public TextParser(String filename) {
     this.filename = filename;
     logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
+    
     allowable_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
+    
+    inner_punctuation = Helper.cvtStringToHashSet(Config.INNER_PUNCTUATION.asStr());
+    preserved_punctuation = Helper.cvtStringToHashSet(Config.PRESERVED_PUNCTUATION.asStr());
+    
+    left_punctuation_marks = Helper.cvtStringToHashSet(Config.LEFT_PUNCTUATION_MARKS.asStr());
+    right_punctuation_marks = Helper.cvtStringToHashSet(Config.RIGHT_PUNCTUATION_MARKS.asStr());
   }
 
   /**
@@ -101,9 +153,7 @@ public class TextParser {
   
   /**
    * Returns the same as @{link TextParser#sentences} with the <code>Vector</code>
-   * list's of words converted to <code>String</code>'s. These string's are
-   * run through the @{link {@link Cleanser#cleanWordsAsStr(Vector)} to
-   * generate the <code>String</code> values.
+   * list's of words converted to <code>String</code>'s. 
    * 
    * Accessor for {@link TextParser#sentences} with the words in the sentences
    * converted to <code>String</code>'s.
@@ -113,11 +163,23 @@ public class TextParser {
    */
   public Vector<String> sentencesAsStr() {
     Vector<String> sent = new Vector<String>();
+    Vector<String> words;
+    String str;
     
     for ( int i = 0; i < sentences.size(); i++ ) {
-      sent.add(Cleanser.cleanWordsAsStr(sentences.get(i)));
-    }
+      words = sentences.get(i);
+      str = "";
+      for ( int j = 0; j < words.size(); j++ ) {
+        if ( j+1 < words.size() ) {
+          str += words.get(j) + " ";
+        } else {
+          str += words.get(j);
+        }
+      }
 
+      sent.add(str);
+    }
+    
     return(sent);
   }
   
@@ -178,13 +240,9 @@ public class TextParser {
    * for {@link TextParser#sentences}.
    */
   public void genSentences() {
-    int startIdx;
-    int unlikelyStartIdx;
-    int unlikelyEndIdx;
-    int idx;
     SentenceMapEntry entry;
     SentenceEntryType type;
-    TextParserOp op;
+    Likelihood likelihood;
     String debugStr;
     Vector<String> sentence;
     
@@ -194,88 +252,40 @@ public class TextParser {
     extraction_map = new boolean[buffer.length];
     parser_map = new Vector<TextParserOp>();
    
-    startIdx = -1;
-    unlikelyStartIdx = -1;
-    unlikelyEndIdx = -1;
+    sent_start_idx = -1;
+    sent_unlikely_start_idx = -1;
+    sent_end_idx = -1;
+    sent_unlikely_end_idx = -1;
     debugStr = "";
 
-    for ( int i = 0; i < sentence_map.length; i++ ) {
+    for ( int i = 0; i < sentence_map.length; i++ ) {      
       entry = sentence_map[i];
       if ( entry == null ) {
         continue;
       }
       
       type = entry.type();
-      
+      likelihood = entry.likelihood();
+
       if ( type == SentenceEntryType.START ) {
-        if ( entry.likelihood() == Likelihood.UNLIKELY ) {
-          unlikelyStartIdx = i;
-        } else {
-          // check if we have anything already parsed, 
-          // if so add a sentence begin/end
-          // otherwise just record the start idx
-          if ( unlikelyEndIdx != -1 ) {
-            idx = -1;
-            if ( startIdx != -1 ) {
-              idx = startIdx;
-              startIdx = -1;
-              if ( logger.isDebugEnabled() ) {
-                debugStr += " StartIdx=" + idx;
-              }
-            } else if ( unlikelyStartIdx != -1 ) {
-              idx = unlikelyStartIdx;
-              unlikelyStartIdx = -1;
-              if ( logger.isDebugEnabled() ) {
-                debugStr += " UnlikelyStartIdx=" + idx;
-              }
-            }
-            
-            if ( idx != -1 ) {
-              if ( logger.isDebugEnabled() ) {
-                debugStr += " UnlikelyEndIdx=" + unlikelyEndIdx;
-              }
-              
-              recordSentence(idx, unlikelyEndIdx);
-              unlikelyEndIdx = -1;
-            }
+        if ( likelihood == Likelihood.UNLIKELY ) {
+          if ( sent_unlikely_start_idx == -1 ) {
+            sent_unlikely_start_idx = i;
           }
-          
-          if ( startIdx == -1 ) {
-            startIdx = i;
-            if ( logger.isDebugEnabled() ) {
-              debugStr =  " StartIdx=" + startIdx;
-            }
+        } else {
+          if ( sent_start_idx == -1 ) {
+            sent_start_idx = i;
           }
         }
       } else if ( type == SentenceEntryType.END ) {
-        if ( entry.likelihood() == Likelihood.UNLIKELY ) {
-          unlikelyEndIdx = i;
+        if ( likelihood == Likelihood.UNLIKELY ) {
+          sent_unlikely_end_idx = i;
         } else {
-          idx = -1;
-          if ( startIdx != -1 ) {
-            idx = startIdx;
-            startIdx = -1;
-            if ( logger.isDebugEnabled() ) {
-              debugStr += " StartIdx=" + idx;
-            }
-          } else if ( unlikelyStartIdx != -1 ) {
-            idx = unlikelyStartIdx;
-            unlikelyStartIdx = -1;
-            if ( logger.isDebugEnabled() ) {
-              debugStr += " UnlikelyStartIdx=" + idx;
-            }
-          }
-          
-          if ( idx != -1 ) {
-            if ( logger.isDebugEnabled() ) {
-              debugStr += " EndIdx=" + i;
-            }
-            recordSentence(idx, i);
-            unlikelyEndIdx = -1;
-          }
+          sent_end_idx = i;
+          checkIndexes();
         }
       }
-      
+
       if ( (debugStr.length() != 0) && logger.isDebugEnabled() ) {
         logger.debug(debugStr + "\n" + 
             Helper.getDebugStringFromSentenceMap(buffer, sentence_map, i, 200, -1) + "\n" +
@@ -283,15 +293,9 @@ public class TextParser {
         debugStr = "";
       }
     }
+
+    checkIndexes();
     
-    for ( int i = 0; i < parser_map.size(); i++ ) {
-      op = parser_map.get(i);
-      sentence = extract(op.start, op.end);
-      if ( sentence.size() > Config.MIN_SENTENCE_LENGTH.asInt() ) {
-        sentences.add(sentence);
-      }
-    }
-       
     if ( logger.isDebugEnabled() ) {
       logger.debug("Buffer:\n" + 
           Helper.getDebugStringFromCharBuf(buffer, 0, buffer.length, 100) +
@@ -302,21 +306,80 @@ public class TextParser {
           Helper.getDebugStringFromBoolBuf(buffer, extraction_map, 0, 
               extraction_map.length, 100));
     }
+
+    for ( int i = 0; i < parser_map.size(); i++ ) {
+      sentence = extract(parser_map.get(i));
+      if ( sentence.size() > Config.MIN_SENTENCE_LENGTH.asInt() ) {
+        sentences.add(sentence);
+      }
+    }
   }
   
   /**
+   * Runs a check of the current sentence start/end indexes we have to see
+   * if a sentence can be generated.
+   */
+  private void checkIndexes() {
+    int tStartIdx;
+    int tEndIdx;
+
+    if ( (sent_end_idx != -1 || sent_unlikely_end_idx != -1) &&
+         (sent_start_idx != -1 || sent_unlikely_start_idx != -1) ) {
+      
+      if ( logger.isDebugEnabled() ) {
+        logger.debug(" sent_start_idx=" + sent_start_idx + 
+            " sent_unlikely_start_idx=" + sent_unlikely_start_idx + 
+            " sent_end_idx=" + sent_end_idx + " sent_unlikely_end_idx=" + 
+            sent_unlikely_end_idx);
+      }
+      
+      tStartIdx = -1;
+      if ( sent_start_idx != -1 ) {
+        tStartIdx = sent_start_idx;
+        sent_start_idx = -1;
+        sent_unlikely_start_idx = -1;
+      } else if ( sent_unlikely_start_idx != -1 ) {
+        tStartIdx = sent_unlikely_start_idx;
+        sent_unlikely_start_idx = -1;
+      }
+      
+      tEndIdx = -1;
+      if ( tStartIdx != -1 ) {
+        if ( sent_end_idx != -1 ) {
+          tEndIdx = sent_end_idx;
+          sent_end_idx = -1;
+          sent_unlikely_end_idx = -1;
+        } else if ( sent_unlikely_end_idx != -1 ) {
+          tEndIdx = sent_unlikely_end_idx;
+          sent_unlikely_end_idx = -1;
+        }
+        
+        if ( tEndIdx != -1 ) {
+          recordSentence(tStartIdx, tEndIdx);
+        }
+      }
+    }
+  }
+  
+  
+  /**
+   * Add's a new sentence begin/end to the <code>extraction_map</code>
+   * and the <code>parser_map</code>.
    * 
-   * @param start
-   * @param end
+   * @param start   The start of the sentence.
+   * @param end   The end of the sentence.
    */
   private void recordSentence(int start, int end) {
     parser_map.add(new TextParserOp(start, end));
     for ( int i = start; i <= end; i++ ) {
       extraction_map[i] = true;
     }
+    
+    if ( logger.isDebugEnabled() ) {
+      logger.debug("Added sentence startIdx=" + start + " endIdx=" + end);
+    }
   }
-  
-  
+
   /**
    * Internal method to generate a sentence map that is used by
    * {@link TextParser#genSentences()} to find the begin and start 
@@ -368,13 +431,7 @@ public class TextParser {
           }
         }
       }
-    }
-
-    /*if ( logger.isDebugEnabled() ) {
-      logger.debug("SentenceMap\n" + 
-          Helper.getDebugStringFromSentenceMap(buffer, sentence_map, 0, 
-              buffer.length, 100));
-    } */   
+    }  
   }
 
   /**
@@ -411,54 +468,36 @@ public class TextParser {
   /**
    * Extract a <code>Vector</code> of words from {@link TextParser#buffer}.
    * 
-   * @param startIdx    The start index to begin extraction.
-   * @param endIdx    The end index to stop extraction.
-   * 
+   * @param op  A <code>TextParserOp</code> contain the start/end indexes
+   *            for extraction.
+   *            
    * @return    A <code>Vector</code> of words.
    */
-  protected Vector<String> extract(int startIdx, int endIdx) {
+  protected Vector<String> extract(TextParserOp op) {
     Vector<String> words;
+    int startIdx;
+    int endIdx;
     String wd;
     char ch;
+    IndexAdjustment indexAdjustment;
     boolean hasLetter;
-    int adjustedStartIdx;
-    int adjustedEndIdx;
+    boolean doAsNewWord;
 
-    // adjust the indexes so we can get any additional punctuation
-    //
-    adjustedStartIdx = startIdx-1;
-    while ( (adjustedStartIdx > 0) &&
-        !extraction_map[adjustedStartIdx] &&
-        !Character.isLetterOrDigit(buffer[adjustedStartIdx]) ) {
-      adjustedStartIdx--;
-    } 
-    
-    if ( adjustedStartIdx != startIdx ) {
-      adjustedStartIdx++;
-    }
-  
-    adjustedEndIdx = endIdx+1;
-    while ( (adjustedEndIdx < buffer.length) &&
-        !extraction_map[adjustedEndIdx] &&
-        !Character.isLetterOrDigit(buffer[adjustedEndIdx]) ) {
-      adjustedEndIdx++;
-    }
-    if ( adjustedEndIdx != endIdx ) {
-      adjustedEndIdx--;
-    }
-
+    startIdx = op.start;
+    endIdx = op.end;
+    indexAdjustment = adjustIndexes(startIdx, endIdx);
     words = new Vector<String>();
     wd = "";
     hasLetter = false;
     
     if ( logger.isDebugEnabled() ) {
       logger.debug("Beginning extract startIdx=" + startIdx + 
-          " adjustedStartIdx=" + adjustedStartIdx +
+          " adjustedStartIdx=" + indexAdjustment.adjustedStartIdx +
           " endIdx=" + endIdx +
-          " adjustedEndIdx=" + adjustedEndIdx + " BUFFER LENGTH=" + buffer.length);
+          " adjustedEndIdx=" + indexAdjustment.adjustedEndIdx);
     }
-    
-    for ( int i = adjustedStartIdx; i <= adjustedEndIdx; i++ ) {
+
+    for ( int i = indexAdjustment.adjustedStartIdx; i <= indexAdjustment.adjustedEndIdx; i++ ) {
       ch = buffer[i];
 
       if ( Character.isLetterOrDigit(ch) ) {
@@ -475,30 +514,35 @@ public class TextParser {
         
       } else {
         // punctuation
-        if ( hasLetter ||
-            ((i-1 >= 0) && Character.isLetter(buffer[i-1])) ) {
-          // the punctuation is attached to the word e.g. type's, time-line
-          // hasLetter assumes there is text to the right,
-          // if that fails we need to test there is text to the left
-          if ( new UrlText().evaluate(buffer, i) ) {
-            wd += ch;
-          } else if ( ch != '_' && ch != ',' && !allowable_ends.contains(ch) ) {
-            wd += ch;
+        doAsNewWord = false;
+        if ( hasLetter || Helper.isPreviousLetter(buffer, i) ) {
+          if ( (i < startIdx) || (i >= endIdx) ) {
+            doAsNewWord = true;
           } else {
-            // the exceptions are sentence ends are ','
-            // and underscores (which appear allot in gutenberg texts)
-            if ( wd.length() != 0 ) {
-              words.add(wd);
+            if ( inner_punctuation.contains(ch) ) {
+              // punctuation attached to the word.
+              wd += ch;
+            } else if ( (ch == '.') && new UrlText().evaluate(buffer, i) ) {
+              // web address 
+              wd += ch;
+            } else if ( (ch == ',') && Helper.isPreviousNumber(buffer, i) &&
+                Helper.isNextNumber(buffer, i) ) {
+              // thousands separator
+              wd += ch;
+            } else if ( preserved_punctuation.contains(ch) ) {
+              // we preserve this punctuation
+              doAsNewWord = true;
             }
-            words.add(Character.toString(ch));
-            wd = "";
-            hasLetter = false;
-          } 
-        } else {
-          // punctuation, add as a separate 'wd'
+          }
+        } else if ( preserved_punctuation.contains(ch) ) {
+          doAsNewWord = true;
+        }
+          
+        if ( doAsNewWord ) {
           if ( wd.length() != 0 ) {
             words.add(wd);
           }
+          
           words.add(Character.toString(ch));
           wd = "";
           hasLetter = false;
@@ -510,26 +554,254 @@ public class TextParser {
       words.add(wd);
     }
     
-    if ( logger.isDebugEnabled() ) {
-      logger.debug("Extracted = " + Helper.cvtVectorToString(words));
+    // we need to run a final check and join punctuation
+    Vector<String> cleanwords = new Vector<String>();
+    int p = 0;
+    boolean skipMunge;
+    String tmpwd;
+    
+    while ( p < words.size() ) {
+      wd = words.get(p);
+      p++;
+      skipMunge = false;
+      
+      if ( (wd.length() != 1) ||
+          !preserved_punctuation.contains(wd.charAt(0)) ||
+          (p+1 >= words.size()) ) {
+        skipMunge = true;
+      }
+      
+      if ( skipMunge ) {
+        cleanwords.add(wd);
+      } else {
+        tmpwd = wd;
+        while ( p < words.size() ) {
+          wd = words.get(p);
+          if ( (wd.length() != 1) || !preserved_punctuation.contains(wd.charAt(0)) ) {
+            break;
+          } else {
+            tmpwd += wd;
+            p++;
+          }
+        }
+        cleanwords.add(tmpwd);
+      }
     }
     
-    return(words);
+    if ( logger.isDebugEnabled() ) {
+      logger.debug("Extracted = " + Helper.cvtVectorToString(cleanwords));
+    }
+    
+    return(cleanwords);
   }
   
+  /**
+   * Adjusts the <code>startIdx</code> and <code>endIdx</code> to capture
+   * any punctuation that is part of the sentence.
+   * 
+   * @param startIdx    Position in <code>buffer</code> where the start of a
+   *                    sentence begins.
+   * @param endIdx      Position in <code>buffer</code> where the end of a 
+   *                    sentence begins.
+   *                    
+   * @return    An <code>IndexAdjustment</code> containing adjusted start/end
+   *            indexes if adjustment was required, otherwise returns
+   *            the <code>startIdx</code>, <code>endIdx</code>.
+   */
+  protected IndexAdjustment adjustIndexes(int startIdx, int endIdx) {
+    IndexAdjustment adjustment;
+    int nxtIdx;
+    int adjustedStartIdx;
+    int adjustedEndIdx;
+    boolean adjustedLeft;
+    
+    adjustment = new IndexAdjustment();
+    
+    // check the start
+    //
+    adjustedLeft = false;
+    
+    if ( startIdx == 0 ) {
+      adjustment.adjustedStartIdx = 0;
+    } else {
+      nxtIdx = startIdx-1;
+      adjustedStartIdx = nxtIdx;
+  
+       while ( (adjustedStartIdx > 0) &&
+           !extraction_map[adjustedStartIdx] &&
+           (Character.isWhitespace(buffer[adjustedStartIdx]) ||
+               left_punctuation_marks.contains(buffer[adjustedStartIdx]) ||
+               buffer[adjustedStartIdx] == '\"') ) {
+          adjustedStartIdx--;
+      }
+        
+      if ( adjustedStartIdx == nxtIdx ) {
+        adjustment.adjustedStartIdx = startIdx;
+      } else {
+        adjustedLeft = true;
+        adjustedStartIdx++;
+        adjustment.adjustedStartIdx = adjustedStartIdx;
+        for ( int i = adjustedStartIdx; i < startIdx; i++ ) {
+          extraction_map[i] = true;
+        }
+      }
+    }
+
+    int ct = 0;
+    if ( adjustedLeft ) {
+      ct++;
+    }
+    
+    for ( int i = startIdx; i < endIdx; i++ ) {
+      if ( left_punctuation_marks.contains(buffer[i]) ) {
+        ct++;
+      } else if ( right_punctuation_marks.contains(buffer[i]) ) {
+        ct--;
+      }
+    }
+
+    if ( ct != 0 ) {
+      adjustedLeft = true;
+    }
+    // now check the end
+    //
+    if ( endIdx == buffer.length-1 ) {
+      adjustment.adjustedEndIdx = endIdx;
+    } else {
+      nxtIdx = endIdx+1;
+      adjustedEndIdx = nxtIdx;
+      
+      while ( (adjustedEndIdx < buffer.length) &&
+          !extraction_map[adjustedEndIdx] &&
+          (   allowable_ends.contains(buffer[adjustedEndIdx]) ||
+              (adjustedLeft &&
+              (Character.isWhitespace(buffer[adjustedEndIdx]) ||
+                  right_punctuation_marks.contains(buffer[adjustedEndIdx]) ||
+                  buffer[adjustedEndIdx] == '\"'))   ) ) {
+        adjustedEndIdx++;
+      }
+      
+      if ( adjustedEndIdx == nxtIdx ) {
+        adjustment.adjustedEndIdx = endIdx;
+      } else {
+        adjustedEndIdx--;
+        adjustment.adjustedEndIdx = adjustedEndIdx;
+        for ( int i = endIdx+1; i <= adjustedEndIdx; i++ ) {
+          extraction_map[i] = true;
+        }
+      }
+    }
+    
+    return(adjustment);
+  }
+  
+  /**
+   * An inner class to represent adjusted start/end indexes for a sentence.
+   * 
+   * @author dave
+   * @since 1.0
+   * @version 1.0
+   */
+  static class IndexAdjustment {
+    
+    /**
+     * The adjusted start index.
+     */
+    private int adjustedStartIdx;
+    
+    /**
+     * The adjusted end index.
+     */
+    private int adjustedEndIdx;
+    
+    /**
+     * Creates an empty <code>IndexAdjustment</code>.
+     */
+    public IndexAdjustment() { }
+
+    /** 
+     * Updates the <code>adjustedStartIdx</code> for this 
+     * <code>IndexAdjustment</code>.
+     * 
+     * @param adjustedStartIdx    The new <code>adjustedStartIdx</code>.
+     */
+    public void adjustedStartIndex(int adjustedStartIdx) { 
+      this.adjustedStartIdx = adjustedStartIdx;
+    }
+    
+    /**
+     * Accessor for <code>adjustedStartIdx</code>.
+     * 
+     * @return    The <code>adjustedStartIdx</code>.
+     */
+    public int adjustedStartIdx() {
+      return(adjustedStartIdx);
+    }
+  
+    /** 
+     * Updates the <code>adjustedEndIdx</code> for this 
+     * <code>IndexAdjustment</code>.
+     * 
+     * @param adjustedEndIdx    The new <code>adjustedEndIdx</code>.
+     */
+    public void adjustedEndIndex(int adjustedEndIndex) { 
+      this.adjustedEndIdx = adjustedEndIndex;
+    }
+    
+    /**
+     * Accessor for <code>adjustedEndIdx</code>.
+     * 
+     * @return    The <code>adjustedEndIdx</code>.
+     */
+    public int adjustedEndIdx() {
+      return(adjustedEndIdx);
+    }
+  }
+  
+  /**
+   * An inner class to represent sentence start/end indexes.
+   * 
+   * @author dave
+   * @since 1.0
+   * @version 1.0
+   */
   static class TextParserOp {
+    
+    /**
+     * The start index for a sentence.
+     */
     private int start;
+    
+    /**
+     * The end index for a sentence.
+     */
     private int end;
     
+    /**
+     * Creates a new <code>TextParserOp</code> and sets the initial parameters.
+     * 
+     * @param start   The start index for a sentence.
+     * @param end   The end index for a sentence.
+     */
     public TextParserOp(int start, int end) {
       this.start = start;
       this.end = end;
     }
     
+    /**
+     * Accessor for <code>start</code>.
+     * 
+     * @return    The <code>start</code>.
+     */
     public int start() {
       return(start);
     }
     
+    /**
+     * Accessor for <code>end</code>.
+     * 
+     * @return    The <code>end</code>.
+     */
     public int end() {
       return(end);
     }

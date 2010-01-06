@@ -5,7 +5,6 @@ package com.orbious;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import com.orbious.util.HelperTest;
-import com.orbious.extractor.CleanserTest;
 import com.orbious.extractor.evaluator.NameTest;
 import com.orbious.extractor.evaluator.SuspensionTest;
 import com.orbious.extractor.evaluator.AcronymTest;
@@ -36,7 +35,6 @@ public class AllTests {
     ts.addTestSuite(AcronymTest.class);
     ts.addTestSuite(UrlTextTest.class);
     
-    ts.addTestSuite(CleanserTest.class);
     ts.addTestSuite(WhitespaceRemoverTest.class);
     ts.addTestSuite(WordTest.class);
     ts.addTestSuite(SentenceTest.class);

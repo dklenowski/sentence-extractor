@@ -17,21 +17,43 @@ public enum Config {
   LOGGER_REALM("sentence-extractor"),
   
   /**
-   * All characters that are considered punctuation.
+   * Left punctuation marks.
    */
-  PUNCTUATION("!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~"),
+  LEFT_PUNCTUATION_MARKS("[{("),
   
+  /**
+   * Right punctuation marks.
+   */
+  RIGHT_PUNCTUATION_MARKS("]})"),
+
   /**
    * All characters that are considered sentence ends.
    */
   SENTENCE_ENDS(".!?\""),
-  
+
+  /**
+   * All punctuation that is considered part of a sentence
+   * e.g. '-', '.'
+   */
+  INNER_PUNCTUATION(".-'`"),
+
   /**
    * Characters that should be preserved during the cleansing process.
-   * This does not include punctuation that is part of a word (e.g. '.', '-' etc)
-   * which is preserved by default.
+   * This includes {@link Config#LEFT_PUNCTUATION_MARKS}, 
+   * {@link Config#RIGHT_PUNCTUATION_MARKS},
+   * {@link Config#SENTENCE_ENDS} and {@link Config#INNER_PUNCTUATION} 
+   * as well as some additional punctuation (e.g. @, $, &).
    */
-  PRESERVED_PUNCTUATION(SENTENCE_ENDS + "'[]:()$&,"),
+  PRESERVED_PUNCTUATION(LEFT_PUNCTUATION_MARKS.asStr() +
+      RIGHT_PUNCTUATION_MARKS.asStr() + SENTENCE_ENDS.asStr() + 
+      INNER_PUNCTUATION.asStr() + ":;@$&,%"),
+  
+  /**
+   * All characters that are considered punctuation. This includes
+   * {@link Config#PRESERVED_PUNCTUATION} along with some additional
+   * punctuation (e.g. "*").
+   */
+  PUNCTUATION(PRESERVED_PUNCTUATION.asStr() + "#*+,/<=>\\^_|~"),
   
   /**
    * A regular expression to match URL's.

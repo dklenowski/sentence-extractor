@@ -15,6 +15,33 @@ import com.orbious.util.Helper;
 
 /**
  * Provides static methods for Sentence operations.
+ * <p>
+ * To use your own evaluators, write a class that extends 
+ * {@link com.orbious.extractor.evaluator.Evalator} and then add the evaluator
+ * using (for start evaluators):
+ * <p>
+ * <code>
+ * Sentence.addStartEvaluator( new MyStartEvaluator() );
+ * </code>
+ * <p>
+ * or for end evaluators:
+ * <p>
+ * <code>
+ * Sentence.addEndEvaluator( new MyEndEvaluator() );
+ * </code> 
+ * <p>
+ * If you would like to use your evaluators in addition to the default evaluators,
+ * you will need to call (for end evaluators):
+ * <p>
+ * <code>
+ * Sentence.initDefaultEndEvaluators();
+ * </code>
+ * <p>
+ * or for start evaluators:
+ * <p>
+ * <code>
+ * Sentence.initDefaultStartEvaluators();
+ * </code>
  * 
  * @author dave
  * @version 1.0

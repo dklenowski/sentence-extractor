@@ -27,6 +27,12 @@ import com.orbious.extractor.SentenceMapEntry.SentenceEntryType;
 public class Helper {
 
   /**
+   * A direction indicator, used by 
+   * {@link Helper#moveToNonWhitespace(DIRN, char[], int)}.
+   */
+  protected enum DIRN { LEFT, RIGHT };
+
+  /**
    * Private Constructor
    */
   private Helper() { }
@@ -174,9 +180,9 @@ public class Helper {
         str += " ";
       } else {
         if ( buf[i] ) {
-          str += "-";
-        } else {
           str += ".";
+        } else {
+          str += "+";
         }
       }
       
@@ -302,11 +308,11 @@ public class Helper {
    * file occupying an entry in the <code>HashSet</code>.
    * 
    * @param filename    The absolute filename to parse.
-   * 
+   * @param lowercase   Convert text to lowercase before adding to <code>HashSet</code>.
    * @return    A <code>HashSet</code> containing the contents
    *            of <code>filename</code>.
    */
-  public static HashSet<String> cvtFileToHashSet(String filename) {
+  public static HashSet<String> cvtFileToHashSet(String filename, boolean lowercase) {
     Logger logger;
     HashSet<String> hs;
     BufferedReader br;
@@ -329,7 +335,11 @@ public class Helper {
       while ( (wd = br.readLine()) != null ) {
         if ( !wd.matches("#.*") ) {
           // ignore comments.
-          hs.add(wd);
+          if ( lowercase ) {
+            hs.add(wd.toLowerCase());
+          } else {
+            hs.add(wd);
+          }
         } 
       }
     } catch ( IOException ioe ) {
@@ -365,4 +375,119 @@ public class Helper {
     str += "|";
     return(str);
   }
+  
+  /**
+   * Determines if the previous non-whitespace character in <code>buf</code> 
+   * from <code>idx</code> is a letter.
+   * 
+   * @param buf   Text buffer.
+   * @param idx   Position in <code>buf</code>.
+   * 
+   * @return    <code>true</code> if the first previous non-whitespace
+   *            character is a letter, <code>false</code> otherwise.
+   */
+  public static boolean isPreviousLetter(final char[] buf, int idx) { 
+    int i;
+
+    i = moveToNonWhitespace(DIRN.LEFT, buf, idx);
+    if ( i == idx ) {
+      return(false);
+    }
+    
+    return( Character.isLetter(buf[i]) );
+  }
+  
+  /**
+   * Determines if the next non-whitespace character in <code>buf</code> 
+   * from <code>idx</code> is a letter.
+   * 
+   * @param buf   Text buffer.
+   * @param idx   Position in <code>buf</code>.
+   * 
+   * @return    <code>true</code> if the first next non-whitespace
+   *            character is a letter, <code>false</code> otherwise.
+   */
+  public static boolean isNextLetter(final char[] buf, int idx) {
+    int i;
+    
+    i = moveToNonWhitespace(DIRN.RIGHT, buf, idx);
+    if ( i == idx ) {
+      return(false);
+    }
+    
+    return( Character.isLetter(buf[i]) );
+  }
+  
+  /**
+   * Determines if the previous non-whitespace character in <code>buf</code> 
+   * from <code>idx</code> is a number.
+   * 
+   * @param buf   Text buffer.
+   * @param idx   Position in <code>buf</code>.
+   * 
+   * @return    <code>true</code> if the first previous non-whitespace
+   *            character is a number, <code>false</code> otherwise.
+   */
+  public static boolean isPreviousNumber(final char[] buf, int idx) {
+    int i;
+    
+    i = moveToNonWhitespace(DIRN.LEFT, buf, idx);
+    if ( i == idx ) {
+      return(false);
+    }
+    
+    return( Character.isDigit(buf[i]) );
+  }
+  
+  /**
+   * Determines if the next non-whitespace character in <code>buf</code> 
+   * from <code>idx</code> is a number.
+   * 
+   * @param buf   Text buffer.
+   * @param idx   Position in <code>buf</code>.
+   * 
+   * @return    <code>true</code> if the first next non-whitespace
+   *            character is a number, <code>false</code> otherwise.
+   */
+  public static boolean isNextNumber(final char[] buf, int idx) {
+    int i;
+    
+    i = moveToNonWhitespace(DIRN.RIGHT, buf, idx);
+    if ( i == idx ) {
+      return(false);
+    }
+    
+    return( Character.isDigit(buf[i]) );
+  }
+  
+  /**
+   * Returns an index that points to the first non-whitespace character
+   * in <code>buf</code>.
+   * 
+   * @param dirn  Either <code>LEFT</code> or <code>RIGHT</code>.
+   * @param buf   Text buffer.
+   * @param idx   Position in <code>buf</code>.
+   * 
+   * @return    The first non-whitespace index in <code>buf</code> either
+   *            in the <code>LEFT</code> or <code>RIGHT</code> direction.
+   */
+  protected static int moveToNonWhitespace(DIRN dirn, final char[] buf, int idx) {
+    int i;
+    
+    if ( dirn == DIRN.LEFT ) {
+      i = idx-1;
+      while ( (i > 0) && Character.isWhitespace(buf[i]) ) {
+        i--;
+      }
+    } else {
+      i = idx+1;
+      while ( (i < buf.length) && Character.isWhitespace(buf[i]) ) {
+        i++;
+      }
+    }
+    
+    return(i);
+  }
+  
+  
 }

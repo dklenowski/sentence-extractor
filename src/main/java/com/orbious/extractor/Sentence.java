@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import com.orbious.extractor.evaluator.Acronym;
 import com.orbious.extractor.evaluator.Evaluator;
 import com.orbious.extractor.evaluator.Name;
+import com.orbious.extractor.evaluator.NumberedHeading;
 import com.orbious.extractor.evaluator.Suspension;
 import com.orbious.extractor.evaluator.UrlText;
 import com.orbious.util.Helper;
@@ -130,7 +131,8 @@ public class Sentence {
     end_evaluators = new Vector<Evaluator>(
         Arrays.asList(  new Suspension(), 
                 new Acronym(),
-                new UrlText() ));   
+                new UrlText(),
+                new NumberedHeading() ));   
   }
 
   /**

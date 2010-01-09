@@ -39,27 +39,27 @@ public class TextParser {
   private char[] buffer;
   
   /**
-   * List of allowable sentence ends.
+   * List of allowable sentence ends (see {@link Config#SENTENCE_ENDS}).
    */
-  private HashSet<Character> allowable_ends;
+  private HashSet<Character> sentence_ends;
   
   /**
-   * List of inner punctuation.
+   * List of inner punctuation. (see {@link Config#INNER_PUNCTUATION}).
    */
   private HashSet<Character> inner_punctuation;
   
   /**
-   * 
+   * List of preserved punctuation (see {@link Config#PRESERVED_PUNCTUATION}).
    */
   private HashSet<Character> preserved_punctuation;
   
   /**
-   * 
+   * List of left punctuation marks (see {@link Config#LEFT_PUNCTUATION_MARKS}).
    */
   private HashSet<Character> left_punctuation_marks;
   
   /**
-   * 
+   * List of right punctuation marks (see {@link Config#RIGHT_PUNCTUATION_MARKS}).
    */
   private HashSet<Character> right_punctuation_marks;  
   
@@ -74,6 +74,12 @@ public class TextParser {
    * (i.e. {@link TextParser#adjustIndexes(int, int)}).
    */
   private boolean[] extraction_map;
+  
+  /**
+   * A buffer that contains where the line starts, which is used by some
+   * by the {@link NumberedHeading} <code>Evaluator</code>.
+   */
+  private static HashSet< Integer > line_starts;
   
   /**
    * A <code>Vector</code> of <code>TextParserOp</code> containing sentence
@@ -120,7 +126,7 @@ public class TextParser {
     this.filename = filename;
     logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
     
-    allowable_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
+    sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
     
     inner_punctuation = Helper.cvtStringToHashSet(Config.INNER_PUNCTUATION.asStr());
     preserved_punctuation = Helper.cvtStringToHashSet(Config.PRESERVED_PUNCTUATION.asStr());
@@ -138,7 +144,7 @@ public class TextParser {
   protected char[] buffer() {
     return(buffer);
   }
-  
+
   /**
    * Returns a <code>Vector</code> of sentences extracted from 
    * {@link TextParser#filename}. Each sentence put into a <code>Vector</code>, 
@@ -186,7 +192,8 @@ public class TextParser {
   /**
    * Parses {@link TextParser#filename} into memory. This method also calls 
    * {@link WhitespaceRemover#remove(Vector, int)} on each line
-   * before adding to memory.
+   * before adding to memory and updates {@link TextParser#line_starts}
+   * with the start of each line (minus whitespace).
    * 
    * @throws FileNotFoundException
    * @throws IOException
@@ -200,6 +207,12 @@ public class TextParser {
     int len;
     int pos;
 
+    if ( line_starts != null ) {
+      line_starts.clear();
+    } else {
+      line_starts = new HashSet<Integer>();
+    }
+    
     br = new BufferedReader(new FileReader(filename));
     raw = new Vector<String>();
     while ( (str = br.readLine()) != null ) {
@@ -216,6 +229,7 @@ public class TextParser {
       str = WhitespaceRemover.remove(raw, i);
       if ( str != null ) {
         clean.add(str);
+        line_starts.add(len);
         len += str.length();
       }
     }
@@ -228,6 +242,8 @@ public class TextParser {
       pos += buf.length;
     }
 
+    TextParserData.lineStarts(line_starts);
+    
     if ( logger.isInfoEnabled() ) {
       logger.info("Statistics for " + filename +
           " Raw LineCt=" + raw.size() + 
@@ -248,9 +264,14 @@ public class TextParser {
     
     genSentenceMap();    
 
-    sentences = new Vector< Vector<String> >();
+    if ( sentences != null ) {
+      sentences.clear();
+      parser_map.clear();
+    } else {
+      sentences = new Vector< Vector<String> >();
+      parser_map = new Vector<TextParserOp>();
+    }
     extraction_map = new boolean[buffer.length];
-    parser_map = new Vector<TextParserOp>();
    
     sent_start_idx = -1;
     sent_unlikely_start_idx = -1;
@@ -395,7 +416,7 @@ public class TextParser {
     for ( int i = 0; i < buffer.length; i++ ) {
       ch = buffer[i];
       
-      if ( allowable_ends.contains(ch) ) {
+      if ( sentence_ends.contains(ch) ) {
         // check for ends
         endOp = Sentence.isEnd(buffer, i);
         if ( endOp != null ) {
@@ -424,14 +445,16 @@ public class TextParser {
           } else {
             addToMap(i, Likelihood.LIKELY, SentenceEntryType.START, null);
           
-            if ( startOp.stopIdx() >= 0 ) {
-              addToMap(startOp.stopIdx(), Likelihood.LIKELY, 
-                  SentenceEntryType.START, SentenceEntrySubType.END_FROM_START);
-            }
+            //if ( startOp.stopIdx() >= 0 ) {
+              //addToMap(startOp.stopIdx(), Likelihood.LIKELY, 
+               //   SentenceEntryType.END, SentenceEntrySubType.END_FROM_START);
+            //}
           }
         }
       }
     }  
+    
+    TextParserData.sentenceMap(sentence_map);
   }
 
   /**
@@ -673,7 +696,7 @@ public class TextParser {
       
       while ( (adjustedEndIdx < buffer.length) &&
           !extraction_map[adjustedEndIdx] &&
-          (   allowable_ends.contains(buffer[adjustedEndIdx]) ||
+          (   sentence_ends.contains(buffer[adjustedEndIdx]) ||
               (adjustedLeft &&
               (Character.isWhitespace(buffer[adjustedEndIdx]) ||
                   right_punctuation_marks.contains(buffer[adjustedEndIdx]) ||
@@ -693,6 +716,68 @@ public class TextParser {
     }
     
     return(adjustment);
+  }
+  
+  
+  /**
+   * An inner class to share <code>TextParser</code> data.
+   * 
+   * @author dave
+   * @since 1.0
+   * @version 1.0
+   */
+  public static class TextParserData {
+    
+    /**
+     * Copy of {@link TextParser#sentence_map}.
+     */
+    private static SentenceMapEntry[] sentence_map;
+    
+    /**
+     * Copy of {@link TextParser#line_starts}
+     */
+    private static HashSet<Integer> line_starts;
+    
+    /**
+     * Private constructor.
+     */
+    private TextParserData() { }
+    
+    /**
+     * Returns the <code>sentence_map</code>.
+     * 
+     * @return  The <code>sentence_map</code>.
+     */
+    public static SentenceMapEntry[] sentenceMap() {
+      return(sentence_map);
+    }
+    
+    /**
+     * Setter for <code>sentence_map</code>.
+     * 
+     * @param map The <code>sentence_map</code>.
+     */
+    public static void sentenceMap(SentenceMapEntry[] map) {
+      sentence_map = map;
+    }
+    
+    /**
+     * Returns the <code>line_starts</code>.
+     * 
+     * @return  The <code>line_starts</code>.
+     */
+    public static HashSet<Integer> lineStarts() {
+      return(line_starts);
+    }
+    
+    /**
+     * Setter for <code>line_starts</code>.
+     * 
+     * @param starts  The <code>line_starts</code>.
+     */
+    public static void lineStarts(HashSet<Integer> starts) {
+      line_starts = starts;
+    }
   }
   
   /**
@@ -757,6 +842,7 @@ public class TextParser {
       return(adjustedEndIdx);
     }
   }
+  
   
   /**
    * An inner class to represent sentence start/end indexes.

@@ -5,11 +5,10 @@ package com.orbious.extractor.evaluator;
 import java.util.HashSet;
 import com.orbious.extractor.Config;
 import com.orbious.extractor.Word;
+import com.orbious.extractor.Word.WordOp;
 import com.orbious.util.Helper;
 
 /**
-* Determines if a position/word in a text buffer is considered a Suspension
-* and therefore not a 
 * The <code>Suspension</code> <code>Evaluator</code> determines if a word 
 * is a suspension and cannot be considered a sentence start/end. i.e. 
 * <ul>
@@ -50,12 +49,12 @@ public class Suspension extends Evaluator {
    *            <code>false</code> otherwise.
    */
   public boolean evaluate(final char[] buf, int idx) {
-    String wd = Word.getPreviousWord(buf, idx);
-    if ( wd == null ) {
+    WordOp op = Word.getPreviousWord(buf, idx, true);
+    if ( op == null ) {
       return(false);
     }
     
-    return( evaluate(wd) );
+    return( evaluate(op.word()) );
   }
   
     /**

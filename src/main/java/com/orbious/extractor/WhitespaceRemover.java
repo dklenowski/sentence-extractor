@@ -18,12 +18,8 @@ public class WhitespaceRemover {
   /**
    * The logger object.
    */
-  private static Logger logger;
-  
-  static {
-    logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
-  }
-  
+  private static Logger logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
+
   /**
    * Private constructor.
    */
@@ -48,6 +44,7 @@ public class WhitespaceRemover {
     char[] buf;
     char ch;
     String str;
+    int letterStartPos;
     
     if ( (idx < 0) || (idx >= text.size()) ) {
       throw new ArrayIndexOutOfBoundsException("Invalid index=" + idx);
@@ -102,8 +99,19 @@ public class WhitespaceRemover {
       str += " ";
     }
 
+    // once we have cleaned the string we need to find position of the first letter
+    //
+    letterStartPos = -1;
+    buf = str.toCharArray();
+    for ( int i = 0; i < buf.length; i++ ) {
+      if ( Character.isLetter(buf[i]) ) {
+        letterStartPos = i;
+        break;
+      }
+    }
+    
     if ( logger.isDebugEnabled() ) {
-      logger.debug("Idx=" + idx + 
+      logger.debug("Idx=" + idx + " letterStartPos=" + letterStartPos +
           "\n\tCleansed=|" + str + 
           "|\n\tOriginal=|" + text.get(idx) + "|");
     }

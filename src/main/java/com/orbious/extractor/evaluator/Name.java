@@ -4,6 +4,7 @@ package com.orbious.extractor.evaluator;
 
 import com.orbious.extractor.Config;
 import com.orbious.extractor.Word;
+import com.orbious.extractor.Word.WordOp;
 import com.orbious.util.Helper;
 import java.util.HashSet;
 
@@ -43,18 +44,19 @@ public class Name extends Evaluator {
    *            a likely sentence start, <code>false</code> otherwise.
    */
   public boolean evaluate(final char[] buf, int idx) {
-    String wd = Word.getPreviousWord(buf, idx);
-    if ( wd == null ) {
+    WordOp op = Word.getNextWord(buf, idx, false);
+    if ( op == null ) {
       return(false);
     }
     
-    return( evaluate(wd) );
+    return( evaluate(op.word()) );
   } 
   
   
   /**
    * Determines if the word is a common name and therefore not a
-   * likely sentence start.
+   * likely sentence start. Also corrects for names that are
+   * entirely capitalized (e.g. WORTLEY is converted to Wortley).
    * 
    * @param wd    A word.
    * 
@@ -66,6 +68,18 @@ public class Name extends Evaluator {
       names = Helper.cvtFileToHashSet(Config.NAMES_FILENAME.asStr(), false);
     }
     
-    return( names.contains(wd) );
+    if ( wd == "" ) {
+      return(false);
+    }
+    
+    char[] buf = wd.toCharArray();
+    StringBuilder str = new StringBuilder();
+    
+    str.append(Character.toUpperCase(buf[0]));
+    for ( int i = 1 ; i < buf.length; i++ ) {
+      str.append(Character.toLowerCase(buf[i]));
+    }
+
+    return( names.contains(str.toString()) );
   }
 }

@@ -19,7 +19,7 @@ public class NameTest extends TestCase {
     AllTests.initLogger();
   }
   
-  public void test_isName() {
+  public void test_WordIsName() {
     boolean ret;
     Name name;
     
@@ -31,7 +31,7 @@ public class NameTest extends TestCase {
     assertEquals(true, ret);
   }
 
-  public void test_isNotName() {
+  public void test_WordIsNotName() {
     boolean ret;
     Name name;
     
@@ -41,5 +41,26 @@ public class NameTest extends TestCase {
 
     ret = name.evaluate("mr.");   
     assertEquals(false, ret); 
+  }
+  
+  public void test_WordIsNameUppercase() {
+    boolean ret;
+    Name name;
+    
+    name = new Name();
+    ret = name.evaluate("WESH");    
+    assertEquals(true, ret); 
+  }
+  
+  public void test_BufIsName() {
+    boolean ret;
+    Name name;
+    String str;
+    
+    name = new Name();
+    
+    str = "Good day Mr WESH.";
+    ret = name.evaluate(str.toCharArray(), 12);
+    assertEquals(true, ret);
   }
 }

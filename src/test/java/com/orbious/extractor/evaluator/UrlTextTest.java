@@ -24,10 +24,10 @@ public class UrlTextTest extends TestCase {
     
     url = new UrlText();
     
-    result = url.evaluate("www.gutenberg.org");
+    result = url.evaluate("www.gutenberg.org".toCharArray(), 0);
     assertEquals(true, result);
     
-    result = url.evaluate("google.com");
+    result = url.evaluate("google.com".toCharArray(), 0);
     assertEquals(true, result);
   }
   
@@ -66,10 +66,10 @@ public class UrlTextTest extends TestCase {
     
     url = new UrlText();
     
-    result = url.evaluate("gutenberg.");
+    result = url.evaluate("gutenberg.".toCharArray(), 0);
     assertEquals(false, result);    
     
-    result = url.evaluate("google.");
+    result = url.evaluate("google.".toCharArray(), 0);
     assertEquals(false, result);    
   }
 

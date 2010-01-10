@@ -24,10 +24,10 @@ public class NameTest extends TestCase {
     Name name;
     
     name = new Name();
-    ret = name.evaluate("Abril");
+    ret = name.evaluate("Abril".toCharArray(), 0);
     assertEquals(true, ret);
 
-    ret = name.evaluate("Taylor");
+    ret = name.evaluate("Taylor".toCharArray(), 0);
     assertEquals(true, ret);
   }
 
@@ -36,10 +36,10 @@ public class NameTest extends TestCase {
     Name name;
     
     name = new Name();
-    ret = name.evaluate("Tomato");    
+    ret = name.evaluate("Tomato".toCharArray(), 0);    
     assertEquals(false, ret);   
 
-    ret = name.evaluate("mr.");   
+    ret = name.evaluate("mr.".toCharArray(), 0);   
     assertEquals(false, ret); 
   }
   
@@ -48,7 +48,7 @@ public class NameTest extends TestCase {
     Name name;
     
     name = new Name();
-    ret = name.evaluate("WESH");    
+    ret = name.evaluate("WESH".toCharArray(), 0);    
     assertEquals(true, ret); 
   }
   

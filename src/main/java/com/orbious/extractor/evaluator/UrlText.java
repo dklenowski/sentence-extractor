@@ -88,24 +88,11 @@ public class UrlText extends Evaluator {
       i++;
     }
 
-    return( evaluate(str) );
-  }
-
-  /**
-   * Determines if the word is a url and therefore not a
-   * likely sentence end.
-   * 
-   * @param wd    A word.
-   * 
-   * @return    <code>true</code> if the word is a url and not
-   *            a likely sentence start, <code>false</code> otherwise.
-   */
-  public boolean evaluate(String wd) {
-    Matcher matcher = url_pattern.matcher(wd);
+    Matcher matcher = url_pattern.matcher(str);
     boolean result = matcher.find();
     
     if ( logger.isDebugEnabled() ) {
-      logger.debug("Word=" + wd + " Match=" + 
+      logger.debug("String=" + str + " Match=" + 
           String.valueOf(result).toUpperCase());
     }
 

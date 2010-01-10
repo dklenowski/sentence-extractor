@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Vector;
 import org.apache.log4j.Logger;
+import com.orbious.extractor.evaluator.AbbreviatedName;
 import com.orbious.extractor.evaluator.Acronym;
 import com.orbious.extractor.evaluator.Evaluator;
 import com.orbious.extractor.evaluator.Name;
@@ -106,7 +107,8 @@ public class Sentence {
     start_evaluators = new Vector<Evaluator>(
         Arrays.asList(  new Suspension(),
                 new Acronym(),
-                new Name() )); 
+                new Name(),
+                new AbbreviatedName() )); 
   }
   
   /**
@@ -132,7 +134,8 @@ public class Sentence {
         Arrays.asList(  new Suspension(), 
                 new Acronym(),
                 new UrlText(),
-                new NumberedHeading() ));   
+                new NumberedHeading(),
+                new AbbreviatedName() ));   
   }
 
   /**
@@ -571,6 +574,10 @@ public class Sentence {
   /**
    * An inner class used to return the results of 
    * {@link Sentence#isEnd(char[], int)}.
+   * 
+   * @author dave
+   * @version 1.0
+   * @since 1.0
    */
   static class EndOp {
     /**

@@ -82,32 +82,6 @@ public class Acronym extends Evaluator {
     
     return(op.result);
   }
-
-  /**
-   * Determines if the word is an acronym and therefore not a likely sentence end.
-   * 
-   * @param wd    A word.
-   * 
-   * @return    <code>true</code> if the word is part of an acronym,
-   *            and not a likely sentence start/end, <code>false</code> otherwise.
-   */
-  public boolean evaluate(String wd) {
-    char[] buf = wd.toCharArray();
-    boolean result;
-    
-    for ( int i = 0; i < buf.length; i++ ) {
-      if ( !Character.isLetterOrDigit(buf[i]) && 
-          !Character.isWhitespace(buf[i]) ) {
-        result = evaluate(buf, i);
-        if ( result ) {
-          return(result);
-        }
-      }
-    }
-    
-    return(false);
-  }
-
   
   /**
    * Checks the <code>buf</code> for oscillations of punctuation/letters

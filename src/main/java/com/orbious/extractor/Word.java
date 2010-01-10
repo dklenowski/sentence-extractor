@@ -191,49 +191,129 @@ public class Word {
     return(op);
   }
   
-  
+  /**
+   * An inner class to store data for word operations.
+   * 
+   * @author dave
+   * @version 1.0
+   * @since 1.0
+   */
   public static class WordOp {
+    
+    /**
+     * The word that was found during the word operation.
+     */
     private String word;
+    
+    /**
+     * The index of the first letter in the word extracted relative to the buffer it 
+     * was extracted from.
+     */
     private int idx;
     
+    /**
+     * Constructor, initializes the <code>WordOp</code>.
+     * 
+     * @param word    The word that was found.
+     * @param idx     The index of the first letter in the word relative 
+     *                to the buffer it was extracted from.
+     */
     public WordOp(String word, int idx) {
       this.word = word;
       this.idx = idx;
     }
     
+    /**
+     * Access for <code>word</code>.
+     * 
+     * @return    The word.
+     */
     public String word() {
       return(word);
     }
     
+    /**
+     * Accessor for <code>idx</code>.
+     * 
+     * @return    The index.
+     */
     public int idx() {
       return(idx);
     }   
   }
   
+  /**
+   * An inner class to store data for word operations that return 
+   * multiple words/indexes.
+   * 
+   * @author dave
+   * @version 1.0
+   * @since 1.0
+   *
+   */
   static class MultipleWordOp {
+    
+    /**
+     * The words that were found during the word operation.
+     */
     private Vector< String > words;
-    private Vector< Integer > idxs;
+    
+    /**
+     * The indexes of the first letter in the words extracted relative to the
+     * buffer it was extracted from.
+     */
+    private Vector< Integer > buf_idxs;
 
+    /**
+     * Constructor, initializes an empty <code>MultipleWordOp</code>.
+     */
     public MultipleWordOp() {
       words = new Vector< String >();
-      idxs = new Vector< Integer >();
+      buf_idxs = new Vector< Integer >();
     }
     
+    /**
+     * Adds a found word to the internal list.
+     * 
+     * @param word    The word to add.
+     * @param idx     The index of the word relative to the buffer it was extracted
+     *                from.
+     */
     public void add(String word, int idx) {
       words.add(word);
-      idxs.add(idx);
+      buf_idxs.add(idx);
     }
-    
-    public String word(int idx) {
-      return(words.get(idx));
-    }
-    
-    public int idx(int idx) {
-      return(idxs.get(idx));
-    }
-    
+ 
+    /**
+     * Returns the number of words that were extracted.
+     * 
+     * @return    The number of words extracted.
+     */
     public int length() {
       return(words.size());
+    }
+    
+    /**
+     * Returns the <code>n</code>'th word extracted.
+     * 
+     * @param n   The <code>n</code>'th index. 
+     * 
+     * @return    The <code>n</code>'th word extracted.
+     */
+    public String word(int n) {
+      return(words.get(n));
+    }
+    
+    /**
+     * Returns the index of the <code>n</code>'th extracted word relative to the
+     * buffer it was extracted from.
+     * 
+     * @param n   The <code>n</code>'th index.
+     * @return    The <code>n</code>'th index of the extracted word relative
+     *            to the buffer it was extractted from.
+     */
+    public int idx(int n) {
+      return(buf_idxs.get(n));
     }
   }
 }

@@ -53,24 +53,11 @@ public class Suspension extends Evaluator {
     if ( op == null ) {
       return(false);
     }
-    
-    return( evaluate(op.word()) );
-  }
-  
-    /**
-     * Determines if the word is an suspension and therefore not a
-     * likely sentence start/end.
-     * 
-     * @param wd  A word.
-     * 
-     * @return    <code>true</code> if the word is an suspension and not
-     *            a likely sentence end, <code>false</code> otherwise.
-     */
-  public boolean evaluate(String wd) {
+
     if ( suspensions == null ) {
       suspensions = Helper.cvtFileToHashSet(Config.SUSPENSION_FILENAME.asStr(), true);
     }
 
-    return( suspensions.contains(wd.toLowerCase()) );
+    return( suspensions.contains(op.word().toLowerCase()) );
   }
 }

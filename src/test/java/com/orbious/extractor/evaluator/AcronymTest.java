@@ -47,13 +47,6 @@ public class AcronymTest extends TestCase {
     assertFalse(acronym.evaluate(buf, 7));
   }
   
-  public void test_AcronymWithSeparatedStopAsWord() {
-    String str = "E.M.C. .";
-    Acronym acronym = new Acronym();    
-
-    assertTrue(acronym.evaluate(str));
-  }
-  
   public void test_AcronymWithStop() {
     String str = "I.B.M..";
     char[] buf = str.toCharArray();
@@ -64,14 +57,7 @@ public class AcronymTest extends TestCase {
     assertTrue(acronym.evaluate(buf, 5));
     assertFalse(acronym.evaluate(buf, 6));
   }
-  
-  public void test_AcronymWithStopAsWord() {
-    String str = "I.B.M.."; 
-    Acronym acronym = new Acronym();
 
-    assertTrue(acronym.evaluate(str));
-  }
-  
   public void test_AcronymAsLowercase() {
     String str = "e.g. ";
     char[] buf = str.toCharArray();
@@ -79,13 +65,6 @@ public class AcronymTest extends TestCase {
 
     assertTrue(acronym.evaluate(buf, 1));
     assertTrue(acronym.evaluate(buf, 3)); 
-  }
-  
-  public void test_AcronymAsLowercaseAsWord() {
-    String str = "e.g. ";
-    Acronym acronym = new Acronym();
-
-    assertTrue(acronym.evaluate(str));  
   }
 
   public void test_NotAcronym() {
@@ -125,25 +104,5 @@ public class AcronymTest extends TestCase {
 
     assertFalse(acronym.evaluate(buf, 0));
     assertFalse(acronym.evaluate(buf, 3));
-  }
-  
-  public void test_NotAcronymAsWord() {
-    String str;
-    Acronym acronym = new Acronym();
-    
-    str = "\",As";
-    assertFalse(acronym.evaluate(str));
-    
-    str = "they?\"";
-    assertFalse(acronym.evaluate(str));
-    
-    str = "lecturin\',\"";
-    assertFalse(acronym.evaluate(str));
-    
-    str = "Titan...";
-    assertFalse(acronym.evaluate(str));
-
-    str = "\"Oh,";
-    assertFalse(acronym.evaluate(str)); 
   }
 }

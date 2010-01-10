@@ -45,25 +45,12 @@ public class Name extends Evaluator {
    */
   public boolean evaluate(final char[] buf, int idx) {
     WordOp op = Word.getNextWord(buf, idx, false);
+    String wd = op.word();
+    
     if ( op == null ) {
       return(false);
     }
-    
-    return( evaluate(op.word()) );
-  } 
-  
-  
-  /**
-   * Determines if the word is a common name and therefore not a
-   * likely sentence start. Also corrects for names that are
-   * entirely capitalized (e.g. WORTLEY is converted to Wortley).
-   * 
-   * @param wd    A word.
-   * 
-   * @return    <code>true</code> if the word is an common name and not
-   *            a likely sentence start, <code>false</code> otherwise.
-   */ 
-  public boolean evaluate(String wd) {
+
     if ( names == null ) {
       names = Helper.cvtFileToHashSet(Config.NAMES_FILENAME.asStr(), false);
     }
@@ -72,14 +59,14 @@ public class Name extends Evaluator {
       return(false);
     }
     
-    char[] buf = wd.toCharArray();
+    char[] wdbuf = wd.toCharArray();
     StringBuilder str = new StringBuilder();
     
-    str.append(Character.toUpperCase(buf[0]));
-    for ( int i = 1 ; i < buf.length; i++ ) {
-      str.append(Character.toLowerCase(buf[i]));
+    str.append(Character.toUpperCase(wdbuf[0]));
+    for ( int i = 1 ; i < wdbuf.length; i++ ) {
+      str.append(Character.toLowerCase(wdbuf[i]));
     }
 
     return( names.contains(str.toString()) );
-  }
+  } 
 }

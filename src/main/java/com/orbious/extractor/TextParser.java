@@ -207,11 +207,8 @@ public class TextParser {
     int len;
     int pos;
 
-    if ( line_starts != null ) {
-      line_starts.clear();
-    } else {
-      line_starts = new HashSet<Integer>();
-    }
+    line_starts = TextParserData.line_starts;
+    line_starts.clear();
     
     br = new BufferedReader(new FileReader(filename));
     raw = new Vector<String>();
@@ -242,11 +239,11 @@ public class TextParser {
       pos += buf.length;
     }
 
-    TextParserData.lineStarts(line_starts);
+
     
     if ( logger.isInfoEnabled() ) {
       logger.info("Statistics for " + filename +
-          " Raw LineCt=" + raw.size() + 
+          " Raw LineCt=" + raw.size() + " LineStarts=" + line_starts.size() +
           " Cleansed CharCt=" + buffer.length);
     }
   }
@@ -436,6 +433,11 @@ public class TextParser {
         // run a quick check to reduce the workload
         if ( !Character.isUpperCase(ch) ) {
           continue;
+        } else if ( (i > 0) && (!Character.isWhitespace(buffer[i-1]) &&
+            !sentence_ends.contains(buffer[i-1])) ) {
+          // a sentence start must either have a whitespace character
+          // or a sentence end for the previous character
+          continue;
         }
 
         startOp = Sentence.isStart(buffer, i);
@@ -453,8 +455,6 @@ public class TextParser {
         }
       }
     }  
-    
-    TextParserData.sentenceMap(sentence_map);
   }
 
   /**
@@ -729,11 +729,6 @@ public class TextParser {
   public static class TextParserData {
     
     /**
-     * Copy of {@link TextParser#sentence_map}.
-     */
-    private static SentenceMapEntry[] sentence_map;
-    
-    /**
      * Copy of {@link TextParser#line_starts}
      */
     private static HashSet<Integer> line_starts;
@@ -744,39 +739,15 @@ public class TextParser {
     private TextParserData() { }
     
     /**
-     * Returns the <code>sentence_map</code>.
-     * 
-     * @return  The <code>sentence_map</code>.
-     */
-    public static SentenceMapEntry[] sentenceMap() {
-      return(sentence_map);
-    }
-    
-    /**
-     * Setter for <code>sentence_map</code>.
-     * 
-     * @param map The <code>sentence_map</code>.
-     */
-    public static void sentenceMap(SentenceMapEntry[] map) {
-      sentence_map = map;
-    }
-    
-    /**
      * Returns the <code>line_starts</code>.
      * 
      * @return  The <code>line_starts</code>.
      */
     public static HashSet<Integer> lineStarts() {
+      if ( line_starts == null ) {
+        line_starts = new HashSet< Integer >();
+      }
       return(line_starts);
-    }
-    
-    /**
-     * Setter for <code>line_starts</code>.
-     * 
-     * @param starts  The <code>line_starts</code>.
-     */
-    public static void lineStarts(HashSet<Integer> starts) {
-      line_starts = starts;
     }
   }
   

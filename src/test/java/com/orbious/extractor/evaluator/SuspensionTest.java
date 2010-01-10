@@ -20,7 +20,7 @@ public class SuspensionTest extends TestCase {
   
   public void test_isSuspension() {
     Suspension suspension = new Suspension();
-    boolean ret = suspension.evaluate("Mr.");
+    boolean ret = suspension.evaluate("Mr.".toCharArray(), 2);
     assertEquals(true, ret);
   }
 
@@ -29,10 +29,10 @@ public class SuspensionTest extends TestCase {
 
     Suspension suspension = new Suspension();
     
-    ret = suspension.evaluate("Tomato");
+    ret = suspension.evaluate("Tomato".toCharArray(), 5);
     assertEquals(false, ret);
 
-    ret = suspension.evaluate("empty.");
+    ret = suspension.evaluate("empty.".toCharArray(), 5);
     assertEquals(false, ret); 
   }
 }

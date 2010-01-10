@@ -2,6 +2,7 @@ package com.orbious.extractor.evaluator;
 
 import java.util.HashSet;
 
+import com.orbious.extractor.Config;
 import com.orbious.extractor.TextParser;
 import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.util.Helper;
@@ -33,7 +34,7 @@ public class NumberedHeading extends Evaluator {
    */
   public NumberedHeading() {
     super("NumberedHeading");
-    roman_numerals = Helper.cvtStringToHashSet("IVXLCDM");
+    roman_numerals = Helper.cvtStringToHashSet(Config.ROMAN_NUMERALS.asStr());
     line_starts = TextParserData.lineStarts();
   }
   
@@ -52,59 +53,26 @@ public class NumberedHeading extends Evaluator {
   public boolean evaluate(final char[] buf, int idx) {
     boolean b;
     
-    b = evaluateNumbered(buf, idx, true);
+    if ( line_starts == null ) {
+      line_starts = TextParserData.lineStarts();
+    }
+
+    b = evaluateNumbered(buf, idx);
     if ( b ) {
       return(b);
     }
     
-    b = evaluateRoman(buf, idx, true);
+    b = evaluateRoman(buf, idx);
     return(b);
   }
-  
-    /**
-     * Determines if a 'word' is part of a numbered heading and therefore not a
-     * likely sentence end.
-     * 
-     * @param wd  A word.
-     * 
-     * @return    <code>true</code> if the <code>wd</code> is a numbered heading and not
-     *            a likely sentence end, <code>false</code> otherwise.
-     */
-  public boolean evaluate(String wd) {
-    char[] buf;
-    int idx;
-    boolean b;
-    
-    // for a word, we need to move to the fullstop, if none return false
-    // otherwise run the evaluations
-    buf = wd.toCharArray();
-    idx = -1;
-    for ( int i = 0; i < buf.length; i++ ) {
-     if ( buf[i] == '.' ) {
-       idx = i;
-       break;
-     }
-    }
-    
-    if ( idx == -1 ) {
-      return(false);
-    }
-    
-    b = evaluateNumbered(wd.toCharArray(), idx, false);
-    if ( b ) {
-      return(b);
-    }
-    
-    b = evaluateRoman(wd.toCharArray(), idx, false);
-    return(b);
-  }
-  
+
   /**
    * 
-   * @param wd
+   * @param buf
+   * @param idx
    * @return
    */
-  protected boolean evaluateNumbered(final char[] buf, int idx, boolean useLineStarts) {
+  protected boolean evaluateNumbered(final char[] buf, int idx) {
     boolean fnd;
     boolean hasNonNumber;
     char ch;
@@ -132,27 +100,18 @@ public class NumberedHeading extends Evaluator {
         break;
       }
     }
-    
-    if ( useLineStarts ) {
-      if ( firstIdx == -1 ) {
-        firstIdx = 0;
-      }
-      if ( line_starts == null ) {
-        line_starts = TextParserData.lineStarts();
-      }
+
+    if ( firstIdx == -1 ) {
+      firstIdx = 0;
+    }
       
-      if ( !hasNonNumber && line_starts.contains(firstIdx) ) {
-        fnd = true;
-      }
-    } else {
-      if ( !hasNonNumber ) {
-        fnd = true;
-      }
+    if ( !hasNonNumber && line_starts.contains(firstIdx) ) {
+      fnd = true;
     }
     
     if ( logger.isDebugEnabled() ) {
       logger.debug("Numbered: buf[" + idx + "]=" + buf[idx] +
-          " firstIdx=" + firstIdx + 
+          " firstIdx=" + firstIdx + " fnd=" + fnd + 
           " hasNonNumber=" + String.valueOf(hasNonNumber).toUpperCase() + 
           " Match=" + String.valueOf(fnd).toUpperCase());
     }
@@ -162,10 +121,11 @@ public class NumberedHeading extends Evaluator {
   
   /**
    * 
-   * @param wd
+   * @param buf
+   * @param idx
    * @return
    */
-  protected boolean evaluateRoman(final char[] buf, int idx, boolean useLineStarts) {
+  protected boolean evaluateRoman(final char[] buf, int idx) {
     boolean fnd;
     boolean hasNonRoman;
     char ch;
@@ -194,18 +154,12 @@ public class NumberedHeading extends Evaluator {
       }
     }
 
-    if ( useLineStarts ) {
-      if ( line_starts == null ) {
-        line_starts = TextParserData.lineStarts();
-      }
-      
-      if ( !hasNonRoman && line_starts.contains(firstIdx) ) {
-        fnd = true;
-      }
-    } else {
-      if ( !hasNonRoman ) {
-        fnd = true;
-      }
+    if ( firstIdx == -1 ) {
+      firstIdx = 0;
+    }
+
+    if ( !hasNonRoman && line_starts.contains(firstIdx) ) {
+      fnd = true;
     }
     
     if ( logger.isDebugEnabled() ) {

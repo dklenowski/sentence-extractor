@@ -56,6 +56,10 @@ public enum Config {
   PUNCTUATION(PRESERVED_PUNCTUATION.asStr() + "#*+,/<=>\\^_|~"),
   
   /**
+   * All characters that are used in roman numerals.
+   */
+  ROMAN_NUMERALS("IVXLCDM"),
+  /**
    * A regular expression to match URL's.
    */
   URL_REGEX("[a-zA-Z0-9\\-]+\\.(com|edu|gov|mil|net|org|biz|info|name|museum|us|ca|uk)"),

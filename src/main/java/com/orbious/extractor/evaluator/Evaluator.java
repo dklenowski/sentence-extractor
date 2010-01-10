@@ -60,16 +60,4 @@ public abstract class Evaluator {
    *            not a sentence end, <code>false</code> otherwise.
    */
   public abstract boolean evaluate(final char[] buf, int idx);  
-  
-  /**
-   * Runs an evaluation on the word <code>wd</code>. If the 
-   * evaluation returns <code>true</code>, the word is likely to be not part of a 
-   * sentence start/end.
-   *  
-   * @param wd    A word.
-   * 
-   * @return    <code>true</code> if the word is not a sentence start/end,
-   *            <code>false</code> otherwise.
-   */
-  public abstract boolean evaluate(String wd);
 }

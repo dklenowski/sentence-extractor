@@ -21,8 +21,8 @@ our $debug = 1;
 #
 sub usage {
   print <<EOF
-  Usage: pre_process_gutenberg.pl -d <input_directory> -o <output_directory>
-  -d <input_directory>    Project Gutenberg directory containing .txt files.
+  Usage: pre_process_gutenberg.pl -i <input_directory> -o <output_directory>
+  -i <input_directory>    Project Gutenberg directory containing .txt files.
   -o <output_directory>   Directory to put processed output files.
   
 EOF
@@ -33,23 +33,24 @@ EOF
 #
 # main
 #
-our ( $opt_d, $opt_o );
+our ( $opt_i, $opt_o );
 
-Getopt::Std::getopts('d:o:');
-if ( !$opt_d || !-d($opt_d) ) {
+Getopt::Std::getopts('i:o:');
+if ( !$opt_i || !-d($opt_i) ) {
   usage();
 } elsif ( !$opt_o || !-d($opt_o) ) {
   usage();
 }
 
-if ( !opendir(DIR, $opt_d) ) {
-  print "Error: Failed to open directory $opt_d : $!\n";
+if ( !opendir(DIR, $opt_i) ) {
+  print "Error: Failed to open input directory $opt_i : $!\n";
   exit(1);
 }
 
 my @files = readdir(DIR);
 closedir(DIR);
 
+my @buf;
 my $outputfile;
 my $path;
 my $fndStart;
@@ -60,12 +61,14 @@ my $processedCt;
 foreach my $file ( @files ) {
   next if ( $file !~ m/\.txt$/ || $file =~ m/_clean/ );
   
-  $path = File::Spec->catfile($opt_d, $file);
+  $path = File::Spec->catfile($opt_i, $file);
   
   $outputfile = File::Spec->catfile($opt_o, $file);
   $outputfile =~ s/\.txt$//;
   $outputfile .= '_clean.txt';
 
+  @buf = ();
+  
   if ( -e($outputfile) ) {
     print "Info: Skipping $file (output file $outputfile exists)\n";
     next;
@@ -99,11 +102,19 @@ foreach my $file ( @files ) {
       $_ =~ m/END OF THE PROJECT GUTENBERG EBOOK/ ) {
       $fndEnd++;
       last;
+    } elsif ( $_ =~ m/^[\s]{0,}table of contents[\s]{0,}$/i ) {
+      # the text before the table of contents can contain allot of garbage
+      @buf = ();
+    } elsif ( $_ =~ m/^[\s]{0,}introduction[\s]{0,}$/i ) {
+      # the text before the introduction can contain allot of garbage
+      @buf = ();
     } elsif ( $fndStart ) {
       $processedCt++;
-      print OUT $_;
+      push(@buf, $_);
     }
   }
+  
+  print OUT @buf;
   
   close(INP);
   close(OUT);

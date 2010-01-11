@@ -447,6 +447,9 @@ public class TextParser {
           } else {
             addToMap(i, Likelihood.LIKELY, SentenceEntryType.START, null);
           
+            ////////////////////
+            // THIS seems to generate allot of false positives? 
+            //
             //if ( startOp.stopIdx() >= 0 ) {
               //addToMap(startOp.stopIdx(), Likelihood.LIKELY, 
                //   SentenceEntryType.END, SentenceEntrySubType.END_FROM_START);

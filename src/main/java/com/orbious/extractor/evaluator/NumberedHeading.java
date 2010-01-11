@@ -30,7 +30,7 @@ public class NumberedHeading extends Evaluator {
   
   /**
    * Constructor, sets the name of this <code>Evaluator</code>
-   * and initializes {@link NumberedHeading#roman_numerals_set} 
+   * and initializes {@link NumberedHeading#roman_numerals} 
    */
   public NumberedHeading() {
     super("NumberedHeading");
@@ -67,10 +67,14 @@ public class NumberedHeading extends Evaluator {
   }
 
   /**
+   * Evaluates the current position to see if it is part of a Numbered Heading.
+   * Note, <code>buf[idx]</code> must contain a full stop for evaluation to proceed.
    * 
-   * @param buf
-   * @param idx
-   * @return
+   * @param buf    Text buffer.
+   * @param idx    Position in the buffer <code>buf</code> to begin evaluation.
+   * 
+   * @return    <code>true</code> if the current position is likely to be a 
+   *            Numbered Heading, <code>false</code> otherwise.
    */
   protected boolean evaluateNumbered(final char[] buf, int idx) {
     boolean fnd;
@@ -118,12 +122,16 @@ public class NumberedHeading extends Evaluator {
 
     return(fnd);
   }
-  
+
   /**
+   * Evaluates the current position to see if it is part of a Roman Numeral Heading.
+   * Note, <code>buf[idx]</code> must contain a full stop for evaluation to proceed.
    * 
-   * @param buf
-   * @param idx
-   * @return
+   * @param buf    Text buffer.
+   * @param idx    Position in the buffer <code>buf</code> to begin evaluation.
+   * 
+   * @return    <code>true</code> if the current position is likely to be a 
+   *            Roman Numeral Heading, <code>false</code> otherwise.
    */
   protected boolean evaluateRoman(final char[] buf, int idx) {
     boolean fnd;

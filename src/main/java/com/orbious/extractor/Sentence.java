@@ -19,7 +19,7 @@ import com.orbious.util.Helper;
  * Provides static methods for Sentence operations.
  * <p>
  * To use your own evaluators, write a class that extends 
- * {@link com.orbious.extractor.evaluator.Evalator} and then add the evaluator
+ * {@link com.orbious.extractor.evaluator.Evaluator} and then add the evaluator
  * using (for start evaluators):
  * <p>
  * <code>

@@ -59,6 +59,7 @@ public enum Config {
    * All characters that are used in roman numerals.
    */
   ROMAN_NUMERALS("IVXLCDM"),
+
   /**
    * A regular expression to match URL's.
    */

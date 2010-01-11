@@ -77,7 +77,7 @@ public class TextParser {
   
   /**
    * A buffer that contains where the line starts, which is used by some
-   * by the {@link NumberedHeading} <code>Evaluator</code>.
+   * by the {@link com.orbious.extractor.evaluator.NumberedHeading} <code>Evaluator</code>.
    */
   private static HashSet< Integer > line_starts;
   
@@ -191,7 +191,7 @@ public class TextParser {
   
   /**
    * Parses {@link TextParser#filename} into memory. This method also calls 
-   * {@link WhitespaceRemover#remove(Vector, int)} on each line
+   * {@link com.orbious.extractor.WhitespaceRemover#remove(Vector, int)} on each line
    * before adding to memory and updates {@link TextParser#line_starts}
    * with the start of each line (minus whitespace).
    * 
@@ -781,7 +781,7 @@ public class TextParser {
      * 
      * @param adjustedStartIdx    The new <code>adjustedStartIdx</code>.
      */
-    public void adjustedStartIndex(int adjustedStartIdx) { 
+    public void adjustedStartIdx(int adjustedStartIdx) { 
       this.adjustedStartIdx = adjustedStartIdx;
     }
     
@@ -800,8 +800,8 @@ public class TextParser {
      * 
      * @param adjustedEndIdx    The new <code>adjustedEndIdx</code>.
      */
-    public void adjustedEndIndex(int adjustedEndIndex) { 
-      this.adjustedEndIdx = adjustedEndIndex;
+    public void adjustedEndIdx(int adjustedEndIdx) { 
+      this.adjustedEndIdx = adjustedEndIdx;
     }
     
     /**

@@ -316,16 +316,17 @@ public class Helper {
     Logger logger;
     HashSet<String> hs;
     BufferedReader br;
+    String resourceStr;
     
     br = null;
     
+    resourceStr = ClassLoader.getSystemResource(filename).getFile();
     
     logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
     try {
-      br = new BufferedReader(
-          new FileReader(filename));
+      br = new BufferedReader(new FileReader(resourceStr));
     } catch ( FileNotFoundException fnfe ) {
-      logger.fatal("Failed to open file " + filename, fnfe);
+      logger.fatal("Failed to open file " + filename + "(" + resourceStr + ")", fnfe);
     }
     
     hs = new HashSet<String>();

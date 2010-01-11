@@ -74,13 +74,13 @@ public enum Config {
   /**
    * A text file containing a list of suspensions (each suspension on a newline).
    */
-  SUSPENSION_FILENAME("src/main/resources/suspensions.txt"),
+  SUSPENSION_FILENAME("suspensions.txt"),
   
   /**
    * A text file containing a list of common names, each on a newline.
    * Ignores lines that begin with "#" (i.e. comments).
    */
-  NAMES_FILENAME("src/main/resources/names.txt"),
+  NAMES_FILENAME("names.txt"),
   
   /**
    * Minimum sentence length (in words), note any internal sentence punctuation

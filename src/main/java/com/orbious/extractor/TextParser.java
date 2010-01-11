@@ -215,8 +215,7 @@ public class TextParser {
     br.close();
     
     logger.info("Found " + raw.size() + " lines in " + filename);
-    System.out.println("USERDIR=" + System.getProperty("user.dir"));
-    
+
     parser_line_starts = TextParserData.line_starts;
     parser_line_starts.clear();
     

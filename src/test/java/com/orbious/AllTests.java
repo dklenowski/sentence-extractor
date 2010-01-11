@@ -53,10 +53,4 @@ public class AllTests {
       DOMConfigurator.configure("src/main/resources/log4j.xml");
     }   
   }
-  
-  public static String getPath(String fname) {
-    String dir = System.getProperty("user.dir");
-    System.out.println("USER DIR=" + dir);
-    return(fname);
-  }
 }

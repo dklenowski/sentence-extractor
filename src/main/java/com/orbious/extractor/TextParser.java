@@ -331,6 +331,10 @@ public class TextParser {
         sentences.add(sentence);
       }
     }
+    
+    if ( logger.isInfoEnabled() ) {
+      logger.info("Found " + sentences.size() + " sentences in " + filename);
+    }
   }
   
   /**

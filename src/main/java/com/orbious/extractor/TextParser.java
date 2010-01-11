@@ -79,7 +79,7 @@ public class TextParser {
    * A buffer that contains where the line starts, which is used by some
    * by the {@link com.orbious.extractor.evaluator.NumberedHeading} <code>Evaluator</code>.
    */
-  private static HashSet< Integer > line_starts;
+  private HashSet< Integer > parser_line_starts;
   
   /**
    * A <code>Vector</code> of <code>TextParserOp</code> containing sentence
@@ -206,9 +206,6 @@ public class TextParser {
     char[] buf;
     int len;
     int pos;
-
-    line_starts = TextParserData.line_starts;
-    line_starts.clear();
     
     br = new BufferedReader(new FileReader(filename));
     raw = new Vector<String>();
@@ -218,7 +215,11 @@ public class TextParser {
     br.close();
     
     logger.info("Found " + raw.size() + " lines in " + filename);
-  
+    System.out.println("USERDIR=" + System.getProperty("user.dir"));
+    
+    parser_line_starts = TextParserData.line_starts;
+    parser_line_starts.clear();
+    
     clean = new Vector<String>();
     len = 0;
   
@@ -226,7 +227,7 @@ public class TextParser {
       str = WhitespaceRemover.remove(raw, i);
       if ( str != null ) {
         clean.add(str);
-        line_starts.add(len);
+        parser_line_starts.add(len);
         len += str.length();
       }
     }
@@ -243,7 +244,7 @@ public class TextParser {
     
     if ( logger.isInfoEnabled() ) {
       logger.info("Statistics for " + filename +
-          " Raw LineCt=" + raw.size() + " LineStarts=" + line_starts.size() +
+          " Raw LineCt=" + raw.size() + " LineStarts=" + parser_line_starts.size() +
           " Cleansed CharCt=" + buffer.length);
     }
   }
@@ -736,6 +737,10 @@ public class TextParser {
      */
     private static HashSet<Integer> line_starts;
     
+    static {
+      line_starts = new HashSet<Integer>();
+    }
+    
     /**
      * Private constructor.
      */
@@ -747,9 +752,6 @@ public class TextParser {
      * @return  The <code>line_starts</code>.
      */
     public static HashSet<Integer> lineStarts() {
-      if ( line_starts == null ) {
-        line_starts = new HashSet< Integer >();
-      }
       return(line_starts);
     }
   }

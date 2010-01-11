@@ -41,10 +41,7 @@ public class UrlTextTest extends TestCase {
     
     str = "www.gutenberg.org..";
     buf = str.toCharArray();
-    
-    for ( int i = 0; i < buf.length; i++ ) {
-    	System.out.println(i + "=" + buf[i]);
-    }
+
     result = url.evaluate(buf, 3);
     assertEquals(true, result);
     result = url.evaluate(buf, 13);  

@@ -31,17 +31,15 @@ public class TextParserTest extends TestCase {
     
     try {
       parser.parse();
-      fail("No FileNotFoundException thrown");
-    } catch ( FileNotFoundException fnfe ) { 
-      
+      fail("No FileNotFoundException thrown"); 
+    } catch ( FileNotFoundException fnfe ) {   
     } catch (IOException ioe ) {
       fail("Wrong Exception (IOException) thrown.");
     }
   }
 
   public void test_Read() {
-    System.out.println(System.getProperty("user.dir"));
-    String fname = "src/test/testdata/17216_short.txt";
+    String fname = "src/test/resources/17216_short.txt";
     TextParser parser = new TextParser(fname);
     
     try {
@@ -79,8 +77,7 @@ public class TextParserTest extends TestCase {
   }
 
   public void test_GenSentences17216() {
-    System.out.println(System.getProperty("user.dir"));
-    String fname = "src/test/testdata/17216_short.txt";
+    String fname = "src/test/resources/17216_short.txt";
     TextParser parser = new TextParser(fname);
 
     Vector<String> expected = new Vector<String>( 
@@ -118,7 +115,7 @@ public class TextParserTest extends TestCase {
   }
   
   public void test_GenSentences17216_2() {
-    String fname = "src/test/testdata/17216_short2.txt";
+    String fname = "src/test/resources/17216_short2.txt";
     TextParser parser = new TextParser(fname);
 
     Vector<String> expected = new Vector<String>( 
@@ -161,7 +158,7 @@ public class TextParserTest extends TestCase {
   }
 
   public void test_GenSentences17216_3() {
-    String fname = "src/test/testdata/17216_short3.txt";
+    String fname = "src/test/resources/17216_short3.txt";
     TextParser parser = new TextParser(fname);
 
     Vector<String> expected = new Vector<String>( 
@@ -210,7 +207,7 @@ public class TextParserTest extends TestCase {
   }
 
   public void test_GenSentences10001() {
-    String fname = "src/test/testdata/10001_short.txt";
+    String fname = "src/test/resources/10001_short.txt";
     TextParser parser = new TextParser(fname);
 
     Vector<String> expected = new Vector<String>( 
@@ -246,7 +243,7 @@ public class TextParserTest extends TestCase {
   }
   
   public void test_GenSentences11938() {
-    String fname = "src/test/testdata/11938_short.txt";
+    String fname = "src/test/resources/11938_short.txt";
     TextParser parser = new TextParser(fname);
 
     Vector<String> expected = new Vector<String>( 

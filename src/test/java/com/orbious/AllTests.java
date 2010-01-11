@@ -50,7 +50,13 @@ public class AllTests {
   public static void initLogger() {
     Logger root = Logger.getRootLogger();
     if ( !root.getAllAppenders().hasMoreElements() ) {
-      DOMConfigurator.configure("resources/log4j.xml");
+      DOMConfigurator.configure("src/main/resources/log4j.xml");
     }   
+  }
+  
+  public static String getPath(String fname) {
+    String dir = System.getProperty("user.dir");
+    System.out.println("USER DIR=" + dir);
+    return(fname);
   }
 }

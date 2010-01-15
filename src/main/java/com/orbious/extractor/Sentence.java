@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import com.orbious.extractor.evaluator.AbbreviatedName;
 import com.orbious.extractor.evaluator.Acronym;
 import com.orbious.extractor.evaluator.Evaluator;
+import com.orbious.extractor.evaluator.InnerQuote;
 import com.orbious.extractor.evaluator.Name;
 import com.orbious.extractor.evaluator.NumberedHeading;
 import com.orbious.extractor.evaluator.Suspension;
@@ -135,7 +136,8 @@ public class Sentence {
                 new Acronym(),
                 new UrlText(),
                 new NumberedHeading(),
-                new AbbreviatedName() ));   
+                new AbbreviatedName(),
+                new InnerQuote() ));   
   }
 
   /**

@@ -88,10 +88,9 @@ public enum Config {
   NAMES_FILENAME("names.txt"),
   
   /**
-   * Minimum sentence length (in words), note any internal sentence punctuation
-   * (e.g. ',') are considered punctuation.
+   * Minimum sentence length (in alphanumeric words).
    */
-  MIN_SENTENCE_LENGTH(3);
+  MIN_SENTENCE_LENGTH(4);
   
   /**
    * The value for the enum. 

@@ -257,7 +257,7 @@ public class TextParser {
     SentenceEntryType type;
     Likelihood likelihood;
     String debugStr;
-    Vector<String> sentence;
+    ExtractionOp op;
     
     genSentenceMap();    
 
@@ -326,9 +326,9 @@ public class TextParser {
     }
 
     for ( int i = 0; i < parser_map.size(); i++ ) {
-      sentence = extract(parser_map.get(i));
-      if ( sentence.size() > Config.MIN_SENTENCE_LENGTH.asInt() ) {
-        sentences.add(sentence);
+      op = extract(parser_map.get(i));
+      if ( op.wordCt() >= Config.MIN_SENTENCE_LENGTH.asInt() ) {
+        sentences.add(op.words());
       }
     }
     
@@ -382,8 +382,7 @@ public class TextParser {
       }
     }
   }
-  
-  
+
   /**
    * Add's a new sentence begin/end to the <code>extraction_map</code>
    * and the <code>parser_map</code>.
@@ -501,15 +500,18 @@ public class TextParser {
    * @param op  A <code>TextParserOp</code> contain the start/end indexes
    *            for extraction.
    *            
-   * @return    A <code>Vector</code> of words.
+   * @return    A <code>ExtractionOp</code> containing the <code>Vector</code>
+   *            of words and the <code>wordCt</code>.
    */
-  protected Vector<String> extract(TextParserOp op) {
+  protected ExtractionOp extract(TextParserOp op) {
     Vector<String> words;
     int startIdx;
     int endIdx;
+    int wordCt;
     String wd;
     char ch;
     IndexAdjustment indexAdjustment;
+    boolean hasAlpha;
     boolean hasLetter;
     boolean doAsNewWord;
 
@@ -518,7 +520,9 @@ public class TextParser {
     indexAdjustment = adjustIndexes(startIdx, endIdx);
     words = new Vector<String>();
     wd = "";
+    hasAlpha = false;
     hasLetter = false;
+    wordCt = 0;
     
     if ( logger.isDebugEnabled() ) {
       logger.debug("Beginning extract startIdx=" + startIdx + 
@@ -532,7 +536,10 @@ public class TextParser {
 
       if ( Character.isLetterOrDigit(ch) ) {
         wd += ch;
-        hasLetter = true;
+        hasAlpha = true;
+        if ( Character.isLetter(ch) ) {
+          hasLetter = true;
+        }
       } else if ( Character.isWhitespace(ch) ) {
         if ( wd.length() == 0 ) {
           continue;
@@ -540,17 +547,23 @@ public class TextParser {
         
         words.add(wd);
         wd = "";
+        if ( hasLetter ) {
+          wordCt++;
+        }
+        hasAlpha = false;
         hasLetter = false;
         
       } else {
         // punctuation
         doAsNewWord = false;
-        if ( hasLetter || Helper.isPreviousLetter(buffer, i) ) {
+        
+        if ( hasAlpha || Helper.isPreviousLetter(buffer, i) ) {
           if ( (i < startIdx) || (i >= endIdx) ) {
             doAsNewWord = true;
           } else {
             if ( inner_punctuation.contains(ch) ) {
               // punctuation attached to the word.
+              System.out.println("ATTACHED TO WORD " + wd);
               wd += ch;
             } else if ( (ch == '.') && new UrlText().evaluate(buffer, i) ) {
               // web address 
@@ -571,17 +584,24 @@ public class TextParser {
         if ( doAsNewWord ) {
           if ( wd.length() != 0 ) {
             words.add(wd);
+            wd = "";
+            if ( hasLetter ) {
+              wordCt++;
+            }
           }
           
           words.add(Character.toString(ch));
-          wd = "";
+          hasAlpha = false;
           hasLetter = false;
         }
       }
     }
     
-    if ( hasLetter ) {
+    if ( hasAlpha ) {
       words.add(wd);
+      if ( hasLetter ) {
+        wordCt++;
+      }
     }
     
     // we need to run a final check and join punctuation
@@ -607,7 +627,8 @@ public class TextParser {
         tmpwd = wd;
         while ( p < words.size() ) {
           wd = words.get(p);
-          if ( (wd.length() != 1) || !preserved_punctuation.contains(wd.charAt(0)) ) {
+          if ( (wd.length() != 1) || sentence_ends.contains(wd.charAt(0)) || 
+              !preserved_punctuation.contains(wd.charAt(0)) ) {
             break;
           } else {
             tmpwd += wd;
@@ -622,7 +643,7 @@ public class TextParser {
       logger.debug("Extracted = " + Helper.cvtVectorToString(cleanwords));
     }
     
-    return(cleanwords);
+    return( new ExtractionOp(cleanwords, wordCt) );
   }
   
   /**
@@ -822,7 +843,6 @@ public class TextParser {
     }
   }
   
-  
   /**
    * An inner class to represent sentence start/end indexes.
    * 
@@ -869,6 +889,58 @@ public class TextParser {
      */
     public int end() {
       return(end);
+    }
+  }
+  
+  /**
+   * An inner class used to store data related to the extraction of words
+   * for a sentence.
+   * 
+   * @author dave
+   * @version 1.0
+   * @since 1.0
+   */
+  static class ExtractionOp {
+    
+    /**
+     * The words constituting a sentence.
+     */
+    private Vector<String> words;
+    
+    /** 
+     * A count of alphanumeric words within <code>words</code>. This is required
+     * because punctuation occupies its own position within the 
+     * <code>words</code> vector.
+     */
+    private int wordCt;
+    
+    /**
+     * Constructor, initialize the <code>ExtractionOp<code> object.
+     * 
+     * @param words   The words constituting a sentence.
+     * @param wordCt  A count of alphanumeric words within <code>words</code>.
+     */
+    public ExtractionOp(Vector<String> words, int wordCt) {
+      this.words = words;
+      this.wordCt = wordCt;
+    }
+    
+    /**
+     * Accessor for <code>words</code>.
+     * 
+     * @return    The <code>words</code>.
+     */
+    public Vector<String> words() {
+      return(words);
+    }
+    
+    /**
+     * Accessor for <code>wordCt</code>.
+     * 
+     * @return    The <code>wordCt</code>.
+     */
+    public int wordCt() {
+      return(wordCt);
     }
   }
 }

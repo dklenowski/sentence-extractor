@@ -30,7 +30,7 @@ public class Helper {
    * A direction indicator, used by 
    * {@link Helper#moveToNonWhitespace(DIRN, char[], int)}.
    */
-  protected enum DIRN { LEFT, RIGHT };
+  public enum DIRN { LEFT, RIGHT };
 
   /**
    * Private Constructor
@@ -472,7 +472,7 @@ public class Helper {
    * @return    The first non-whitespace index in <code>buf</code> either
    *            in the <code>LEFT</code> or <code>RIGHT</code> direction.
    */
-  protected static int moveToNonWhitespace(DIRN dirn, final char[] buf, int idx) {
+  public static int moveToNonWhitespace(DIRN dirn, final char[] buf, int idx) {
     int i;
     
     if ( dirn == DIRN.LEFT ) {

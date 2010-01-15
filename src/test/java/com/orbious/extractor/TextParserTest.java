@@ -99,8 +99,8 @@ public class TextParserTest extends TestCase {
 
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr();
-    assertEquals(expected.size(), sentences.size());
     
+    assertEquals(expected.size(), sentences.size());   
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
         diff_match_patch dmp = new diff_match_patch();
@@ -113,7 +113,7 @@ public class TextParserTest extends TestCase {
       }
     }
   }
-  
+
   public void test_GenSentences17216_2() {
     String fname = "src/test/resources/17216_short2.txt";
     TextParser parser = new TextParser(fname);
@@ -142,7 +142,7 @@ public class TextParserTest extends TestCase {
 
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr();
-    
+  
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
      if ( !expected.get(i).equals(sentences.get(i)) ) {
@@ -167,7 +167,7 @@ public class TextParserTest extends TestCase {
             "That handbill now stands as the INTRODUCTION to this , the first Volume of Punch , and was employed to announce the advent of a publication which has sustained for nearly twenty years a popularity unsurpassed in the history of periodical literature .",
             "Punch and the Elections were the only matters which occupied the public mind on July 17, 1842 .",
             "The Whigs had been defeated in many places where hitherto they had been the popular party , and it was quite evident that the Meeting of Parliament would terminate their lease of Office .",
-            "[ STREET POLITICS . ]",
+            //"[ STREET POLITICS . ]",
             "The House met on the 19th of August , and unanimously elected MR. SHAW LEFEVRE to be Speaker .",
             "The address on the QUEEN'S Speech was moved by MR. MARK PHILLIPS , and seconded by MR. DUNDAS .",
             "MR. J.S. WORTLEY moved an amendment , negativing the confidence of the House in the Ministry , and the debate continued to occupy Parliament for four nights , when the Opposition obtained a majority of 91 against the Ministers .",
@@ -192,7 +192,7 @@ public class TextParserTest extends TestCase {
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr();
     
-    assertEquals(expected.size(), sentences.size());
+    assertEquals(expected.size(), sentences.size());    
     for ( int i = 0; i < sentences.size(); i++ ) {
      if ( !expected.get(i).equals(sentences.get(i)) ) {
         diff_match_patch dmp = new diff_match_patch();
@@ -227,7 +227,7 @@ public class TextParserTest extends TestCase {
 
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr();
-    
+   
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
@@ -248,8 +248,17 @@ public class TextParserTest extends TestCase {
 
     Vector<String> expected = new Vector<String>( 
         Arrays.asList(
-            "This piece is ascribed to Seneca by ancient tradition ; it is impossible to prove that it is his , and impossible to prove that it is not .",
-            "The matter will probably continue to be decided by every one according to his view of Seneca's character and abilities : in the matters of style and of sentiment much may be said on both sides ."
+            "Pedo brings him before the judgement seat of 14 Aeacus , who was holding court under the Lex Cornelia to try cases of murder and assassination .",
+            "Pedo requests the judge to take the prisoner's name , and produces a summons with this charge : Senators killed , 35 ; Roman Knights , 221 ; others as the sands of the sea-shore for multitude .",
+            //////////////////////////////////////////////////
+            // THIS IS NOT THE BEST, BUT if we add "]" as a sentence end
+            // it generates more false positives.
+            "[ Sidenote : Il. ix , 385 ] Claudius finds no counsel .",
+            "At length out steps P. Petronius , an old chum of his , a finished scholar in the Claudian tongue and claims a remand .",
+            "Pedo Pompeius prosecutes with loud outcry .",
+            "The counsel for the defence tries to reply ; but Aeacus , who is the soul of justice , will not have it .",
+            "Aeacus hears the case against Claudius , refuses to hear the other side and passes sentence against him , quoting the line : \" As he did , so be he done by , this is justice undefiled. \"",
+            "[ Footnote : A proverbial line . ]"
         ));
     try {
       parser.parse();
@@ -264,10 +273,9 @@ public class TextParserTest extends TestCase {
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr();
     
-    //assertEquals(expected.size(), sentences.size());
+    assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
-      System.out.println(sentences.get(i));
-      /*if ( !expected.get(i).equals(sentences.get(i)) ) {
+      if ( !expected.get(i).equals(sentences.get(i)) ) {
         diff_match_patch dmp = new diff_match_patch();
         LinkedList<Diff> d = dmp.diff_main(expected.get(i), sentences.get(i));
 
@@ -275,7 +283,7 @@ public class TextParserTest extends TestCase {
                            "Actual  =|" + sentences.get(i) + "|\n" + 
                            "Diff    =" + d);
         fail();
-      }*/
+      }
     }    
   }
   
@@ -302,7 +310,7 @@ public class TextParserTest extends TestCase {
 
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr();
-    
+
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {

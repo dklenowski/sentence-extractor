@@ -363,7 +363,7 @@ public class Helper {
    */
   
   public static String cvtVectorToString(Vector<String> words) {
-    String str = "|";
+    String str = "";
 
     for ( int i = 0; i < words.size(); i++ ) {
       if ( i+1 < words.size() ) {
@@ -373,7 +373,7 @@ public class Helper {
       }
     }
 
-    str += "|";
+    str += "";
     return(str);
   }
   

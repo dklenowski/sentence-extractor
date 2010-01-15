@@ -563,7 +563,6 @@ public class TextParser {
           } else {
             if ( inner_punctuation.contains(ch) ) {
               // punctuation attached to the word.
-              System.out.println("ATTACHED TO WORD " + wd);
               wd += ch;
             } else if ( (ch == '.') && new UrlText().evaluate(buffer, i) ) {
               // web address 

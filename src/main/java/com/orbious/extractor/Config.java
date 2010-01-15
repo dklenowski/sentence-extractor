@@ -17,6 +17,11 @@ public enum Config {
   LOGGER_REALM("sentence-extractor"),
   
   /**
+   * The Log4j configuration file.
+   */
+  LOGGER_CONF_FILENAME("log4j.xml"),
+  
+  /**
    * Left punctuation marks.
    */
   LEFT_PUNCTUATION_MARKS("[{("),

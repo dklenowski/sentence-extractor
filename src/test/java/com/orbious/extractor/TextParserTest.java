@@ -242,6 +242,43 @@ public class TextParserTest extends TestCase {
     }    
   }
   
+  public void test_GenSentences100012() {
+    String fname = "src/test/resources/10001_short2.txt";
+    TextParser parser = new TextParser(fname);
+
+    Vector<String> expected = new Vector<String>( 
+        Arrays.asList(
+            "This piece is ascribed to Seneca by ancient tradition ; it is impossible to prove that it is his , and impossible to prove that it is not .",
+            "The matter will probably continue to be decided by every one according to his view of Seneca's character and abilities : in the matters of style and of sentiment much may be said on both sides ."
+        ));
+    try {
+      parser.parse();
+    } catch ( FileNotFoundException fnfe ) {
+      fnfe.printStackTrace();
+      fail("FileNotFoundException thrown");
+    } catch ( IOException ioe ) {
+      ioe.printStackTrace();
+      fail("IOException thrown");
+    }
+
+    parser.genSentences();
+    Vector<String> sentences = parser.sentencesAsStr();
+    
+    //assertEquals(expected.size(), sentences.size());
+    for ( int i = 0; i < sentences.size(); i++ ) {
+      System.out.println(sentences.get(i));
+      /*if ( !expected.get(i).equals(sentences.get(i)) ) {
+        diff_match_patch dmp = new diff_match_patch();
+        LinkedList<Diff> d = dmp.diff_main(expected.get(i), sentences.get(i));
+
+        System.out.println("Expected=|" + expected.get(i) + "|\n" +
+                           "Actual  =|" + sentences.get(i) + "|\n" + 
+                           "Diff    =" + d);
+        fail();
+      }*/
+    }    
+  }
+  
   public void test_GenSentences11938() {
     String fname = "src/test/resources/11938_short.txt";
     TextParser parser = new TextParser(fname);

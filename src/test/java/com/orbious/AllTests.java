@@ -11,6 +11,7 @@ import com.orbious.extractor.evaluator.NumberedHeadingTest;
 import com.orbious.extractor.evaluator.SuspensionTest;
 import com.orbious.extractor.evaluator.AcronymTest;
 import com.orbious.extractor.evaluator.UrlTextTest;
+import com.orbious.extractor.Config;
 import com.orbious.extractor.TextParserTest;
 import com.orbious.extractor.WhitespaceRemoverTest;
 import com.orbious.extractor.WordTest;
@@ -50,7 +51,9 @@ public class AllTests {
   public static void initLogger() {
     Logger root = Logger.getRootLogger();
     if ( !root.getAllAppenders().hasMoreElements() ) {
-      DOMConfigurator.configure("src/main/resources/log4j.xml");
+      String resourceStr = 
+        ClassLoader.getSystemResource(Config.LOGGER_CONF_FILENAME.asStr()).getFile();
+      DOMConfigurator.configure(resourceStr);
     }   
   }
 }

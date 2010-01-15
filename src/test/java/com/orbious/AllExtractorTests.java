@@ -25,7 +25,7 @@ import junit.framework.Test;
  * @since 1.0
  */
 
-public class AllTests {
+public class AllExtractorTests {
   
   public static Test suite() {
     initLogger();

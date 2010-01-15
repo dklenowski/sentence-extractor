@@ -2,7 +2,7 @@ package com.orbious.extractor.evaluator;
 
 // $Id: AcronymTest.java 12 2009-12-05 11:40:44Z app $
 
-import com.orbious.AllTests;
+import com.orbious.AllExtractorTests;
 import com.orbious.extractor.evaluator.Acronym;
 import junit.framework.TestCase;
 
@@ -16,7 +16,7 @@ public class AcronymTest extends TestCase {
 
   public AcronymTest(String name) { 
     super(name);
-    AllTests.initLogger();
+    AllExtractorTests.initLogger();
   }
   
   public void test_ExceptionThrown() {

@@ -2,7 +2,7 @@ package com.orbious.extractor.evaluator;
 
 // $Id$
 
-import com.orbious.AllTests;
+import com.orbious.AllExtractorTests;
 import com.orbious.extractor.evaluator.Name;
 import junit.framework.TestCase;
 
@@ -16,7 +16,7 @@ public class NameTest extends TestCase {
   
   public NameTest(String name) {
     super(name);
-    AllTests.initLogger();
+    AllExtractorTests.initLogger();
   }
   
   public void test_WordIsName() {

@@ -4,7 +4,7 @@ package com.orbious.extractor;
 
 import java.util.Arrays;
 import java.util.Vector;
-import com.orbious.AllTests;
+import com.orbious.AllExtractorTests;
 
 import junit.framework.TestCase;
 
@@ -18,7 +18,7 @@ public class WhitespaceRemoverTest extends TestCase {
   
   public WhitespaceRemoverTest(String name) {
     super(name);
-    AllTests.initLogger();
+    AllExtractorTests.initLogger();
   }
   
   public void test_ExceptionThrow() {

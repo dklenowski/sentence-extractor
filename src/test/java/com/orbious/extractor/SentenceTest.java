@@ -2,7 +2,7 @@ package com.orbious.extractor;
 
 // $Id: SentenceTest.java 14 2009-12-06 10:03:53Z app $
 
-import com.orbious.AllTests;
+import com.orbious.AllExtractorTests;
 import com.orbious.extractor.Sentence.StartOp;
 import junit.framework.TestCase;
 
@@ -16,7 +16,7 @@ public class SentenceTest extends TestCase {
   
   public SentenceTest(String name) {
     super(name);
-    AllTests.initLogger();
+    AllExtractorTests.initLogger();
   }
 
   //

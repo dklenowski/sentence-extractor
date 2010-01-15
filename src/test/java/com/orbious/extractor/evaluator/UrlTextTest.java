@@ -2,7 +2,7 @@ package com.orbious.extractor.evaluator;
 
 // $Id$
 
-import com.orbious.AllTests;
+import com.orbious.AllExtractorTests;
 import junit.framework.TestCase;
 
 /**
@@ -15,7 +15,7 @@ public class UrlTextTest extends TestCase {
 
   public UrlTextTest(String name) {
     super(name);
-    AllTests.initLogger();    
+    AllExtractorTests.initLogger();    
   }
   
   public void test_isUrlWord() {

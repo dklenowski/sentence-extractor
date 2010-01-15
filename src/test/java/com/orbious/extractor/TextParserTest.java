@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.Vector;
 import name.fraser.neil.plaintext.diff_match_patch;
 import name.fraser.neil.plaintext.diff_match_patch.Diff;
-import com.orbious.AllTests;
+import com.orbious.AllExtractorTests;
 import junit.framework.TestCase;
 
 /**
@@ -22,7 +22,7 @@ public class TextParserTest extends TestCase {
 
   public TextParserTest(String name) {
     super(name);
-    AllTests.initLogger();
+    AllExtractorTests.initLogger();
   }
 
   public void test_readWithException() {

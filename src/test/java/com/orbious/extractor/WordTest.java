@@ -2,7 +2,7 @@ package com.orbious.extractor;
 
 // $Id: WordTest.java 12 2009-12-05 11:40:44Z app $
 
-import com.orbious.AllTests;
+import com.orbious.AllExtractorTests;
 import junit.framework.TestCase;
 
 /**
@@ -15,7 +15,7 @@ public class WordTest extends TestCase {
 
     public WordTest(String name) {
       super(name);
-      AllTests.initLogger();
+      AllExtractorTests.initLogger();
     }
     
     public void test_ExceptionThrown() {

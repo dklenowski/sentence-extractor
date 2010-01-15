@@ -1,6 +1,6 @@
 package com.orbious.extractor.evaluator;
 
-import com.orbious.AllTests;
+import com.orbious.AllExtractorTests;
 
 import junit.framework.TestCase;
 
@@ -8,7 +8,7 @@ public class AbbreviatedNameTest extends TestCase {
   
   public AbbreviatedNameTest(String name) {
     super(name);
-    AllTests.initLogger();
+    AllExtractorTests.initLogger();
   }
   
   public void test_EvaluateMatch() {

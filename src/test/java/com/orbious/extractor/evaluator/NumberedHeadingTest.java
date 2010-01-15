@@ -5,7 +5,7 @@ package com.orbious.extractor.evaluator;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import com.orbious.AllTests;
+import com.orbious.AllExtractorTests;
 import com.orbious.extractor.TextParser.TextParserData;
 
 import junit.framework.TestCase;
@@ -21,7 +21,7 @@ public class NumberedHeadingTest extends TestCase {
   
   public NumberedHeadingTest(String name) {
     super(name);
-    AllTests.initLogger();
+    AllExtractorTests.initLogger();
   }
   
   public void test_IsRoman() {

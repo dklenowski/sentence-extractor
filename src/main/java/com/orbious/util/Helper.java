@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Vector;
 import org.apache.log4j.Logger;
@@ -495,9 +497,29 @@ public class Helper {
   }
   
   public static String getResourceStr(String filename) {
-    //return( Config.class.getClassLoader().getResource(filename).getFile() );
-    //return( "".getClass().getResource(filename).getFile() );
-    return( Thread.currentThread().getContextClassLoader().getResource(filename).getFile() );
+    //return( Config.class.getClassLoader().getResource(filename).getPath() );
+    //return( "".getClass().getResource(filename).getPath() );
+    
+    ClassLoader classLoader = null;
+    URL url = null;
+    
+    classLoader = Thread.currentThread().getContextClassLoader();
+    if ( classLoader != null ) {
+      url = classLoader.getResource(filename);
+      if ( url != null ) {
+        return( url.getPath() );
+      }
+    }
+
+    classLoader = Helper.class.getClassLoader();
+    if ( classLoader != null ) {
+      url = classLoader.getResource(filename);
+      if ( url != null ) {
+        return( url.getPath() );
+      }
+    }
+    
+    return( ClassLoader.getSystemResource(filename).getPath() );
   }
   
 }

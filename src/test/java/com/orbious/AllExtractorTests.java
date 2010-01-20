@@ -4,6 +4,7 @@ package com.orbious;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
+import com.orbious.util.Helper;
 import com.orbious.util.HelperTest;
 import com.orbious.extractor.evaluator.AbbreviatedNameTest;
 import com.orbious.extractor.evaluator.NameTest;
@@ -51,8 +52,7 @@ public class AllExtractorTests {
   public static void initLogger() {
     Logger root = Logger.getRootLogger();
     if ( !root.getAllAppenders().hasMoreElements() ) {
-      String resourceStr = 
-        ClassLoader.getSystemResource(Config.LOGGER_CONF_FILENAME.asStr()).getFile();
+      String resourceStr = Helper.getResourceStr(Config.LOGGER_CONF_FILENAME.asStr());
       DOMConfigurator.configure(resourceStr);
     }   
   }

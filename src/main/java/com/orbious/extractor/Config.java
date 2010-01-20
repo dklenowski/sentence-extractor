@@ -19,7 +19,7 @@ public enum Config {
   /**
    * The Log4j configuration file.
    */
-  LOGGER_CONF_FILENAME("log4j.xml"),
+  LOGGER_CONF_FILENAME("com/orbious/extractor/log4j.xml"),
   
   /**
    * Left punctuation marks.
@@ -79,13 +79,13 @@ public enum Config {
   /**
    * A text file containing a list of suspensions (each suspension on a newline).
    */
-  SUSPENSION_FILENAME("suspensions.txt"),
+  SUSPENSION_FILENAME("com/orbious/extractor/suspensions.txt"),
   
   /**
    * A text file containing a list of common names, each on a newline.
    * Ignores lines that begin with "#" (i.e. comments).
    */
-  NAMES_FILENAME("names.txt"),
+  NAMES_FILENAME("com/orbious/extractor/names.txt"),
   
   /**
    * Minimum sentence length (in alphanumeric words).

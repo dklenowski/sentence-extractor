@@ -6,6 +6,8 @@ import com.orbious.extractor.Config;
 import com.orbious.extractor.Word;
 import com.orbious.extractor.Word.WordOp;
 import com.orbious.util.Helper;
+
+import java.io.FileNotFoundException;
 import java.util.HashSet;
 
 /**
@@ -43,7 +45,7 @@ public class Name extends Evaluator {
    * @return    <code>true</code> if the word is a common name and not
    *            a likely sentence start, <code>false</code> otherwise.
    */
-  public boolean evaluate(final char[] buf, int idx) {
+  public boolean evaluate(final char[] buf, int idx) throws FileNotFoundException {
     WordOp op = Word.getNextWord(buf, idx, false);
     String wd = op.word();
     

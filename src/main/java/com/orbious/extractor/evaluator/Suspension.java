@@ -2,6 +2,7 @@ package com.orbious.extractor.evaluator;
 
 // $Id$
 
+import java.io.FileNotFoundException;
 import java.util.HashSet;
 import com.orbious.extractor.Config;
 import com.orbious.extractor.Word;
@@ -48,7 +49,7 @@ public class Suspension extends Evaluator {
    *            therefore not a likely sentence start/end, 
    *            <code>false</code> otherwise.
    */
-  public boolean evaluate(final char[] buf, int idx) {
+  public boolean evaluate(final char[] buf, int idx) throws FileNotFoundException {
     WordOp op = Word.getPreviousWord(buf, idx, true);
     if ( op == null ) {
       return(false);

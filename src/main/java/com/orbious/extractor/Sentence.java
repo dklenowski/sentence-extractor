@@ -210,10 +210,19 @@ public class Sentence {
       initDefaultEndEvaluators();
     }
     
+    boolean result;
     for ( int i = 0; i < end_evaluators.size(); i++ ) {
       evaluator = end_evaluators.get(i);
 
-      if ( evaluator.evaluate(buf, idx) ) {
+      result = false;
+      try {
+        result = evaluator.evaluate(buf, idx);
+      } catch ( Exception e ) {
+        logger.fatal("Exception thrown running end evaluator " + evaluator.name() +
+            ", most likely the results will be corrupt?", e);
+      }
+
+      if ( result ) {
         if ( logger.isDebugEnabled() ) {
           debugStr += "\t" + evaluator.name() + " Result=TRUE\n";
           logger.debug(debugStr);
@@ -440,9 +449,19 @@ public class Sentence {
       initDefaultStartEvaluators();
     }
     
+    boolean result;
     for ( int i = 0; i < start_evaluators.size(); i++ ) {
       evaluator = start_evaluators.get(i);
-      if ( evaluator.evaluate(buf, idx-1) ) {
+      result = false;
+      
+      try {
+        result = evaluator.evaluate(buf, idx-1);
+      } catch ( Exception e ) {
+        logger.fatal("Exception thrown running end evaluator " + evaluator.name() +
+            ", most likely the results will be corrupt?", e);
+      }
+      
+      if ( result ) {
         if ( logger.isDebugEnabled() ) {
           debugStr += "\t" + evaluator.name() + " Result=TRUE\n";
           logger.debug(debugStr);

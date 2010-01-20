@@ -312,21 +312,25 @@ public class Helper {
    * @return    A <code>HashSet</code> containing the contents
    *            of <code>filename</code>.
    */
-  public static HashSet<String> cvtFileToHashSet(String filename, boolean lowercase) {
+  public static HashSet<String> cvtFileToHashSet(String filename, boolean lowercase)
+    throws FileNotFoundException {
     Logger logger;
     HashSet<String> hs;
     BufferedReader br;
     String resourceStr;
     
     br = null;
-    
-    //resourceStr = ClassLoader.getSystemResource(filename).getFile();
-    resourceStr = "".getClass().getClassLoader().getResource(filename).getFile();
+
+    resourceStr = getResourceStr(filename);
     logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
+    if ( resourceStr == null ) {
+      throw new FileNotFoundException("Failed to open file " + filename + " (" + resourceStr + ")");
+    }
+    
     try {
       br = new BufferedReader(new FileReader(resourceStr));
     } catch ( FileNotFoundException fnfe ) {
-      logger.fatal("Failed to open file " + filename + "(" + resourceStr + ")", fnfe);
+      logger.fatal("Failed to open file " + filename + " (" + resourceStr + ")", fnfe);
     }
     
     hs = new HashSet<String>();
@@ -490,5 +494,10 @@ public class Helper {
     return(i);
   }
   
+  public static String getResourceStr(String filename) {
+    //return( Config.class.getClassLoader().getResource(filename).getFile() );
+    //return( "".getClass().getResource(filename).getFile() );
+    return( Thread.currentThread().getContextClassLoader().getResource(filename).getFile() );
+  }
   
 }

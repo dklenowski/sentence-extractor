@@ -59,5 +59,5 @@ public abstract class Evaluator {
    * @return    <code>true</code> if the position in the buffer is
    *            not a sentence end, <code>false</code> otherwise.
    */
-  public abstract boolean evaluate(final char[] buf, int idx);  
+  public abstract boolean evaluate(final char[] buf, int idx) throws Exception;  
 }

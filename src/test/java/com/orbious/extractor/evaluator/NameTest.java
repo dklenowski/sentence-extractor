@@ -2,6 +2,8 @@ package com.orbious.extractor.evaluator;
 
 // $Id$
 
+import java.io.FileNotFoundException;
+
 import com.orbious.AllExtractorTests;
 import com.orbious.extractor.evaluator.Name;
 import junit.framework.TestCase;
@@ -23,33 +25,45 @@ public class NameTest extends TestCase {
     boolean ret;
     Name name;
     
-    name = new Name();
-    ret = name.evaluate("Abril".toCharArray(), 0);
-    assertEquals(true, ret);
-
-    ret = name.evaluate("Taylor".toCharArray(), 0);
-    assertEquals(true, ret);
+    try {
+      name = new Name();
+      ret = name.evaluate("Abril".toCharArray(), 0);
+      assertEquals(true, ret);
+  
+      ret = name.evaluate("Taylor".toCharArray(), 0);
+      assertEquals(true, ret);
+    } catch ( FileNotFoundException fnfe ) {
+      fail("Failed to open names txt file");
+    }
   }
 
   public void test_WordIsNotName() {
     boolean ret;
     Name name;
     
-    name = new Name();
-    ret = name.evaluate("Tomato".toCharArray(), 0);    
-    assertEquals(false, ret);   
-
-    ret = name.evaluate("mr.".toCharArray(), 0);   
-    assertEquals(false, ret); 
+    try {
+      name = new Name();
+      ret = name.evaluate("Tomato".toCharArray(), 0);    
+      assertEquals(false, ret);   
+  
+      ret = name.evaluate("mr.".toCharArray(), 0);   
+      assertEquals(false, ret); 
+    } catch ( FileNotFoundException fnfe ) {
+      fail("Failed to open names txt file");
+    }
   }
   
   public void test_WordIsNameUppercase() {
     boolean ret;
     Name name;
     
-    name = new Name();
-    ret = name.evaluate("WESH".toCharArray(), 0);    
-    assertEquals(true, ret); 
+    try {
+      name = new Name();
+      ret = name.evaluate("WESH".toCharArray(), 0);    
+      assertEquals(true, ret); 
+    } catch ( FileNotFoundException fnfe ) {
+      fail("Failed to open names txt file");;
+    }
   }
   
   public void test_BufIsName() {
@@ -57,10 +71,13 @@ public class NameTest extends TestCase {
     Name name;
     String str;
     
-    name = new Name();
-    
-    str = "Good day Mr WESH.";
-    ret = name.evaluate(str.toCharArray(), 12);
-    assertEquals(true, ret);
+    try {
+      name = new Name();
+      str = "Good day Mr WESH.";
+      ret = name.evaluate(str.toCharArray(), 12);
+      assertEquals(true, ret);
+    } catch ( FileNotFoundException fnfe ) {
+      fail("Failed to open names txt file");
+    }
   }
 }

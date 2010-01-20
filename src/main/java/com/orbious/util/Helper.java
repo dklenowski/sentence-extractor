@@ -321,7 +321,7 @@ public class Helper {
     br = null;
     
     //resourceStr = ClassLoader.getSystemResource(filename).getFile();
-    resourceStr = "".getClass().getResource(filename).getFile();
+    resourceStr = "".getClass().getClassLoader().getResource(filename).getFile();
     logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
     try {
       br = new BufferedReader(new FileReader(resourceStr));

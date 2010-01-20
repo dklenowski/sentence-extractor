@@ -7,7 +7,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
-import com.orbious.util.Helper;
+import com.orbious.extractor.util.Helper;
 
 /**
  * Provides various static word operation methods.

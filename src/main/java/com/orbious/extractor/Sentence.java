@@ -14,7 +14,7 @@ import com.orbious.extractor.evaluator.Name;
 import com.orbious.extractor.evaluator.NumberedHeading;
 import com.orbious.extractor.evaluator.Suspension;
 import com.orbious.extractor.evaluator.UrlText;
-import com.orbious.util.Helper;
+import com.orbious.extractor.util.Helper;
 
 /**
  * Provides static methods for Sentence operations.

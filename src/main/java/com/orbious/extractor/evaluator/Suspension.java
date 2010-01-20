@@ -7,7 +7,7 @@ import java.util.HashSet;
 import com.orbious.extractor.Config;
 import com.orbious.extractor.Word;
 import com.orbious.extractor.Word.WordOp;
-import com.orbious.util.Helper;
+import com.orbious.extractor.util.Helper;
 
 /**
 * The <code>Suspension</code> <code>Evaluator</code> determines if a word 

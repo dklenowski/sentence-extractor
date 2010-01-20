@@ -1,12 +1,13 @@
-package com.orbious.util;
+package com.orbious.extractor.util;
 
 // $Id: Helper.java 11 2009-12-04 14:07:11Z app $
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.net.URI;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Vector;
@@ -16,7 +17,6 @@ import com.orbious.extractor.SentenceMapEntry;
 import com.orbious.extractor.SentenceMapEntry.Likelihood;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntrySubType;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntryType;
-
 
 /**
  * Static helper methods.
@@ -319,22 +319,17 @@ public class Helper {
     Logger logger;
     HashSet<String> hs;
     BufferedReader br;
-    String resourceStr;
+    InputStream in;
     
     br = null;
 
-    resourceStr = getResourceStr(filename);
+    in = getResourceStream(filename);
     logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
-    if ( resourceStr == null ) {
-      throw new FileNotFoundException("Failed to open file " + filename + " (" + resourceStr + ")");
+    if ( in == null ) {
+      throw new FileNotFoundException("Failed to open file " + filename);
     }
     
-    try {
-      br = new BufferedReader(new FileReader(resourceStr));
-    } catch ( FileNotFoundException fnfe ) {
-      logger.fatal("Failed to open file " + filename + " (" + resourceStr + ")", fnfe);
-    }
-    
+    br = new BufferedReader(new InputStreamReader(in));
     hs = new HashSet<String>();
 
     try {
@@ -496,30 +491,64 @@ public class Helper {
     return(i);
   }
   
-  public static String getResourceStr(String filename) {
-    //return( Config.class.getClassLoader().getResource(filename).getPath() );
-    //return( "".getClass().getResource(filename).getPath() );
-    
+  /**
+   * Retreives a resource from the classpath and returns the results
+   * as an <code>InputStream</code>.
+   * 
+   * @param filename    The filename to search for on the classpath.
+   * @return    An <code>InputSteam</code> for the resource.
+   */
+  public static InputStream getResourceStream(String filename) {
+    ClassLoader classLoader = null;
+    InputStream in = null;
+
+    classLoader = Thread.currentThread().getContextClassLoader();
+    if ( classLoader != null ) {
+      in = classLoader.getResourceAsStream(filename);
+      if ( in != null ) {
+        return(in);
+      }
+    }
+
+    classLoader = Helper.class.getClassLoader();
+    if ( classLoader != null ) {
+      in = classLoader.getResourceAsStream(filename);
+      if ( in != null ) {
+        return(in);
+      }
+    }
+
+    return( ClassLoader.getSystemResourceAsStream(filename) );
+  }
+  
+  /**
+   * Retreives a resource from the classpath and returns the results
+   * a <code>File<code> result.
+   * 
+   * @param filename    The filename to search for on the classpath.
+   * @return    A file containing the fully qualified name of the resource.
+   */
+  public static File getResourceFile(String filename) {
     ClassLoader classLoader = null;
     URL url = null;
-    
+
     classLoader = Thread.currentThread().getContextClassLoader();
     if ( classLoader != null ) {
       url = classLoader.getResource(filename);
       if ( url != null ) {
-        return( url.getPath() );
+        return( new File(url.getFile()) );
       }
     }
 
     classLoader = Helper.class.getClassLoader();
     if ( classLoader != null ) {
       url = classLoader.getResource(filename);
-      if ( url != null ) {
-        return( url.getPath() );
+      if ( url != null && new File(url.getFile()).canRead() ) {
+        return( new File(url.getFile()) );
       }
     }
-    
-    return( ClassLoader.getSystemResource(filename).getPath() );
+
+    return( new File(ClassLoader.getSystemResource(filename).getFile()) );
   }
   
 }

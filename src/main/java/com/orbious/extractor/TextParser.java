@@ -15,7 +15,7 @@ import com.orbious.extractor.SentenceMapEntry.Likelihood;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntrySubType;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntryType;
 import com.orbious.extractor.evaluator.UrlText;
-import com.orbious.util.Helper;
+import com.orbious.extractor.util.Helper;
 
 /**
  * Parser a text document into sentences. This class is the central class

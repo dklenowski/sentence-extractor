@@ -1,4 +1,4 @@
-package com.orbious.util;
+package com.orbious.extractor.util;
 
 // $Id: HelperTest.java 12 2009-12-05 11:40:44Z app $
 

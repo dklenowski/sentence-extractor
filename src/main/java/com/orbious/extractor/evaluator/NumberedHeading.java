@@ -5,7 +5,7 @@ import java.util.HashSet;
 import com.orbious.extractor.Config;
 import com.orbious.extractor.TextParser;
 import com.orbious.extractor.TextParser.TextParserData;
-import com.orbious.util.Helper;
+import com.orbious.extractor.util.Helper;
 
 /**
 * The <code>NumberedHeading</code> <code>Evaluator</code> determines if a full stop

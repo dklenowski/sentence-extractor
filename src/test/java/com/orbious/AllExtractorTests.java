@@ -2,10 +2,12 @@ package com.orbious;
 
 // $Id: AllTests.java 14 2009-12-06 10:03:53Z app $
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
-import com.orbious.util.Helper;
-import com.orbious.util.HelperTest;
+import com.orbious.extractor.util.Helper;
+import com.orbious.extractor.util.HelperTest;
 import com.orbious.extractor.evaluator.AbbreviatedNameTest;
 import com.orbious.extractor.evaluator.NameTest;
 import com.orbious.extractor.evaluator.NumberedHeadingTest;
@@ -52,8 +54,8 @@ public class AllExtractorTests {
   public static void initLogger() {
     Logger root = Logger.getRootLogger();
     if ( !root.getAllAppenders().hasMoreElements() ) {
-      String resourceStr = Helper.getResourceStr(Config.LOGGER_CONF_FILENAME.asStr());
-      DOMConfigurator.configure(resourceStr);
+      File f = Helper.getResourceFile(Config.LOGGER_CONF_FILENAME.asStr());
+      DOMConfigurator.configure(f.toString());
     }   
   }
 }

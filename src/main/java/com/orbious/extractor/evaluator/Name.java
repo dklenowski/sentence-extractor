@@ -5,7 +5,7 @@ package com.orbious.extractor.evaluator;
 import com.orbious.extractor.Config;
 import com.orbious.extractor.Word;
 import com.orbious.extractor.Word.WordOp;
-import com.orbious.util.Helper;
+import com.orbious.extractor.util.Helper;
 
 import java.io.FileNotFoundException;
 import java.util.HashSet;

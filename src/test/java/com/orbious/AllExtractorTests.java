@@ -60,7 +60,8 @@ public class AllExtractorTests {
         File f = Helper.getResourceFile(Config.LOGGER_CONF_FILENAME.asStr());
         DOMConfigurator.configure(f.toString());
       } catch ( IOException ioe ) {
-        System.err.println("Failed to find log4j resource, using BasicConfigurator.");
+        System.err.println("Failed to find log4j resource (" + 
+            Config.LOGGER_CONF_FILENAME.asStr() + "), using BasicConfigurator.");
         BasicConfigurator.configure();
       }
     }   

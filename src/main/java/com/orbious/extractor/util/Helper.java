@@ -541,6 +541,10 @@ public class Helper {
     String line;
     
     in = getResourceStream(filename);
+    if ( in == null ) {
+      throw new FileNotFoundException("Failed to find file " + filename);
+    }
+
     f = File.createTempFile("SentenceExtractorLog4j", ".xml");
     
     br = new BufferedReader(new InputStreamReader(in));

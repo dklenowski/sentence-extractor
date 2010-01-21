@@ -3,12 +3,13 @@ package com.orbious.extractor.util;
 // $Id: Helper.java 11 2009-12-04 14:07:11Z app $
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Vector;
 import org.apache.log4j.Logger;
@@ -522,33 +523,36 @@ public class Helper {
   }
   
   /**
-   * Retreives a resource from the classpath and returns the results
-   * a <code>File<code> result.
+   * Retrieves a resource from the classpath and returns the results
+   * a <code>File<code> result. Because not many applications can understand
+   * jar files, the process is to read in the file using 
+   * <code>getResourceAsStream</code>, write the file to a temporary location
+   * and parse the location back to the application.
    * 
    * @param filename    The filename to search for on the classpath.
    * @return    A file containing the fully qualified name of the resource.
    */
-  public static File getResourceFile(String filename) {
-    ClassLoader classLoader = null;
-    URL url = null;
-
-    classLoader = Thread.currentThread().getContextClassLoader();
-    if ( classLoader != null ) {
-      url = classLoader.getResource(filename);
-      if ( url != null ) {
-        return( new File(url.getFile()) );
-      }
+  public static File getResourceFile(String filename)
+    throws IOException {
+    InputStream in;
+    File f;
+    BufferedWriter bw;
+    BufferedReader br;
+    String line;
+    
+    in = getResourceStream(filename);
+    f = File.createTempFile("SentenceExtractorLog4j", ".xml");
+    
+    br = new BufferedReader(new InputStreamReader(in));
+    bw = new BufferedWriter(new FileWriter(f));
+    
+    while ( (line = br.readLine()) != null ) {
+      bw.write(line + "\n");
     }
-
-    classLoader = Helper.class.getClassLoader();
-    if ( classLoader != null ) {
-      url = classLoader.getResource(filename);
-      if ( url != null && new File(url.getFile()).canRead() ) {
-        return( new File(url.getFile()) );
-      }
-    }
-
-    return( new File(ClassLoader.getSystemResource(filename).getFile()) );
+    
+    br.close();
+    bw.close();
+    
+    return(f);
   }
-  
 }

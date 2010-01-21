@@ -3,7 +3,9 @@ package com.orbious;
 // $Id: AllTests.java 14 2009-12-06 10:03:53Z app $
 
 import java.io.File;
+import java.io.IOException;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import com.orbious.extractor.util.Helper;
@@ -54,8 +56,13 @@ public class AllExtractorTests {
   public static void initLogger() {
     Logger root = Logger.getRootLogger();
     if ( !root.getAllAppenders().hasMoreElements() ) {
-      File f = Helper.getResourceFile(Config.LOGGER_CONF_FILENAME.asStr());
-      DOMConfigurator.configure(f.toString());
+      try {
+        File f = Helper.getResourceFile(Config.LOGGER_CONF_FILENAME.asStr());
+        DOMConfigurator.configure(f.toString());
+      } catch ( IOException ioe ) {
+        System.err.println("Failed to find log4j resource, using BasicConfigurator.");
+        BasicConfigurator.configure();
+      }
     }   
   }
 }

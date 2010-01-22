@@ -1,0 +1,33 @@
+
+
+    * Version branches/1.1.
+    * Used to extract sentences from text documents.
+    * Has been used successfully on Project Gutenberg texts.
+    * Uses heuristic algorithms. 
+
+The Sentence Extraction Algorithm
+
+Basically consists of the following steps:
+
+   1. Extract all text from document, removing excessive whitespace (e.g. multiple spaces between words) into a character buffer.
+   2. For each word in the character buffer:
+         1. If the first character of a word (has a whitespace previously) is uppercase begin the Start Evaluation Process.
+         2. If the character is a sentence end (e.g. '.', '!' etc) run the End Evaluation Process.
+         3. Once the evaluation process is complete and a map of starts/ends is generated, begin sentence extraction. 
+   3. Record "likely" starts and "unlikely" starts until a "likely" end or "unlikely" end is reached. When the end is reached use either the "likely" start or "unlikely" start detected earlier as the sentence start. 
+
+Start Evaluation Process
+
+   1. Run through the start evaluators (e.g. Name, Suspension etc) and if an evaluator returns true, conclude the sentence start is "unlikely", otherwise conclude the sentence start is "likely". Add the start to a map. If the start is likely, also record the previous position as a likely sentence end. 
+
+End Evaluation Process
+
+   1. Run through the end evaluators (e.g. Acroynm, URL etc) and if an evaluator returns true, conclude the sentence end is "unlikely", otherwise conclude the sentence end is "likely". Add the end to a map. If the end is likely, also record the next position as a likely sentence start. 
+
+Note on "Evaluators"
+
+Evaluators are classes that take a character buffer and a position in the buffer and check whether the position constitutes a sentence start/end (depending on whether the evaluator is evaluating a sentence start or end). For example, there is a default evaluator called "Name" that checks the word extracted from the index against a table of known names. If it finds the name, it returns true and the algorithm records the position as an "unlikely" sentence start.
+
+Note on sentence extraction
+
+The texts available on the internet are difficult to process programmatically because of inconsistency in punctuation (e.g. Project Gutenberg eTexts). It is advisable to examine texts before extraction to see if any pre processing can be done. This can increase accuracy significantly.

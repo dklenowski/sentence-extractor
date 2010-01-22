@@ -391,7 +391,7 @@ public class Sentence {
       ch = buf[i];
     }
     
-    if ( Character.isUpperCase(ch) ) {
+    if ( Character.isUpperCase(ch) || Character.isDigit(ch) ) {
       return(i);
     }
     

@@ -324,4 +324,33 @@ public class TextParserTest extends TestCase {
       }
     }    
   }
+  
+  public void test_GenSentencesWiki() {
+    String fname = "src/test/resources/wiki.txt";
+    TextParser parser = new TextParser(fname);
+
+    Vector<String> expected = new Vector<String>( 
+        Arrays.asList(
+            "The Project Gutenberg EBook of Punch , or the London Charivari , Volume 1 , Complete , by Various ." , 
+            "This eBook is for the use of anyone anywhere at no cost and with almost no restrictions whatsoever .", 
+            "You may copy it , give it away or re-use it under the terms of the Project Gutenberg License included with this eBook or online at www.gutenberg.net ."
+        ));
+            
+    try {
+      parser.parse();
+    } catch ( FileNotFoundException fnfe ) {
+      fnfe.printStackTrace();
+      fail("FileNotFoundException thrown");
+    } catch ( IOException ioe ) {
+      ioe.printStackTrace();
+      fail("IOException thrown");
+    }
+
+    parser.genSentences();
+    Vector<String> sentences = parser.sentencesAsStr();
+  
+    for ( int i = 0; i < sentences.size(); i++ ) {
+      System.out.println(sentences.get(i));
+    }
+  }
 }

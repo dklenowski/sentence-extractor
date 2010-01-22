@@ -113,8 +113,15 @@ public class Helper {
     int modct;
     int start;
     int end;
+    int lineCt;
     
-    str = "";
+    lineCt = 0;
+    if ( width != -1 ) {
+      str = String.format("%5s :", lineCt);
+      lineCt++;
+    } else {
+      str = "";
+    }
     modct = 1;
     
     start = idx-(size/2);
@@ -132,7 +139,8 @@ public class Helper {
       str += buf[i];
       
       if ( (width != -1) && (modct % width == 0) ) {
-        str += "\n";
+        str += "\n"  + String.format("%5s :", lineCt);
+        lineCt++;
       }
       modct++;
     }
@@ -163,8 +171,15 @@ public class Helper {
     int modct;
     int start;
     int end;
+    int lineCt;
     
-    str = "";
+    lineCt = 0;
+    if ( width != -1 ) {
+      str = String.format("%5s :", lineCt);
+      lineCt++;
+    } else {
+      str = "";
+    }
     modct = 1;
     
     start = idx-(size/2);
@@ -190,7 +205,8 @@ public class Helper {
       }
       
       if ( (width != -1) && (modct % width == 0) ) {
-        str += "\n";
+        str += "\n" + String.format("%5s :", lineCt);
+        lineCt++;
       }
       modct++;
     }
@@ -221,8 +237,15 @@ public class Helper {
     SentenceMapEntry entry;
     int start;
     int end;
+    int lineCt;
     
-    str = "";
+    lineCt = 0;
+    if ( width != -1 ) {
+      str = String.format("%5s :", lineCt);
+      lineCt++;
+    } else {
+      str = "";
+    }
     modct = 1;
     
     start = idx-(size/2);
@@ -276,7 +299,8 @@ public class Helper {
       }
       
       if ( (width != -1) && (modct % width == 0) ) {
-        str += "\n";
+        str += "\n" + String.format("%5s :", lineCt);
+        lineCt++;
       }
       modct++;
     }

@@ -37,6 +37,10 @@ public class Suspension extends Evaluator {
     super("Suspension");
   }
   
+  public boolean authoritative() {
+    return(false);
+  }
+  
   /**
    * Determines if the previous word from <code>idx</code>
    * in the buffer <code>buf</code> is a suspension and therefore 

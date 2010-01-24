@@ -34,7 +34,7 @@ public enum Config {
   /**
    * All characters that are considered sentence ends.
    */
-  SENTENCE_ENDS(".!?\""),
+  SENTENCE_ENDS(".!?\":"),
 
   /**
    * All punctuation that is considered part of a sentence

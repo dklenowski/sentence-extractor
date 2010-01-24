@@ -48,6 +48,8 @@ public abstract class Evaluator {
     return(name);
   }
   
+  public abstract boolean authoritative();
+  
   /**
    * Runs an evaluation based on position <code>idx</code> in the 
    * <code>buffer</code>. If the evaluation returns <code>true</code>,

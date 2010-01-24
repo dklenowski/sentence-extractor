@@ -291,15 +291,19 @@ public class TextParser {
             sent_unlikely_start_idx = i;
           }
         } else {
-          if ( sent_start_idx == -1 ) {
+          //if ( sent_start_idx == -1 ) {
             sent_start_idx = i;
-          }
+          //}
         }
       } else if ( type == SentenceEntryType.END ) {
         if ( likelihood == Likelihood.UNLIKELY ) {
-          sent_unlikely_end_idx = i;
+          if ( sent_unlikely_end_idx == -1 ) {
+            sent_unlikely_end_idx = i;
+          }
         } else {
-          sent_end_idx = i;
+          //if ( sent_end_idx == -1 ) {
+            sent_end_idx = i;
+          //}
           checkIndexes();
         }
       }
@@ -417,7 +421,6 @@ public class TextParser {
       ch = buffer[i];
       
       if ( sentence_ends.contains(ch) ) {
-        // check for ends
         endOp = Sentence.isEnd(buffer, i);
         if ( endOp != null ) {
           if ( !endOp.isEnd() ) {

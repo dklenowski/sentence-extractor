@@ -144,6 +144,20 @@ public class SentenceTest extends TestCase {
     assertEquals(11, Sentence.hasUpper(buf, 6));    
   }
   
+  public void test_hasUpperList() {
+    String str;
+    char[] buf;
+    
+    str = "Process. 2. The";
+    buf = str.toCharArray();
+    
+    for ( int i = 0; i < buf.length; i++ ) {
+      System.out.println(i + "=" + buf[i]);
+    }
+    assertEquals(12, Sentence.hasUpper(buf, 7));
+   
+  }
+  
   //
   // isStart
   //

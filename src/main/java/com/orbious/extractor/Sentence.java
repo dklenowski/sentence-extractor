@@ -175,6 +175,17 @@ public class Sentence {
         Helper.getDebugStringFromCharBuf(buf, idx, 50) + "\n";
     
     op = new EndOp(false, -1);
+    if ( buf[idx] == ':' ) {
+      // special case, check not a time, otherwise add as a sentence end
+      // with no start_from_end
+      if ( isColonATime(buf, idx) ) {
+        return(null);
+      }
+      
+      op.isEnd = true;
+      return(op);
+    }
+    
     
     if ( hasLaterEnd(buf, idx) ) {
       if ( logger.isDebugEnabled() ) {
@@ -243,7 +254,31 @@ public class Sentence {
     op.isEnd = true;
     return(op);
   }
+  
+  /**
+   * Determines if the colon at position <code>idx</code> in the buffer
+   * <code>buf</code> constitutes a time. e.g. 8:00 pm.
+   * 
+   * @param buf   Text buffer.
+   * @param idx   Position in the buffer where a colon exists.
+   * 
+   * @return    <code>true</code> if the colon constitutes a time, 
+   *            <code>false</code> otherwise.
+   */
+  protected static boolean isColonATime(final char[] buf, int idx) { 
+    if ( buf[idx] != ':' ) {
+      return(false);
+    } else if ( Helper.isPreviousNumber(buf, idx) && 
+        Helper.isNextNumber(buf, idx) ) {
+      return(true);
+    }
+    return(false);
+  }
 
+  protected static boolean isColonPausedForFragment(final char[] buf, int idx) {
+    return(false);
+  }
+  
   /**
    * Determines if we have encountered a premature sentence end. For example, 
    * where 2 sentence end's exist sequentially, optionally separated by a space.
@@ -390,8 +425,26 @@ public class Sentence {
       }
       ch = buf[i];
     }
+
+    if ( Character.isDigit(ch) ) {
+      // could be part of a list
+      i++;
+      System.out.println("IN CASE 2");
+      if ( i >= buf.length ) {
+        return(-1);
+      }
+      
+      ch = buf[i];
+      while ( Character.isWhitespace(ch) || punctuation.contains(ch) ) {
+        i++;
+        if ( i >= buf.length ) {
+          return(-1);
+        }
+        ch = buf[i];
+      }
+    }
     
-    if ( Character.isUpperCase(ch) || Character.isDigit(ch) ) {
+    if ( Character.isUpperCase(ch) ) {
       return(i);
     }
     

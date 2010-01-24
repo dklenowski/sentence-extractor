@@ -31,6 +31,10 @@ public class UrlText extends Evaluator {
     url_pattern = Pattern.compile(Config.URL_REGEX.asStr());
   }
   
+  public boolean authoritative() {
+    return(false);
+  }
+  
   /**
    * Determines if the previous word from <code>idx</code>
    * in the buffer <code>buf</code> is a url and therefore not a

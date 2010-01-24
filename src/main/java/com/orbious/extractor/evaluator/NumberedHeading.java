@@ -38,6 +38,10 @@ public class NumberedHeading extends Evaluator {
     line_starts = TextParserData.lineStarts();
   }
   
+  public boolean authoritative() {
+    return(false);
+  }
+  
   /**
    * Determines if the previous word from <code>idx</code>
    * in the buffer <code>buf</code> is a numbered heading and therefore 

@@ -80,4 +80,19 @@ public class NameTest extends TestCase {
       fail("Failed to open names txt file");
     }
   }
+  
+  public void test_BufIsNotName() {
+    boolean ret;
+    Name name;
+    String str;
+
+    try {
+      name = new Name();
+      str = "Evaluation Process 1. Run through the start eval";
+      ret = name.evaluate(str.toCharArray(), 22);
+      assertEquals(false, ret);
+    } catch ( FileNotFoundException fnfe ) {
+      fail("Failed to open names txt file");
+    }    
+  }
 }

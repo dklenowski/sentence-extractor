@@ -34,6 +34,10 @@ public class Name extends Evaluator {
     super("Name");
   }
   
+  public boolean authoritative() {
+    return(false);
+  }
+  
   /**
    * Determines if the previous word from <code>idx</code>
    * in the buffer <code>buf</code> is a common name and therefore not a

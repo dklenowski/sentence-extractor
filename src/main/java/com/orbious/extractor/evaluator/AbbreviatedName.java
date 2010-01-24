@@ -48,6 +48,10 @@ public class AbbreviatedName extends Evaluator {
     super("AbbreviatedName");
   }
   
+  public boolean authoritative() {
+    return(false);
+  }
+  
   /**
    * Determines if the current characters are part of an Abbreviated Name
    * and therefore not a likely sentence start/end.

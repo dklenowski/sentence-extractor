@@ -8,6 +8,10 @@ public class InnerQuote extends Evaluator {
     super("InnerQuote");
   }
   
+  public boolean authoritative() {
+    return(false);
+  }
+  
   public boolean evaluate(final char[] buf, int idx) {
     if ( (idx < 0) || (idx >= buf.length) ) {
       throw new ArrayIndexOutOfBoundsException("Invalid index=" + idx);

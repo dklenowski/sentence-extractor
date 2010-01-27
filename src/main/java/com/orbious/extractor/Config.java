@@ -15,7 +15,7 @@ public enum Config {
    * The default log4j logging realm.
    */
   LOGGER_REALM("sentence-extractor"),
-  
+
   /**
    * The Log4j configuration file.
    */

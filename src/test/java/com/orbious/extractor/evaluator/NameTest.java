@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 
 import com.orbious.AllExtractorTests;
 import com.orbious.extractor.evaluator.Name;
+import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
+
 import junit.framework.TestCase;
 
 /**
@@ -26,7 +28,7 @@ public class NameTest extends TestCase {
     Name name;
     
     try {
-      name = new Name();
+      name = new Name(EvaluatorType.START);
       ret = name.evaluate("Abril".toCharArray(), 0);
       assertEquals(true, ret);
   
@@ -42,7 +44,7 @@ public class NameTest extends TestCase {
     Name name;
     
     try {
-      name = new Name();
+      name = new Name(EvaluatorType.START);
       ret = name.evaluate("Tomato".toCharArray(), 0);    
       assertEquals(false, ret);   
   
@@ -58,7 +60,7 @@ public class NameTest extends TestCase {
     Name name;
     
     try {
-      name = new Name();
+      name = new Name(EvaluatorType.START);
       ret = name.evaluate("WESH".toCharArray(), 0);    
       assertEquals(true, ret); 
     } catch ( FileNotFoundException fnfe ) {
@@ -72,7 +74,7 @@ public class NameTest extends TestCase {
     String str;
     
     try {
-      name = new Name();
+      name = new Name(EvaluatorType.START);
       str = "Good day Mr WESH.";
       ret = name.evaluate(str.toCharArray(), 12);
       assertEquals(true, ret);
@@ -87,7 +89,7 @@ public class NameTest extends TestCase {
     String str;
 
     try {
-      name = new Name();
+      name = new Name(EvaluatorType.START);
       str = "Evaluation Process 1. Run through the start eval";
       ret = name.evaluate(str.toCharArray(), 22);
       assertEquals(false, ret);

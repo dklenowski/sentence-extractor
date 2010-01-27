@@ -6,14 +6,19 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Vector;
 import org.apache.log4j.Logger;
+
+import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.evaluator.AbbreviatedName;
 import com.orbious.extractor.evaluator.Acronym;
 import com.orbious.extractor.evaluator.Evaluator;
+import com.orbious.extractor.evaluator.HeadingEvaluator;
 import com.orbious.extractor.evaluator.InnerQuote;
+import com.orbious.extractor.evaluator.InsideLeftRightMarks;
 import com.orbious.extractor.evaluator.Name;
 import com.orbious.extractor.evaluator.NumberedHeading;
 import com.orbious.extractor.evaluator.Suspension;
 import com.orbious.extractor.evaluator.UrlText;
+import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
 import com.orbious.extractor.util.Helper;
 
 /**
@@ -82,9 +87,14 @@ public class Sentence {
    */
   private static Vector<Evaluator> start_evaluators;
   
+  private static HashSet<Character> leftMarks;
+  private static HashSet<Character> rightMarks;
+  
   static {
     allowable_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
     punctuation = Helper.cvtStringToHashSet(Config.PUNCTUATION.asStr());
+    leftMarks = Helper.cvtStringToHashSet(Config.LEFT_PUNCTUATION_MARKS.asStr());
+    rightMarks = Helper.cvtStringToHashSet(Config.RIGHT_PUNCTUATION_MARKS.asStr());
     logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
   }
   
@@ -106,10 +116,12 @@ public class Sentence {
    */
   public static void initDefaultStartEvaluators() {
     start_evaluators = new Vector<Evaluator>(
-        Arrays.asList(  new Suspension(),
-                new Acronym(),
-                new Name(),
-                new AbbreviatedName() )); 
+        Arrays.asList(  new Suspension(EvaluatorType.START),
+                new Acronym(EvaluatorType.START),
+                new Name(EvaluatorType.START),
+                new AbbreviatedName(EvaluatorType.START),
+                new HeadingEvaluator(EvaluatorType.START),
+                new InsideLeftRightMarks(EvaluatorType.START) )); 
   }
   
   /**
@@ -132,12 +144,15 @@ public class Sentence {
    */
   public static void initDefaultEndEvaluators() {
     end_evaluators = new Vector<Evaluator>(
-        Arrays.asList(  new Suspension(), 
-                new Acronym(),
-                new UrlText(),
-                new NumberedHeading(),
-                new AbbreviatedName(),
-                new InnerQuote() ));   
+        Arrays.asList(  
+                new NumberedHeading(EvaluatorType.END), // needs to go before suspension
+                new Suspension(EvaluatorType.END), 
+                new Acronym(EvaluatorType.END),
+                new UrlText(EvaluatorType.END),
+                new AbbreviatedName(EvaluatorType.END),
+                new InnerQuote(EvaluatorType.END),
+                new InsideLeftRightMarks(EvaluatorType.END)
+        ));   
   }
 
   /**
@@ -170,22 +185,16 @@ public class Sentence {
     String debugStr;
     EndOp op;
     int startIdx;
-
+    boolean result;
+    
     debugStr = "End Evaluation idx=" + idx + "\n" + 
         Helper.getDebugStringFromCharBuf(buf, idx, 50) + "\n";
-    
     op = new EndOp(false, -1);
-    if ( buf[idx] == ':' ) {
-      // special case, check not a time, otherwise add as a sentence end
-      // with no start_from_end
-      if ( isColonATime(buf, idx) ) {
-        return(null);
-      }
-      
-      op.isEnd = true;
-      return(op);
-    }
     
+    if ( buf[idx] == ':' ) {
+      // colons are a special case
+      return( processColon(buf, idx) );
+    }
     
     if ( hasLaterEnd(buf, idx) ) {
       if ( logger.isDebugEnabled() ) {
@@ -221,16 +230,16 @@ public class Sentence {
       initDefaultEndEvaluators();
     }
     
-    boolean result;
     for ( int i = 0; i < end_evaluators.size(); i++ ) {
       evaluator = end_evaluators.get(i);
-
       result = false;
+      
       try {
         result = evaluator.evaluate(buf, idx);
       } catch ( Exception e ) {
         logger.fatal("Exception thrown running end evaluator " + evaluator.name() +
-            ", most likely the results will be corrupt?", e);
+            ", most likely the results will be corrupt, so exiting?", e);
+        return(null);
       }
 
       if ( result ) {
@@ -238,7 +247,8 @@ public class Sentence {
           debugStr += "\t" + evaluator.name() + " Result=TRUE\n";
           logger.debug(debugStr);
         }
-        return(null);
+        op.failedEvaluator = evaluator;
+        return(op);
         
       } else {
         if ( logger.isDebugEnabled() ) {
@@ -253,6 +263,38 @@ public class Sentence {
     
     op.isEnd = true;
     return(op);
+  }
+  
+  protected static EndOp processColon(final char[] buf, int idx ) {
+    String debugStr;
+    EndOp op;
+    
+    debugStr = "Colon End Evaluation idx=" + idx + "\n" + 
+      Helper.getDebugStringFromCharBuf(buf, idx, 50) + "\n";
+    op = new EndOp(false, -1);
+    
+    if ( isColonATime(buf, idx) ) {
+      if ( logger.isDebugEnabled() ) {
+        debugStr += "\tColonIsATime=TRUE\n";
+        logger.debug(debugStr);
+      }
+      return(null);
+    } else if ( isColonAContinuation(buf, idx) ) {
+      if ( logger.isDebugEnabled() ) {
+        debugStr += "\tColonIsAContinuation=TRUE\n";
+        logger.debug(debugStr);
+      }
+      return(null);       
+    } else if ( isColonInsideMarks(buf, idx) ) {
+      if ( logger.isDebugEnabled() ) {
+        debugStr += "\tColonInsideMarks=TRUE\n";
+        logger.debug(debugStr);
+      }
+      return(null);  
+    }
+    
+    op.isEnd = true;
+    return(op);  
   }
   
   /**
@@ -274,9 +316,53 @@ public class Sentence {
     }
     return(false);
   }
+  
+  protected static boolean isColonAContinuation(final char[] buf, int idx ) {
+    if ( buf[idx] != ':' ) {
+      return(false);
+    }
+    
+    int i = Helper.moveToNonWhitespace(ParseDirn.RIGHT, buf, idx);
+    if ( i == -1 ) {
+      return(false);
+    } else if ( !Character.isLowerCase(buf[i]) ) {
+      return(false);
+    }
+   
+    return(true);
+  }
+  
+  protected static boolean isColonInsideMarks(final char[] buf, int idx) {
+    if ( buf[idx] != ':' ) {
+      return(false);
+    } else if ( (idx-1) < 0 ) {
+      return(false);
+    }
+    
+    int startIdx;
+    char ch;
+    int markCt;
+    
+    startIdx = TextParserData.findPreviousMapEnd(idx);
+    if ( startIdx == -1 ) {
+      return(false);
+    }
+    
+    markCt = 0;
+    for ( int j = startIdx; j < idx; j++ ) {
+      ch = buf[j];
+      if ( leftMarks.contains(ch) ) {
+        markCt++;
+      } else if ( rightMarks.contains(ch) ) {
+        markCt--;
+      }
+    }
 
-  protected static boolean isColonPausedForFragment(final char[] buf, int idx) {
-    return(false);
+    if ( markCt == 0 ) {
+      return(false);
+    }
+    
+    return(true);
   }
   
   /**
@@ -429,7 +515,6 @@ public class Sentence {
     if ( Character.isDigit(ch) ) {
       // could be part of a list
       i++;
-      System.out.println("IN CASE 2");
       if ( i >= buf.length ) {
         return(-1);
       }
@@ -462,7 +547,7 @@ public class Sentence {
    *              in the <code>buf</code> is a likely sentence start, 
    *              <code>false</code> otherwise.
    */
-  public static StartOp isStart(final char[] buf, int idx) {
+  public static StartOp isStart(final char[] buf, int idx, boolean ignoreStop) {
     int stopIdx;
     Evaluator evaluator;
     String debugStr;
@@ -472,30 +557,35 @@ public class Sentence {
       Helper.getDebugStringFromCharBuf(buf, idx, 50) + "\n";
 
     op = new StartOp(false, -1);
-    
+
     if ( !Character.isUpperCase(buf[idx]) ) {
-      logger.debug(debugStr + "\tResult=FALSE (no uppercase).\n");
+      if ( logger.isDebugEnabled() ) {
+        logger.debug(debugStr + "\tResult=FALSE (no uppercase).\n");
+      }
       return(null);
     }
     
     if ( (idx-1) < 0 ) {
-      logger.debug(debugStr + "\tResult=TRUE (index=0).\n");
+      if ( logger.isDebugEnabled() ) {
+        logger.debug(debugStr + "\tResult=TRUE (index=0).\n");
+      }
       op.isStart = true;
       return(op);
     }
     
-    stopIdx = hasStop(buf, idx);
-    op.stopIdx = stopIdx;
-    
-    if ( stopIdx < -1 ) {
-      if ( logger.isDebugEnabled() ) {
-        debugStr += "\thasStop=FALSE\n";
-        logger.debug(debugStr);  
+    if ( !ignoreStop ) {
+      stopIdx = hasStop(buf, idx);
+      op.stopIdx = stopIdx;
+      
+      if ( stopIdx < -1 ) {
+        if ( logger.isDebugEnabled() ) {
+          debugStr += "\thasStop=FALSE\n";
+          logger.debug(debugStr);  
+        }
+  
+        return(null);
       }
-
-      return(null);
     }
-
     
     // now run some evaluators
     if ( start_evaluators == null ) {
@@ -511,7 +601,8 @@ public class Sentence {
         result = evaluator.evaluate(buf, idx-1);
       } catch ( Exception e ) {
         logger.fatal("Exception thrown running end evaluator " + evaluator.name() +
-            ", most likely the results will be corrupt?", e);
+            ", most likely the results will be corrupt, so exiting?", e);
+        return(null);
       }
       
       if ( result ) {
@@ -519,7 +610,9 @@ public class Sentence {
           debugStr += "\t" + evaluator.name() + " Result=TRUE\n";
           logger.debug(debugStr);
         }
+        op.failedEvaluator = evaluator;
         return(op);
+        
       } else {
         if ( logger.isDebugEnabled() ) {
           debugStr += "\t" + evaluator.name() + " Result=FALSE\n";
@@ -590,6 +683,11 @@ public class Sentence {
      * The previous sentence end for a likely sentence start.
      */
     private int stopIdx;
+    
+    /**
+     * The most recent failed <code>Evaluator</code>, if any.
+     */
+    private Evaluator failedEvaluator;
 
     /**
      * Initializes an empty <code>StartOp</code>.
@@ -642,6 +740,14 @@ public class Sentence {
     public void stopIdx(int stopIdx) {
       this.stopIdx = stopIdx;
     }
+
+    public void failedEvaluator(Evaluator failedEvaluator) { 
+      this.failedEvaluator = failedEvaluator;
+    }
+    
+    public Evaluator failedEvaluator() {
+      return(failedEvaluator);
+    }
   }
   
   
@@ -663,6 +769,11 @@ public class Sentence {
      * The next sentence start for a likely sentence end.
      */
     private int startIdx;
+    
+    /**
+     * The most recent failed <code>Evaluator</code>, if any.
+     */
+    private Evaluator failedEvaluator;
     
     /**
      * Initializes an empty <code>EndOp</code>.
@@ -714,6 +825,14 @@ public class Sentence {
      */
     public void startIdx(int startIdx) {
       this.startIdx = startIdx;
+    }
+    
+    public void failedEvaluator(Evaluator failedEvaluator) { 
+      this.failedEvaluator = failedEvaluator;
+    }
+    
+    public Evaluator failedEvaluator() {
+      return(failedEvaluator);
     }
   }
 }

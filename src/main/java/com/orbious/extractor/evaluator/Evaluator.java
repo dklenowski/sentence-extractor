@@ -19,11 +19,18 @@ import com.orbious.extractor.Config;
 
 public abstract class Evaluator {
   
+  public enum EvaluatorType { START, END };
+  
   /**
    * The name of this <code>Evaluator</code>, used in debugging.
    */
-  private String name;
+  protected String name;
 
+  /**
+   * The type of this evaluator
+   */
+  protected EvaluatorType type;
+  
   /**
    * Logger object.
    */
@@ -35,8 +42,9 @@ public abstract class Evaluator {
    * @param name    The name of this <code>Evaluator</code>, used in 
    *                debugging.
    */
-  public Evaluator(String name) {
+  public Evaluator(String name, EvaluatorType type) {
     this.name = name;
+    this.type = type;
   }
   
   /**
@@ -47,8 +55,12 @@ public abstract class Evaluator {
   public String name() {
     return(name);
   }
+
+  public EvaluatorType type() {
+    return(type);
+  }
   
-  public abstract boolean authoritative();
+  public abstract boolean recordAsUnlikely();
   
   /**
    * Runs an evaluation based on position <code>idx</code> in the 

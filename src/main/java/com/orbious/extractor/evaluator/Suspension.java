@@ -33,12 +33,12 @@ public class Suspension extends Evaluator {
   /**
    * Constructor, initializes the <code>Suspension</code> class.
    */
-  public Suspension() {
-    super("Suspension");
+  public Suspension(EvaluatorType type) {
+    super("Suspension", type);
   }
   
-  public boolean authoritative() {
-    return(false);
+  public boolean recordAsUnlikely() {
+    return(true);
   }
   
   /**
@@ -54,7 +54,14 @@ public class Suspension extends Evaluator {
    *            <code>false</code> otherwise.
    */
   public boolean evaluate(final char[] buf, int idx) throws FileNotFoundException {
-    WordOp op = Word.getPreviousWord(buf, idx, true);
+    WordOp op;
+    
+    if ( type == EvaluatorType.START ) {
+      op = Word.getNextWord(buf, idx, true);
+    } else {
+      op = Word.getPreviousWord(buf, idx, true);
+    }
+
     if ( op == null ) {
       return(false);
     }

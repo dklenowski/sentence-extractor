@@ -4,12 +4,14 @@ package com.orbious;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import com.orbious.extractor.util.Helper;
 import com.orbious.extractor.util.HelperTest;
+import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.evaluator.AbbreviatedNameTest;
 import com.orbious.extractor.evaluator.NameTest;
 import com.orbious.extractor.evaluator.NumberedHeadingTest;
@@ -17,6 +19,7 @@ import com.orbious.extractor.evaluator.SuspensionTest;
 import com.orbious.extractor.evaluator.AcronymTest;
 import com.orbious.extractor.evaluator.UrlTextTest;
 import com.orbious.extractor.Config;
+import com.orbious.extractor.SentenceMapEntry;
 import com.orbious.extractor.TextParserTest;
 import com.orbious.extractor.WhitespaceRemoverTest;
 import com.orbious.extractor.WordTest;
@@ -65,5 +68,10 @@ public class AllExtractorTests {
         BasicConfigurator.configure();
       }
     }   
+  }
+  
+  public static void initEmptyTextParserData() {
+    TextParserData.setTextParserData(new HashSet<Integer>(), 
+        new SentenceMapEntry[5000], -1);
   }
 }

@@ -4,6 +4,8 @@ package com.orbious.extractor.evaluator;
 
 import com.orbious.AllExtractorTests;
 import com.orbious.extractor.evaluator.Acronym;
+import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
+
 import junit.framework.TestCase;
 
 /**
@@ -22,7 +24,7 @@ public class AcronymTest extends TestCase {
   public void test_ExceptionThrown() {
     String str = "test";
     char[] buf = str.toCharArray();
-    Acronym acronym = new Acronym();
+    Acronym acronym = new Acronym(EvaluatorType.END);
 
     try {
       acronym.evaluate(buf, 4);
@@ -39,7 +41,7 @@ public class AcronymTest extends TestCase {
   public void test_AcronymWithSeparatedStop() {
     String str = "E.M.C. .";
     char[] buf = str.toCharArray();
-    Acronym acronym = new Acronym();
+    Acronym acronym = new Acronym(EvaluatorType.END);
     
     assertTrue(acronym.evaluate(buf, 1));
     assertTrue(acronym.evaluate(buf, 3));
@@ -50,7 +52,7 @@ public class AcronymTest extends TestCase {
   public void test_AcronymWithStop() {
     String str = "I.B.M..";
     char[] buf = str.toCharArray();
-    Acronym acronym = new Acronym();
+    Acronym acronym = new Acronym(EvaluatorType.END);
 
     assertTrue(acronym.evaluate(buf, 1));
     assertTrue(acronym.evaluate(buf, 3));
@@ -61,7 +63,7 @@ public class AcronymTest extends TestCase {
   public void test_AcronymAsLowercase() {
     String str = "e.g. ";
     char[] buf = str.toCharArray();
-    Acronym acronym = new Acronym();
+    Acronym acronym = new Acronym(EvaluatorType.END);
 
     assertTrue(acronym.evaluate(buf, 1));
     assertTrue(acronym.evaluate(buf, 3)); 
@@ -71,7 +73,7 @@ public class AcronymTest extends TestCase {
     String str;
     char[] buf;
 
-    Acronym acronym = new Acronym();
+    Acronym acronym = new Acronym(EvaluatorType.END);
     
     str = "\",As";
     buf = str.toCharArray();

@@ -26,12 +26,12 @@ public class UrlText extends Evaluator {
   /**
    * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
    */
-  public UrlText() {
-    super("UrlText");
+  public UrlText(EvaluatorType type) {
+    super("UrlText", type);
     url_pattern = Pattern.compile(Config.URL_REGEX.asStr());
   }
   
-  public boolean authoritative() {
+  public boolean recordAsUnlikely() {
     return(false);
   }
   

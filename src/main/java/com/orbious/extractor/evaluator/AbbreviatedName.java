@@ -1,5 +1,6 @@
 package com.orbious.extractor.evaluator;
 
+import com.orbious.extractor.ParseDirn;
 import com.orbious.extractor.Word;
 import com.orbious.extractor.Word.WordOp;
 
@@ -29,12 +30,6 @@ import com.orbious.extractor.Word.WordOp;
  */
 
 public class AbbreviatedName extends Evaluator {
-
-  /**
-   * Direction of traversal, used in 
-   * {@link AbbreviatedName#checkCase(char[], int, DIRN, boolean)}.
-   */
-  private enum DIRN { LEFT, RIGHT };
   
   /**
    * Debugging string.
@@ -44,14 +39,14 @@ public class AbbreviatedName extends Evaluator {
   /**
    * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
    */
-  public AbbreviatedName() {
-    super("AbbreviatedName");
-  }
+  public AbbreviatedName(EvaluatorType type) {
+    super("AbbreviatedName", type);
+  }  
   
-  public boolean authoritative() {
-    return(false);
+  public boolean recordAsUnlikely() {
+    return(true);
   }
-  
+
   /**
    * Determines if the current characters are part of an Abbreviated Name
    * and therefore not a likely sentence start/end.
@@ -113,7 +108,7 @@ public class AbbreviatedName extends Evaluator {
     
     // check the previous characters are part of the abbreviated name
     if ( idx-1 > 0 ) {
-      i = checkCase(buf, idx, DIRN.LEFT, false);
+      i = checkCase(buf, idx, ParseDirn.LEFT, false);
       if ( i == -1 ) {
         if ( logger.isDebugEnabled() ) {
           debugStr += " failed left (evaluateLeftToRight).";
@@ -123,7 +118,7 @@ public class AbbreviatedName extends Evaluator {
     }
     
     // now check the next characters
-    i = checkCase(buf, idx, DIRN.RIGHT, true);
+    i = checkCase(buf, idx, ParseDirn.RIGHT, true);
     if ( i == -1 ) {
       if ( logger.isDebugEnabled() ) {
         debugStr += " failed right (evaluateLeftToRight)";
@@ -172,7 +167,7 @@ public class AbbreviatedName extends Evaluator {
     int i;
     
     if ( idx+1 < buf.length ) {
-      i = checkCase(buf, idx, DIRN.RIGHT, false);
+      i = checkCase(buf, idx, ParseDirn.RIGHT, false);
       if ( i == -1 ) {
         if ( logger.isDebugEnabled() ) {
           debugStr += " failed right (evaluateRightToLeft).";
@@ -185,7 +180,7 @@ public class AbbreviatedName extends Evaluator {
       }
     }
     
-    i = checkCase(buf, idx, DIRN.LEFT, true);
+    i = checkCase(buf, idx, ParseDirn.LEFT, true);
     if ( i == -1 ) {
       if ( logger.isDebugEnabled() ) {
         debugStr += " failed left (evaluateRightToLeft).";
@@ -225,18 +220,20 @@ public class AbbreviatedName extends Evaluator {
    * @return    <code>true</code> if the case is correct for an abbreviated name,
    *             <code>false</code> otherwise.
    */
-  protected int checkCase(final char[] buf, int idx, DIRN dirn, boolean ignoreMatch) {
+  protected int checkCase(final char[] buf, int idx, ParseDirn dirn, boolean ignoreMatch) {
     char ch;
     int i;
     int inc;
     boolean nxtUpperCase;
     boolean match;
 
-    if ( dirn == DIRN.LEFT ) {
+    if ( dirn == ParseDirn.LEFT ) {
       inc = -1;
     } else {
       inc = 1;
     }
+    
+    System.out.println("DIRN=" + dirn);
     
     i = idx+inc;
     if ( buf[idx] == '.' ) {
@@ -245,18 +242,27 @@ public class AbbreviatedName extends Evaluator {
       nxtUpperCase = false;
     }
     
+    System.out.println("idx=" + idx + " i=" + i);
+    
+    while ( Character.isWhitespace(buf[i]) ) {
+      i += inc;
+    }
+    
     match = false;
     while ( (i >= 0) && (i < buf.length) && !Character.isWhitespace(buf[i]) ) {
       ch = buf[i];
+      System.out.println("ch=" + ch);
       if ( nxtUpperCase ) {
         // we are looking for an uppercase character
         if ( !Character.isUpperCase(ch) ) {
+          System.out.println("Failed to find uppercase");
           return(-1);
         }
         nxtUpperCase = false;
       } else {
         // we are looking for a fullstop
         if ( ch != '.' ) {
+          System.out.println("Failed to find .");
           return(-1);
         }
         nxtUpperCase = true;
@@ -271,7 +277,7 @@ public class AbbreviatedName extends Evaluator {
       return(-1);
     }
     
-    if ( dirn == DIRN.LEFT ) {
+    if ( dirn == ParseDirn.LEFT ) {
       i++;
     } else {
       i--;

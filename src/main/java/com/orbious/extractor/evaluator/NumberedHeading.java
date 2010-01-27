@@ -24,21 +24,15 @@ public class NumberedHeading extends Evaluator {
   private static HashSet< Character > roman_numerals;
   
   /**
-   * Local copy of lines ends from {@link TextParser#line_starts}.
-   */
-  private static HashSet< Integer > line_starts;
-  
-  /**
    * Constructor, sets the name of this <code>Evaluator</code>
    * and initializes {@link NumberedHeading#roman_numerals} 
    */
-  public NumberedHeading() {
-    super("NumberedHeading");
+  public NumberedHeading(EvaluatorType type) {
+    super("NumberedHeading", type);
     roman_numerals = Helper.cvtStringToHashSet(Config.ROMAN_NUMERALS.asStr());
-    line_starts = TextParserData.lineStarts();
   }
   
-  public boolean authoritative() {
+  public boolean recordAsUnlikely() {
     return(false);
   }
   
@@ -56,10 +50,6 @@ public class NumberedHeading extends Evaluator {
    */
   public boolean evaluate(final char[] buf, int idx) {
     boolean b;
-    
-    if ( line_starts == null ) {
-      line_starts = TextParserData.lineStarts();
-    }
 
     b = evaluateNumbered(buf, idx);
     if ( b ) {
@@ -113,7 +103,7 @@ public class NumberedHeading extends Evaluator {
       firstIdx = 0;
     }
       
-    if ( !hasNonNumber && line_starts.contains(firstIdx) ) {
+    if ( !hasNonNumber && TextParserData.containsLineStart(firstIdx) ) {
       fnd = true;
     }
     
@@ -170,7 +160,7 @@ public class NumberedHeading extends Evaluator {
       firstIdx = 0;
     }
 
-    if ( !hasNonRoman && line_starts.contains(firstIdx) ) {
+    if ( !hasNonRoman && TextParserData.containsLineStart(firstIdx) ) {
       fnd = true;
     }
     

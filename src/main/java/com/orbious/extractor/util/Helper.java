@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Vector;
 import org.apache.log4j.Logger;
 import com.orbious.extractor.Config;
+import com.orbious.extractor.ParseDirn;
 import com.orbious.extractor.SentenceMapEntry;
 import com.orbious.extractor.SentenceMapEntry.Likelihood;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntrySubType;
@@ -28,12 +29,6 @@ import com.orbious.extractor.SentenceMapEntry.SentenceEntryType;
  */
 
 public class Helper {
-
-  /**
-   * A direction indicator, used by 
-   * {@link Helper#moveToNonWhitespace(DIRN, char[], int)}.
-   */
-  public enum DIRN { LEFT, RIGHT };
 
   /**
    * Private Constructor
@@ -416,7 +411,7 @@ public class Helper {
   public static boolean isPreviousLetter(final char[] buf, int idx) { 
     int i;
 
-    i = moveToNonWhitespace(DIRN.LEFT, buf, idx);
+    i = moveToNonWhitespace(ParseDirn.LEFT, buf, idx);
     if ( i == idx ) {
       return(false);
     }
@@ -437,7 +432,7 @@ public class Helper {
   public static boolean isNextLetter(final char[] buf, int idx) {
     int i;
     
-    i = moveToNonWhitespace(DIRN.RIGHT, buf, idx);
+    i = moveToNonWhitespace(ParseDirn.RIGHT, buf, idx);
     if ( i == idx ) {
       return(false);
     }
@@ -458,7 +453,7 @@ public class Helper {
   public static boolean isPreviousNumber(final char[] buf, int idx) {
     int i;
     
-    i = moveToNonWhitespace(DIRN.LEFT, buf, idx);
+    i = moveToNonWhitespace(ParseDirn.LEFT, buf, idx);
     if ( i == idx ) {
       return(false);
     }
@@ -479,7 +474,7 @@ public class Helper {
   public static boolean isNextNumber(final char[] buf, int idx) {
     int i;
     
-    i = moveToNonWhitespace(DIRN.RIGHT, buf, idx);
+    i = moveToNonWhitespace(ParseDirn.RIGHT, buf, idx);
     if ( i == idx ) {
       return(false);
     }
@@ -498,10 +493,10 @@ public class Helper {
    * @return    The first non-whitespace index in <code>buf</code> either
    *            in the <code>LEFT</code> or <code>RIGHT</code> direction.
    */
-  public static int moveToNonWhitespace(DIRN dirn, final char[] buf, int idx) {
+  public static int moveToNonWhitespace(ParseDirn dirn, final char[] buf, int idx) {
     int i;
     
-    if ( dirn == DIRN.LEFT ) {
+    if ( dirn == ParseDirn.LEFT ) {
       i = idx-1;
       while ( (i > 0) && Character.isWhitespace(buf[i]) ) {
         i--;
@@ -511,6 +506,10 @@ public class Helper {
       while ( (i < buf.length) && Character.isWhitespace(buf[i]) ) {
         i++;
       }
+    }
+    
+    if ( (i < 0) || (i >= buf.length) ) {
+      return(-1);
     }
     
     return(i);

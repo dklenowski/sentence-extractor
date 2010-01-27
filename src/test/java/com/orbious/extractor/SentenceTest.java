@@ -19,6 +19,10 @@ public class SentenceTest extends TestCase {
     AllExtractorTests.initLogger();
   }
 
+  public void setUp() {
+    AllExtractorTests.initEmptyTextParserData();
+  }
+  
   //
   // isEnd
   //
@@ -169,7 +173,7 @@ public class SentenceTest extends TestCase {
     str = "sample. The";
     buf = str.toCharArray();
 
-    assertEquals(true, Sentence.isStart(buf, 8).isStart());    
+    assertEquals(true, Sentence.isStart(buf, 8, false).isStart());    
   }
   
   public void test_isStartWithPunct() { 
@@ -179,7 +183,7 @@ public class SentenceTest extends TestCase {
     str = "Mr. McGoo";
     buf = str.toCharArray();
 
-    StartOp op = Sentence.isStart(buf, 4);
+    StartOp op = Sentence.isStart(buf, 4, false);
     assertEquals(false, op.isStart());    
   }
 }

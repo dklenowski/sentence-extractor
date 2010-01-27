@@ -30,12 +30,12 @@ public class Name extends Evaluator {
   /**
    * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
    */
-  public Name() {
-    super("Name");
+  public Name(EvaluatorType type) {
+    super("Name", type);
   }
-  
-  public boolean authoritative() {
-    return(false);
+
+  public boolean recordAsUnlikely() {
+    return(true);
   }
   
   /**

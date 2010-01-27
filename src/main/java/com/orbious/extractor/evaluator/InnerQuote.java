@@ -1,15 +1,16 @@
 package com.orbious.extractor.evaluator;
 
+import com.orbious.extractor.ParseDirn;
 import com.orbious.extractor.util.Helper;
 
 public class InnerQuote extends Evaluator {
   
-  public InnerQuote() {
-    super("InnerQuote");
+  public InnerQuote(EvaluatorType type) {
+    super("InnerQuote", type);
   }
   
-  public boolean authoritative() {
-    return(false);
+  public boolean recordAsUnlikely() {
+    return(true);
   }
   
   public boolean evaluate(final char[] buf, int idx) {
@@ -21,7 +22,7 @@ public class InnerQuote extends Evaluator {
       return(false);
     }
     
-    int prevIdx =Helper.moveToNonWhitespace(Helper.DIRN.LEFT, buf, idx);
+    int prevIdx =Helper.moveToNonWhitespace(ParseDirn.LEFT, buf, idx);
     if ( prevIdx < 0 ) {
       return(false);
     } else if ( buf[prevIdx] == ':' ) {

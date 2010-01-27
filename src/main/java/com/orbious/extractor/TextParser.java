@@ -14,7 +14,10 @@ import com.orbious.extractor.Sentence.StartOp;
 import com.orbious.extractor.SentenceMapEntry.Likelihood;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntrySubType;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntryType;
+import com.orbious.extractor.evaluator.Evaluator;
+import com.orbious.extractor.evaluator.HeadingEvaluator;
 import com.orbious.extractor.evaluator.UrlText;
+import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
 import com.orbious.extractor.util.Helper;
 
 /**
@@ -79,7 +82,7 @@ public class TextParser {
    * A buffer that contains where the line starts, which is used by some
    * by the {@link com.orbious.extractor.evaluator.NumberedHeading} <code>Evaluator</code>.
    */
-  private HashSet< Integer > parser_line_starts;
+  private HashSet< Integer > line_starts;
   
   /**
    * A <code>Vector</code> of <code>TextParserOp</code> containing sentence
@@ -206,6 +209,7 @@ public class TextParser {
     char[] buf;
     int len;
     int pos;
+    int lineCt;
     
     br = new BufferedReader(new FileReader(filename));
     raw = new Vector<String>();
@@ -216,18 +220,18 @@ public class TextParser {
     
     logger.info("Found " + raw.size() + " lines in " + filename);
 
-    parser_line_starts = TextParserData.line_starts;
-    parser_line_starts.clear();
-    
+    line_starts = new HashSet<Integer>();
     clean = new Vector<String>();
     len = 0;
+    lineCt = 0;
   
     for ( int i = 0; i < raw.size(); i++ ) {
       str = WhitespaceRemover.remove(raw, i);
       if ( str != null ) {
         clean.add(str);
-        parser_line_starts.add(len);
+        line_starts.add(len);
         len += str.length();
+        lineCt++;
       }
     }
     
@@ -239,12 +243,16 @@ public class TextParser {
       pos += buf.length;
     }
 
-
+    TextParserData.line_starts = line_starts;
+    TextParserData.sentence_map = sentence_map;
+    TextParserData.avg_line_char_ct = len/lineCt;
     
     if ( logger.isInfoEnabled() ) {
       logger.info("Statistics for " + filename +
-          " Raw LineCt=" + raw.size() + " LineStarts=" + parser_line_starts.size() +
-          " Cleansed CharCt=" + buffer.length);
+          " Raw: LineCt=" + raw.size() + 
+          " Cleansed: LineStarts=" + line_starts.size() +
+          " CharCt=" + buffer.length +
+          " AvgLineCharCt=" + TextParserData.avg_line_char_ct);
     }
   }
  
@@ -291,9 +299,10 @@ public class TextParser {
             sent_unlikely_start_idx = i;
           }
         } else {
-          //if ( sent_start_idx == -1 ) {
-            sent_start_idx = i;
-          //}
+          if ( sent_start_idx != -1 ) {
+            checkIndexes();
+          }
+          sent_start_idx = i;
         }
       } else if ( type == SentenceEntryType.END ) {
         if ( likelihood == Likelihood.UNLIKELY ) {
@@ -301,9 +310,10 @@ public class TextParser {
             sent_unlikely_end_idx = i;
           }
         } else {
-          //if ( sent_end_idx == -1 ) {
-            sent_end_idx = i;
-          //}
+          if ( sent_end_idx != -1 ) {
+            checkIndexes();
+          }
+          sent_end_idx = i;
           checkIndexes();
         }
       }
@@ -348,7 +358,9 @@ public class TextParser {
   private void checkIndexes() {
     int tStartIdx;
     int tEndIdx;
-
+    boolean fndStart;
+    boolean fndEnd;
+    
     if ( (sent_end_idx != -1 || sent_unlikely_end_idx != -1) &&
          (sent_start_idx != -1 || sent_unlikely_start_idx != -1) ) {
       
@@ -358,30 +370,46 @@ public class TextParser {
             " sent_end_idx=" + sent_end_idx + " sent_unlikely_end_idx=" + 
             sent_unlikely_end_idx);
       }
+    
+      fndStart = false;
+      fndEnd = false;
       
       tStartIdx = -1;
       if ( sent_start_idx != -1 ) {
         tStartIdx = sent_start_idx;
+        fndStart = true;
         sent_start_idx = -1;
-        sent_unlikely_start_idx = -1;
       } else if ( sent_unlikely_start_idx != -1 ) {
         tStartIdx = sent_unlikely_start_idx;
-        sent_unlikely_start_idx = -1;
       }
       
       tEndIdx = -1;
       if ( tStartIdx != -1 ) {
         if ( sent_end_idx != -1 ) {
           tEndIdx = sent_end_idx;
+          fndEnd = true;
           sent_end_idx = -1;
-          sent_unlikely_end_idx = -1;
         } else if ( sent_unlikely_end_idx != -1 ) {
           tEndIdx = sent_unlikely_end_idx;
-          sent_unlikely_end_idx = -1;
         }
         
-        if ( tEndIdx != -1 ) {
+        if ( (tEndIdx != -1) && (tStartIdx < tEndIdx) && (fndStart || fndEnd) ) {
           recordSentence(tStartIdx, tEndIdx);
+          sent_unlikely_start_idx = -1;
+          sent_unlikely_end_idx = -1;
+        } else {
+          // restore
+          if ( fndStart ) {
+            sent_start_idx = tStartIdx;
+          } else {
+            sent_unlikely_start_idx = tStartIdx;
+          }
+          
+          if ( fndEnd ) {
+            sent_end_idx = tEndIdx;
+          } else {
+            sent_unlikely_end_idx = tEndIdx;
+          }
         }
       }
     }
@@ -414,8 +442,12 @@ public class TextParser {
     char ch;
     EndOp endOp;
     StartOp startOp;
+    boolean ignoreStop;
+    Evaluator evaluator;
     
     sentence_map = new SentenceMapEntry[buffer.length];
+    TextParserData.sentence_map = sentence_map;
+    ignoreStop = false;
     
     for ( int i = 0; i < buffer.length; i++ ) {
       ch = buffer[i];
@@ -424,7 +456,11 @@ public class TextParser {
         endOp = Sentence.isEnd(buffer, i);
         if ( endOp != null ) {
           if ( !endOp.isEnd() ) {
-            addToMap(i, Likelihood.UNLIKELY, SentenceEntryType.END, null);
+            evaluator = endOp.failedEvaluator();
+
+            if ( (evaluator != null) && evaluator.recordAsUnlikely() ) {
+              addToMap(i, Likelihood.UNLIKELY, SentenceEntryType.END, null);
+            }
           } else {
             addToMap(i, Likelihood.LIKELY, SentenceEntryType.END, null);
             
@@ -433,23 +469,32 @@ public class TextParser {
                   SentenceEntryType.START, SentenceEntrySubType.START_FROM_END);
             }
           }
+          
+          if ( ignoreStop ) {
+            ignoreStop = false;
+          }
         }
 
       } else {
         // run a quick check to reduce the workload
         if ( !Character.isUpperCase(ch) ) {
           continue;
-        } else if ( (i > 0) && (!Character.isWhitespace(buffer[i-1]) &&
-            !sentence_ends.contains(buffer[i-1])) ) {
-          // a sentence start must either have a whitespace character
-          // or a sentence end for the previous character
+        } else if ( (i > 0) && !Character.isWhitespace(buffer[i-1]) ) {
           continue;
         }
 
-        startOp = Sentence.isStart(buffer, i);
+        startOp = Sentence.isStart(buffer, i, ignoreStop);
         if ( startOp != null ) {
           if ( !startOp.isStart() ) {
-            addToMap(i, Likelihood.UNLIKELY, SentenceEntryType.START, null);
+            evaluator = startOp.failedEvaluator();
+            
+            if ( (evaluator != null) && evaluator.recordAsUnlikely() ) {
+              addToMap(i, Likelihood.UNLIKELY, SentenceEntryType.START, null);
+            }
+            
+            if ( evaluator instanceof HeadingEvaluator ) {
+              ignoreStop = true;
+            }
           } else {
             addToMap(i, Likelihood.LIKELY, SentenceEntryType.START, null);
           
@@ -567,7 +612,7 @@ public class TextParser {
             if ( inner_punctuation.contains(ch) ) {
               // punctuation attached to the word.
               wd += ch;
-            } else if ( (ch == '.') && new UrlText().evaluate(buffer, i) ) {
+            } else if ( (ch == '.') && new UrlText(EvaluatorType.END).evaluate(buffer, i) ) {
               // web address 
               wd += ch;
             } else if ( (ch == ',') && Helper.isPreviousNumber(buffer, i) &&
@@ -761,24 +806,67 @@ public class TextParser {
     /**
      * Copy of {@link TextParser#line_starts}
      */
-    private static HashSet<Integer> line_starts;
+    protected static HashSet<Integer> line_starts;
+
+    protected static SentenceMapEntry[] sentence_map;
     
-    static {
-      line_starts = new HashSet<Integer>();
-    }
+    protected static int avg_line_char_ct = -1;
     
     /**
      * Private constructor.
      */
     private TextParserData() { }
+
     
-    /**
-     * Returns the <code>line_starts</code>.
-     * 
-     * @return  The <code>line_starts</code>.
-     */
-    public static HashSet<Integer> lineStarts() {
-      return(line_starts);
+    // USED ONLY IN DEBUGGING
+    public static void setTextParserData(HashSet<Integer> lineStarts,
+        SentenceMapEntry[] sentenceMap, int avgLineCharCt) {
+      line_starts = lineStarts;
+      sentence_map = sentenceMap;
+      avg_line_char_ct = avgLineCharCt;
+    }
+    
+    public static boolean containsLineStart(int idx) {
+      if ( line_starts == null ) {
+        throw new NullPointerException("TextParserData not initialized correctly");
+      }
+      
+      return( line_starts.contains(idx) );
+    }
+    
+    public static int findPreviousMapEnd(int idx) {
+      if ( sentence_map == null ) {
+        throw new NullPointerException("TextParserData not initialized correctly");
+      }
+      
+      int i = idx-1;
+      if ( i < 0 ) {
+        return(-1);
+      }
+      
+      SentenceMapEntry entry;
+      int endIdx = -1;
+      
+      while ( i > 0 ) {
+        entry = sentence_map[i];
+        if ( entry == null ) {
+          i--;
+          continue;
+        }
+        
+        if ( (entry.type() == SentenceEntryType.END) &&
+             (entry.likelihood() == Likelihood.LIKELY) ) {
+          endIdx = i;
+          break;
+        }
+        i--;
+      }
+      
+      return(endIdx);
+    }
+
+    public static int avgLineCharCt() {
+      return(avg_line_char_ct);
     }
   }
   

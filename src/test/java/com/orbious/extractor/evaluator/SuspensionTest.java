@@ -5,6 +5,8 @@ package com.orbious.extractor.evaluator;
 import java.io.FileNotFoundException;
 
 import com.orbious.AllExtractorTests;
+import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
+
 import junit.framework.TestCase;
 
 /**
@@ -22,9 +24,10 @@ public class SuspensionTest extends TestCase {
   
   public void test_isSuspension() {
     try {
-      Suspension suspension = new Suspension();
-      boolean ret = suspension.evaluate("Mr.".toCharArray(), 2);
-      assertEquals(true, ret);
+      Suspension suspension = new Suspension(EvaluatorType.START);
+      
+      assertTrue(suspension.evaluate("Mr.".toCharArray(), 2));
+      assertTrue(suspension.evaluate("Il.".toCharArray(), 2));
     } catch ( FileNotFoundException fnfe ) {
       fail("Failed to open suspensions txt file");
     }
@@ -34,13 +37,10 @@ public class SuspensionTest extends TestCase {
     boolean ret;
 
     try {
-      Suspension suspension = new Suspension();
+      Suspension suspension = new Suspension(EvaluatorType.START);
       
-      ret = suspension.evaluate("Tomato".toCharArray(), 5);
-      assertEquals(false, ret);
-  
-      ret = suspension.evaluate("empty.".toCharArray(), 5);
-      assertEquals(false, ret);  
+      assertFalse(suspension.evaluate("Tomato".toCharArray(), 5));
+      assertFalse(suspension.evaluate("empty.".toCharArray(), 5));
     } catch ( FileNotFoundException fnfe ) {
       fail("Failed to open suspensions txt file");
     }

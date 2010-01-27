@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import com.orbious.AllExtractorTests;
 import com.orbious.extractor.TextParser.TextParserData;
+import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
 
 import junit.framework.TestCase;
 
@@ -28,7 +29,7 @@ public class NumberedHeadingTest extends TestCase {
     NumberedHeading head;
     
     initLineStarts(Arrays.asList(0));
-    head = new NumberedHeading();
+    head = new NumberedHeading(EvaluatorType.START);
     assertEquals(true, head.evaluate("I.".toCharArray(), 1));
     assertEquals(true, head.evaluate("IMD.".toCharArray(), 3));
   }
@@ -37,7 +38,7 @@ public class NumberedHeadingTest extends TestCase {
     NumberedHeading head;
     
     initLineStarts(Arrays.asList(0));
-    head = new NumberedHeading();
+    head = new NumberedHeading(EvaluatorType.START);
     assertEquals(false, head.evaluate("typhoonIIM".toCharArray(), 7));
     assertEquals(false, head.evaluate("IPD.".toCharArray(), 3));
   }
@@ -47,7 +48,7 @@ public class NumberedHeadingTest extends TestCase {
     String str;
 
     initLineStarts(Arrays.asList(0, 2));
-    head = new NumberedHeading();
+    head = new NumberedHeading(EvaluatorType.START);
 
     str = "15.";
     assertEquals(true, head.evaluate(str.toCharArray(), 2));
@@ -61,7 +62,7 @@ public class NumberedHeadingTest extends TestCase {
     String str;
 
     initLineStarts(Arrays.asList(0));
-    head = new NumberedHeading();
+    head = new NumberedHeading(EvaluatorType.START);
 
     str = "sad day in 1984.";
     assertEquals(false, head.evaluate(str.toCharArray(), 15));
@@ -70,9 +71,11 @@ public class NumberedHeadingTest extends TestCase {
   private void initLineStarts(List< Integer > list) {
     HashSet<Integer> lineStarts;
 
-    lineStarts = TextParserData.lineStarts();
+    lineStarts = new HashSet<Integer>();
     for ( int i = 0; i < list.size(); i++ ) {
       lineStarts.add(list.get(i));
     }
+    
+    TextParserData.setTextParserData(lineStarts, null, -1);
   }
 }

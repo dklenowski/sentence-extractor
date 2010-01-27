@@ -48,12 +48,15 @@ public class Acronym extends Evaluator {
   /**
    * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
    */
-  public Acronym() {
-    super("Acronym");
+  public Acronym(EvaluatorType type) {
+    super("Acronym", type);
   }
-  
-  public boolean authoritative() {
-    return(false);
+
+  public boolean recordAsUnlikely() {
+    if ( type == EvaluatorType.END ) {
+      return(false);
+    }
+    return(true);
   }
   
   /**

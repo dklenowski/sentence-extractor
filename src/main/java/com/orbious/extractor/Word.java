@@ -18,12 +18,6 @@ import com.orbious.extractor.util.Helper;
  */
 
 public class Word {
-
-  /**
-   * An enum representing the direction to extract words from i.e.
-   * <code>LEFT</code> for previous, <code>RIGHT</code> for next.
-   */
-  private enum DIRN { LEFT, RIGHT };
   
   /**
    * In memory representation of inner punctuation.
@@ -54,7 +48,7 @@ public class Word {
    */
   public static WordOp getPreviousWord(final char[] buf, int idx,
       boolean includeStop) {
-    MultipleWordOp mop = getWords(buf, idx, 1, DIRN.LEFT, includeStop);
+    MultipleWordOp mop = getWords(buf, idx, 1, ParseDirn.LEFT, includeStop);
     if ( mop.length() == 0 ) {
       return(null);
     }
@@ -74,7 +68,7 @@ public class Word {
    *            otherwise the word extracted.
    */
   public static WordOp getNextWord(final char[] buf, int idx, boolean includeStop) {
-    MultipleWordOp mop = getWords(buf, idx, 1, DIRN.RIGHT, includeStop);
+    MultipleWordOp mop = getWords(buf, idx, 1, ParseDirn.RIGHT, includeStop);
     if ( mop.length() == 0 ) {
       return(null);
     }
@@ -100,7 +94,7 @@ public class Word {
    * @return    <code>null</code> if no word was extracted,  
    *            otherwise up to <code>num</code> number of words extracted.
    */
-  public static MultipleWordOp getWords(final char[] buf, int idx, int num, DIRN dirn,
+  public static MultipleWordOp getWords(final char[] buf, int idx, int num, ParseDirn dirn,
       boolean includeStop) {
     MultipleWordOp op;
     char ch;
@@ -119,7 +113,7 @@ public class Word {
     lastIdx = -1;
     
     i = idx;
-    if ( dirn == DIRN.LEFT ) {
+    if ( dirn == ParseDirn.LEFT ) {
       j = num-1;
     } else {
       j = 0;
@@ -134,7 +128,7 @@ public class Word {
         hasLetter = true;
       } else if ( Character.isWhitespace(ch) ) {
         if ( hasLetter ) {
-          if ( dirn == DIRN.LEFT ) {
+          if ( dirn == ParseDirn.LEFT ) {
             op.add(new StringBuffer(wd).reverse().toString(), lastIdx);
             j--;
           } else {
@@ -162,7 +156,7 @@ public class Word {
         }
       }
 
-      if ( dirn == DIRN.LEFT ) {
+      if ( dirn == ParseDirn.LEFT ) {
         i--;
       } else {
         i++;
@@ -170,7 +164,7 @@ public class Word {
     }
     
     if ( hasLetter ) {
-      if ( dirn == DIRN.LEFT ) {
+      if ( dirn == ParseDirn.LEFT ) {
         op.add(new StringBuffer(wd).reverse().toString(), lastIdx);
         j--;
       } else {

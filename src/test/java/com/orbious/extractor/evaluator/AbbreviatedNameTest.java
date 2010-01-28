@@ -12,101 +12,219 @@ public class AbbreviatedNameTest extends TestCase {
     AllExtractorTests.initLogger();
   }
   
-  public void test_EvaluateMatch() {
+  public void test_EvaluateLeftToRightMatch() {
     AbbreviatedName name;
     String str;
+    char[] buf;
+    boolean result;
     
     name = new AbbreviatedName(EvaluatorType.START);
+    str = "P. Petro";
+    buf = str.toCharArray();
+    
+    result = name.evaluateLeftToRight(buf, 0);
+    if ( !result ) {
+      fail(name.debugStr());
+    }
+
+    result = name.evaluateLeftToRight(buf, 1);
+    if ( !result ) {
+      fail(name.debugStr());
+    }
+    
+    result = name.evaluateLeftToRight(buf, 3);
+    if ( !result ) {
+      fail(name.debugStr());
+    }
+  }
+  
+  public void test_EvaluateLeftToRightNotMatch() {
+    AbbreviatedName name;
+    String str;
+    char[] buf;
+
+    name = new AbbreviatedName(EvaluatorType.START);
+    str = "A Potato";
+    buf = str.toCharArray();
+    
+    assertFalse(name.evaluateLeftToRight(buf, 0));
+    assertFalse(name.evaluateLeftToRight(buf, 3));
+  }
+  
+  public void test_EvaluateRightToLeftMatch() {
+    AbbreviatedName name;
+    String str;
+    char[] buf;
+    boolean result;
+    
+    name = new AbbreviatedName(EvaluatorType.START);
+    str = "Petro P.";
+    buf = str.toCharArray();
+    
+    result = name.evaluateRightToLeft(buf, 0);
+    if ( !result ) {
+      fail(name.debugStr());
+    }
+  
+    result = name.evaluateRightToLeft(buf, 6);
+    if ( !result ) {
+      fail(name.debugStr());
+    }
+
+    result = name.evaluateRightToLeft(buf, 7);
+    if ( !result ) {
+      fail(name.debugStr());
+    }
+  }
+
+  public void test_EvaluateLToRMatch() {
+    AbbreviatedName name;
+    String str;
+    char[] buf;
 
     str = "W.H.D. Rouse";
-    assertTrue(name.evaluate(str.toCharArray(), 0));
-    assertTrue(name.evaluate(str.toCharArray(), 1));
-    assertTrue(name.evaluate(str.toCharArray(), 2));
-    assertTrue(name.evaluate(str.toCharArray(), 3));
-    assertTrue(name.evaluate(str.toCharArray(), 4));
-    assertTrue(name.evaluate(str.toCharArray(), 5));
-    
-    str = "M.A. Little";
-    assertTrue(name.evaluate(str.toCharArray(), 0));
-    assertTrue(name.evaluate(str.toCharArray(), 1));
-    assertTrue(name.evaluate(str.toCharArray(), 2));
-    assertTrue(name.evaluate(str.toCharArray(), 3));
-    
-    str = "B. Thomas";
-    assertTrue(name.evaluate(str.toCharArray(), 0));
-    assertTrue(name.evaluate(str.toCharArray(), 1)); 
-    
-    str = "C. H. Bompas.";
-    assertTrue(name.evaluate(str.toCharArray(), 0));
-    assertTrue(name.evaluate(str.toCharArray(), 1));
-    assertTrue(name.evaluate(str.toCharArray(), 3));
-    assertTrue(name.evaluate(str.toCharArray(), 4)); 
-  }
+    buf = str.toCharArray();
 
-  public void test_EvaluateNotMatch() {
-    AbbreviatedName name;
-    String str;
+    name = new AbbreviatedName(EvaluatorType.START);
+    assertTrue(name.evaluate(buf, 0));
+    assertTrue(name.evaluate(buf, 2));
+    assertTrue(name.evaluate(buf, 4));
+    assertTrue(name.evaluate(buf, 7));
+    
+    name = new AbbreviatedName(EvaluatorType.END);    
+    assertTrue(name.evaluate(buf, 1));
+    assertTrue(name.evaluate(buf, 3));
+    assertTrue(name.evaluate(buf, 5));
+
+    str = "M.A. Little";
+    buf = str.toCharArray();
     
     name = new AbbreviatedName(EvaluatorType.START);
+    assertTrue(name.evaluate(buf, 0));
+    assertTrue(name.evaluate(buf, 2));
+    assertTrue(name.evaluate(buf, 5));
+    
+    name = new AbbreviatedName(EvaluatorType.END);    
+    assertTrue(name.evaluate(buf, 1));
+    assertTrue(name.evaluate(buf, 3));
+
+    str = "B. Thomas";
+    buf = str.toCharArray();
+
+    name = new AbbreviatedName(EvaluatorType.START);
+    assertTrue(name.evaluate(buf, 0));
+    assertTrue(name.evaluate(buf, 3)); 
+
+    name = new AbbreviatedName(EvaluatorType.END);    
+    assertTrue(name.evaluate(buf, 1));
+
+    str = "C. H. Bompas.";
+    buf = str.toCharArray();
+
+    name = new AbbreviatedName(EvaluatorType.START);
+    assertTrue(name.evaluate(buf, 0));
+    assertTrue(name.evaluate(buf, 3)); 
+    assertTrue(name.evaluate(buf, 6));
+    
+    name = new AbbreviatedName(EvaluatorType.END);    
+    assertTrue(name.evaluate(buf, 1));
+    assertTrue(name.evaluate(buf, 4));    
+  }
+
+  public void test_EvaluateLToRNotMatch() {
+    AbbreviatedName name;
+    String str;
+    char[] buf;
 
     str = "plenty. The";
-    assertFalse(name.evaluate(str.toCharArray(), 6)); 
-    assertFalse(name.evaluate(str.toCharArray(), 8));
+    buf = str.toCharArray();
+    
+    name = new AbbreviatedName(EvaluatorType.END);
+    assertFalse(name.evaluate(buf, 6)); 
+
+    name = new AbbreviatedName(EvaluatorType.START);
+    assertFalse(name.evaluate(buf, 8));
     
     str = "riders. THE";
-    assertFalse(name.evaluate(str.toCharArray(), 6));
-    assertFalse(name.evaluate(str.toCharArray(), 8));
+    buf = str.toCharArray();
+    
+    name = new AbbreviatedName(EvaluatorType.END);
+    assertFalse(name.evaluate(buf, 6)); 
 
-    str = "www.gutenberg.net .";
-    assertFalse(name.evaluate(str.toCharArray(), 3));
-    assertFalse(name.evaluate(str.toCharArray(), 13));
-    assertFalse(name.evaluate(str.toCharArray(), 18));
-    
-    str = "www.gutenberg.net . Title";
-    assertFalse(name.evaluate(str.toCharArray(), 18));
-  }
-  
-  public void test_EvaluateReverseMatch() {
-    AbbreviatedName name;
-    String str;
-    
     name = new AbbreviatedName(EvaluatorType.START);
-
-    str = "Rouse W.H.D. wore pants";
-    assertTrue(name.evaluate(str.toCharArray(), 6));
-    assertTrue(name.evaluate(str.toCharArray(), 7));
-    assertTrue(name.evaluate(str.toCharArray(), 8));
-    assertTrue(name.evaluate(str.toCharArray(), 9));
-    assertTrue(name.evaluate(str.toCharArray(), 10));
-    assertTrue(name.evaluate(str.toCharArray(), 11));
-
-    str = "Little M.A. was tenable";
-    assertTrue(name.evaluate(str.toCharArray(), 7));
-    assertTrue(name.evaluate(str.toCharArray(), 8));
-    assertTrue(name.evaluate(str.toCharArray(), 9));
-    assertTrue(name.evaluate(str.toCharArray(), 10));
+    assertFalse(name.evaluate(buf, 8));
     
-    str = "Thomas B. said there were many";
-    assertTrue(name.evaluate(str.toCharArray(), 7));
-    assertTrue(name.evaluate(str.toCharArray(), 8));
+    str = "www.gutenberg.net .";
+    buf = str.toCharArray();
+    
+    name = new AbbreviatedName(EvaluatorType.END);
+    assertFalse(name.evaluate(buf, 3)); 
+    assertFalse(name.evaluate(buf, 13)); 
+    assertFalse(name.evaluate(buf, 18)); 
+        
+    str = "www.gutenberg.net . Title";
+    buf = str.toCharArray();
+    
+    name = new AbbreviatedName(EvaluatorType.END);
+    assertFalse(name.evaluate(buf, 18)); 
   }
-  
-  public void test_EvaluateSentence() {
+
+  public void test_EvaluateRToLMatch() {
     AbbreviatedName name;
     String str;
     char[] buf;
     
-    name = new AbbreviatedName(EvaluatorType.END);
-    
-    str = "At length out steps P. Petronius, an old chum of";
+    str = "Rouse W.H.D. wore pants";
     buf = str.toCharArray();
-    for ( int i = 0; i < buf.length; i++ ) {
-      System.out.println(i + "=" + buf[i]);
-    }
+
+    name = new AbbreviatedName(EvaluatorType.START);
+    assertTrue(name.evaluate(buf, 0)); 
+    assertTrue(name.evaluate(buf, 6)); 
+    assertTrue(name.evaluate(buf, 8));
+    assertTrue(name.evaluate(buf, 10));
     
-    //assertTrue(name.evaluate(str.toCharArray(), 21));
+    name = new AbbreviatedName(EvaluatorType.END);
+    assertTrue(name.evaluate(buf, 7)); 
+    assertTrue(name.evaluate(buf, 9)); 
+    assertTrue(name.evaluate(buf, 11));
+
+    str = "Little M.A. was tenable";
+    buf = str.toCharArray();
     
     name = new AbbreviatedName(EvaluatorType.START);
-    assertTrue(name.evaluate(str.toCharArray(), 23));
+    assertTrue(name.evaluate(buf, 0)); 
+    assertTrue(name.evaluate(buf, 7)); 
+    assertTrue(name.evaluate(buf, 9));
+    
+    name = new AbbreviatedName(EvaluatorType.END);
+    assertTrue(name.evaluate(buf, 8)); 
+    assertTrue(name.evaluate(buf, 10)); 
+    
+    str = "Thomas B. said there were many";
+    buf = str.toCharArray();
+    
+    name = new AbbreviatedName(EvaluatorType.START);
+    assertTrue(name.evaluate(buf, 0)); 
+    assertTrue(name.evaluate(buf, 7)); 
+    
+    name = new AbbreviatedName(EvaluatorType.END);
+    assertTrue(name.evaluate(buf, 8)); 
+  }
+
+
+  public void test_EvaluateSentence() {
+    AbbreviatedName name;
+    String str;
+    char[] buf;
+
+    str = "At length out steps P. Petronius, an old chum of";
+    buf = str.toCharArray();
+  
+    name = new AbbreviatedName(EvaluatorType.START);
+    assertTrue(name.evaluate(buf, 20));
+    assertTrue(name.evaluate(buf, 23));
+    
+    name = new AbbreviatedName(EvaluatorType.END);
+    assertTrue(name.evaluate(buf, 21));
   }
 }

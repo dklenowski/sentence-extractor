@@ -57,8 +57,21 @@ public class Suspension extends Evaluator {
     WordOp op;
     
     if ( type == EvaluatorType.START ) {
+      if ( !Character.isUpperCase(buf[idx]) ) {
+        return(false);
+      } 
+      if ( idx != 0 ) {
+        idx--;
+      }
       op = Word.getNextWord(buf, idx, true);
     } else {
+      if ( buf[idx] != '.' ) {
+        return(false);
+      }
+      
+      if ( idx+1 < buf.length ) {
+        idx++;
+      }
       op = Word.getPreviousWord(buf, idx, true);
     }
 

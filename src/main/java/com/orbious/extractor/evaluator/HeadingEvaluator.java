@@ -21,9 +21,6 @@ public class HeadingEvaluator extends Evaluator {
   }
   
   public boolean evaluate(char[] buf, int idx) throws Exception {  
-    idx++;  // we need to do this because evaluation begins
-            // at the first character before the actual start
-    
     if ( !Character.isUpperCase(buf[idx]) || !TextParserData.containsLineStart(idx) ) {
       // we are not at the start of of a line, so not a heading
       if ( logger.isDebugEnabled() ) {

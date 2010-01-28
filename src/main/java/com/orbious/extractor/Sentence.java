@@ -116,7 +116,8 @@ public class Sentence {
    */
   public static void initDefaultStartEvaluators() {
     start_evaluators = new Vector<Evaluator>(
-        Arrays.asList(  new Suspension(EvaluatorType.START),
+        Arrays.asList(  
+                new Suspension(EvaluatorType.START),
                 new Acronym(EvaluatorType.START),
                 new Name(EvaluatorType.START),
                 new AbbreviatedName(EvaluatorType.START),
@@ -598,7 +599,7 @@ public class Sentence {
       result = false;
       
       try {
-        result = evaluator.evaluate(buf, idx-1);
+        result = evaluator.evaluate(buf, idx);
       } catch ( Exception e ) {
         logger.fatal("Exception thrown running end evaluator " + evaluator.name() +
             ", most likely the results will be corrupt, so exiting?", e);

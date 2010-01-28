@@ -50,6 +50,9 @@ public class Name extends Evaluator {
    *            a likely sentence start, <code>false</code> otherwise.
    */
   public boolean evaluate(final char[] buf, int idx) throws FileNotFoundException {
+    if ( idx != 0 ) {
+      idx--;
+    }
     WordOp op = Word.getNextWord(buf, idx, false);
     String wd = op.word();
     

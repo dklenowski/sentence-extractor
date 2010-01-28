@@ -13,6 +13,8 @@ import com.orbious.extractor.util.Helper;
 import com.orbious.extractor.util.HelperTest;
 import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.evaluator.AbbreviatedNameTest;
+import com.orbious.extractor.evaluator.HeadingTest;
+import com.orbious.extractor.evaluator.InsideLeftRightMarksTest;
 import com.orbious.extractor.evaluator.NameTest;
 import com.orbious.extractor.evaluator.NumberedHeadingTest;
 import com.orbious.extractor.evaluator.SuspensionTest;
@@ -47,6 +49,8 @@ public class AllExtractorTests {
     ts.addTestSuite(UrlTextTest.class);
     ts.addTestSuite(NumberedHeadingTest.class);
     ts.addTestSuite(AbbreviatedNameTest.class);
+    ts.addTestSuite(HeadingTest.class);
+    ts.addTestSuite(InsideLeftRightMarksTest.class);
     
     ts.addTestSuite(WhitespaceRemoverTest.class);
     ts.addTestSuite(WordTest.class);

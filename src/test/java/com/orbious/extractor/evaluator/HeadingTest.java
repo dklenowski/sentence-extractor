@@ -29,14 +29,18 @@ public class HeadingTest extends TestCase {
             "2. If the character is a sentence end (e.g. '.', '!' etc) run the End Evaluation Process." ));
  
     char[] buf = initTextParserData(data);
+    for ( int i = 0; i < buf.length; i++ ) {
+      System.out.println(i + "=" + buf[i]);
+    }
+    
     HeadingEvaluator evaluator = new HeadingEvaluator(EvaluatorType.START);
     boolean ret;
     try {
-      ret = evaluator.evaluate(buf, 1);
+      ret = evaluator.evaluate(buf, 2);
       assertEquals(false, ret);
-      ret = evaluator.evaluate(buf, 28);
+      ret = evaluator.evaluate(buf, 29);
       assertEquals(true, ret);
-      ret = evaluator.evaluate(buf, 62);
+      ret = evaluator.evaluate(buf, 63);
       assertEquals(false, ret);
     } catch ( Exception e ) { 
       fail("Exception thrown: \n" + e.getMessage());

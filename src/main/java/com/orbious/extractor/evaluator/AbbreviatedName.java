@@ -3,6 +3,7 @@ package com.orbious.extractor.evaluator;
 import com.orbious.extractor.ParseDirn;
 import com.orbious.extractor.Word;
 import com.orbious.extractor.Word.WordOp;
+import com.orbious.extractor.util.Helper;
 
 // $Id$
 
@@ -46,6 +47,11 @@ public class AbbreviatedName extends Evaluator {
   public boolean recordAsUnlikely() {
     return(true);
   }
+  
+  // DEBUGGIN ONLY 
+  public String debugStr() { 
+    return(debugStr);
+  }
 
   /**
    * Determines if the current characters are part of an Abbreviated Name
@@ -61,10 +67,12 @@ public class AbbreviatedName extends Evaluator {
   public boolean evaluate(final char[] buf, int idx) {
     boolean b;
     
-    if ( buf[idx] != '.' && !Character.isUpperCase(buf[idx]) ) {
+    if ( (type == EvaluatorType.START) && !Character.isUpperCase(buf[idx]) ) {
+      return(false);
+    } else if ( (type == EvaluatorType.END) && buf[idx] != '.' ) {
       return(false);
     }
-    
+
     debugStr = "";
     b = evaluateLeftToRight(buf, idx);
     if ( b ) {
@@ -97,52 +105,111 @@ public class AbbreviatedName extends Evaluator {
    *            <code>false</code> otherwise.
    */
   protected boolean evaluateLeftToRight(final char[] buf, int idx) {
-    if ( (idx-1 < 0) && (idx+1 >= buf.length) ) {
-      // there is not enough data in the buf to perform an evaluation
-      return(false);
-    } else if ( (buf[idx] != '.') && !Character.isUpperCase(buf[idx]) ) {
-      return(false);
-    }
 
+    //
+    // We have to handle 3 cases:
+    // P. Petro
+    // 12 3
+    //
     int i;
     
-    // check the previous characters are part of the abbreviated name
-    if ( idx-1 > 0 ) {
-      i = checkCase(buf, idx, ParseDirn.LEFT, false);
-      if ( i == -1 ) {
+    if ( logger.isDebugEnabled() ) {
+      debugStr += "LtoR: ";
+    }
+    
+    if ( Character.isUpperCase(buf[idx]) ) {
+      if ( idx+1 >= buf.length ) {
+        return(false);
+      }
+      
+      if ( buf[idx+1] == '.' ) {
+        //
+        // case 1
+        //
+        i = checkCase(buf, idx, ParseDirn.RIGHT);
+        if ( i == -1 ) {
+          if ( logger.isDebugEnabled() ) {
+            debugStr += "Case 1-Failed Checkcase, ";
+          }
+          return(false);
+        } 
+ 
+        i = Helper.moveToNonWhitespace(ParseDirn.RIGHT, buf, i+1);
+        if ( (i != -1) && Character.isUpperCase(buf[i]) ) {
+          if ( logger.isDebugEnabled() ) {
+            debugStr += "Case 1-TRUE, ";
+          }
+          return(true);
+        }
+
         if ( logger.isDebugEnabled() ) {
-          debugStr += " failed left (evaluateLeftToRight).";
+          debugStr += "Case 1-Default FALSE, ";
+        }
+        return(false);
+        
+      } else if ( Character.isLowerCase(buf[idx+1]) ) {
+        //
+        // case 3
+        // 
+        i = Helper.moveToNonWhitespace(ParseDirn.LEFT, buf, idx-1);
+        if ( i == -1 ) {
+          if ( logger.isDebugEnabled() ) {
+            debugStr += "Case 3-Failed move left, ";
+          }
+          return(false);
+        } 
+        
+        i = checkCase(buf, idx, ParseDirn.LEFT);
+        if ( i == -1 ) {
+          if ( logger.isDebugEnabled() ) {
+            debugStr += "Case 1-Failed Checkcase, ";
+          }
+          return(false);
+        } 
+        
+        if ( logger.isDebugEnabled() ) {
+          debugStr += "Case 3-TRUE, ";
+        }
+        return(true);
+        
+        
+      } else {
+        if ( logger.isDebugEnabled() ) {
+          debugStr += "Case 1,3-Default FALSE, ";
         }
         return(false);
       }
-    }
-    
-    // now check the next characters
-    i = checkCase(buf, idx, ParseDirn.RIGHT, true);
-    if ( i == -1 ) {
-      if ( logger.isDebugEnabled() ) {
-        debugStr += " failed right (evaluateLeftToRight)";
+      
+    } else if ( buf[idx] == '.' ) {
+      //
+      // case 2
+      //
+      i = checkCase(buf, idx, ParseDirn.LEFT);
+      if ( i == -1 ) {
+        if ( logger.isDebugEnabled() ) {
+          debugStr += "Case 2-Failed Checkcase, ";
+        }
+        return(false);
+      }  
+      
+      i = Helper.moveToNonWhitespace(ParseDirn.RIGHT, buf, idx+1);
+      if ( (i != -1) && Character.isUpperCase(buf[i]) ) {
+        if ( logger.isDebugEnabled() ) {
+          debugStr += "Case 2-TRUE, ";
+        }
+        return(true);
       }
-      return(false);
-    }
-    
-    // we now need to check the idx return from checkCase is an uppercase
-    i++;
-    while ( (i < buf.length) && Character.isWhitespace(buf[i]) ) {
-      i++;
-    }
-    
-    if ( (i >= buf.length) || !Character.isUpperCase(buf[i]) ) {
+
       if ( logger.isDebugEnabled() ) {
-        debugStr += " failed uppercase (evaluateLeftToRight)";
+        debugStr += "Case 2-Default FALSE, ";
       }
       return(false);
     }
     
     if ( logger.isDebugEnabled() ) {
-      debugStr += " passed evaluateLeftToRight";
+      debugStr += "Default FALSE, ";
     }
-    return(true);
+    return(false);
   }
   
   /**
@@ -157,59 +224,118 @@ public class AbbreviatedName extends Evaluator {
    *            <code>false</code> otherwise.
    */
   protected boolean evaluateRightToLeft(final char[] buf, int idx) {
-    if ( (idx-1 < 0) && (idx+1 >= buf.length) ) {
-      // there is not enough data in the buf to perform an evaluation
-      return(false);
-    } else if ( (buf[idx] != '.') && !Character.isUpperCase(buf[idx]) ) {
-      return(false);
-    }
-
-    int i;
     
-    if ( idx+1 < buf.length ) {
-      i = checkCase(buf, idx, ParseDirn.RIGHT, false);
+    //
+    // 3 cases:
+    // Petro P.
+    // 1     23
+    //
+    int i;
+    WordOp op;
+    
+    if ( logger.isDebugEnabled() ) {
+      debugStr += "RtoL: ";
+    }
+    
+    if ( Character.isUpperCase(buf[idx]) ) {
+      if ( idx+1 >= buf.length ) {
+        return(false);
+      }
+      
+      if ( buf[idx+1] == '.' ) {
+        //
+        // case 2
+        //
+        i = checkCase(buf, idx, ParseDirn.RIGHT);
+        if ( i == -1 ) {
+          if ( logger.isDebugEnabled() ) {
+            debugStr += "Case 2-Failed Checkcase, ";
+          }
+          return(false);
+        }
+    
+        op = Word.getPreviousWord(buf, i-1, true);
+        
+        if ( (op == null) || (op.word().length() == 0) ) {
+          if ( logger.isDebugEnabled() ) {
+            debugStr += "Case 2-Failed Word, ";
+          }
+          return(true);
+        }
+
+        if ( Character.isUpperCase(op.word().charAt(0)) ) {
+          if ( logger.isDebugEnabled() ) {
+            debugStr += "Case 2-TRUE, ";
+          }
+          return(true);
+        }
+        
+      } else if ( Character.isLowerCase(buf[idx+1] ) ) {
+        //
+        // case 1
+        //
+        i = idx+1;
+        while ( (i < buf.length) && !Character.isWhitespace(buf[i]) ) {
+          i++;
+        }
+        
+        i = Helper.moveToNonWhitespace(ParseDirn.RIGHT, buf, i);
+        if ( i == -1 ) {
+          if ( logger.isDebugEnabled() ) {
+            debugStr += "Case 1-Failed Move, ";
+          }
+          return(false);
+        }
+        
+        i = checkCase(buf, i, ParseDirn.RIGHT);
+        if ( i == -1 ) {
+          if ( logger.isDebugEnabled() ) {
+            debugStr += "Case 1-Failed Checkcase, ";
+          }
+          return(false);
+        }
+        
+        if ( logger.isDebugEnabled() ) {
+          debugStr += "Case 1-TRUE, ";
+        }
+        return(true);
+      }
+  
+    } else if ( buf[idx] == '.' ) {
+      // 
+      // case 3
+      // 
+      i = checkCase(buf, idx, ParseDirn.LEFT);
       if ( i == -1 ) {
         if ( logger.isDebugEnabled() ) {
-          debugStr += " failed right (evaluateRightToLeft).";
+          debugStr += "Case 3-Failed Checkcase, ";
         }
         return(false);
-      }  
+      }
+      
+      op = Word.getPreviousWord(buf, idx-1, true);
 
-      if ( logger.isDebugEnabled() ) {
-        debugStr += " RIGHT idx=" + i;
+      if ( (op == null) || (op.word().length() == 0) ) {
+        if ( logger.isDebugEnabled() ) {
+          debugStr += "Case 3-Failed Word, ";
+        }
+        return(true);
       }
-    }
-    
-    i = checkCase(buf, idx, ParseDirn.LEFT, true);
-    if ( i == -1 ) {
-      if ( logger.isDebugEnabled() ) {
-        debugStr += " failed left (evaluateRightToLeft).";
+
+      if ( Character.isUpperCase(op.word().charAt(0)) ) {
+        if ( logger.isDebugEnabled() ) {
+          debugStr += "Case 3-TRUE, ";
+        }
+        return(true);
       }
-      return(false);
     }
     
     if ( logger.isDebugEnabled() ) {
-      debugStr += " LEFT idx=" + i;
+      debugStr += "Default FALSE, ";
     }
-    
-    // we now need to check the idx return from checkCase is an uppercase
-    // at the start of the previous word
-    i--;
-    
-    WordOp op = Word.getPreviousWord(buf, i, true);
-    if ( (op == null) || !Character.isUpperCase(op.word().charAt(0)) ) {
-      if ( logger.isDebugEnabled() ) {
-        debugStr += " failed uppercase (evaluateRightToLeft)";
-      }
-      return(false);
-    }
-    
-    if ( logger.isDebugEnabled() ) {
-      debugStr += " passed evaluateRightToLeft";
-    }
-    return(true);
+    return(false);
   }
-  
+
   /**
    * Checks the case for an abbreviated name. 
    * 
@@ -220,7 +346,7 @@ public class AbbreviatedName extends Evaluator {
    * @return    <code>true</code> if the case is correct for an abbreviated name,
    *             <code>false</code> otherwise.
    */
-  protected int checkCase(final char[] buf, int idx, ParseDirn dirn, boolean ignoreMatch) {
+  protected int checkCase(final char[] buf, int idx, ParseDirn dirn) {
     char ch;
     int i;
     int inc;
@@ -232,9 +358,7 @@ public class AbbreviatedName extends Evaluator {
     } else {
       inc = 1;
     }
-    
-    System.out.println("DIRN=" + dirn);
-    
+
     i = idx+inc;
     if ( buf[idx] == '.' ) {
       nxtUpperCase = true;
@@ -242,27 +366,30 @@ public class AbbreviatedName extends Evaluator {
       nxtUpperCase = false;
     }
     
-    System.out.println("idx=" + idx + " i=" + i);
-    
+    if ( (i < 0) || (i >= buf.length) ) {
+      return(-1);
+    }
+ 
     while ( Character.isWhitespace(buf[i]) ) {
       i += inc;
+      if ( (i < 0) || (i >= buf.length) ) {
+        return(-1);
+      }
     }
     
     match = false;
     while ( (i >= 0) && (i < buf.length) && !Character.isWhitespace(buf[i]) ) {
       ch = buf[i];
-      System.out.println("ch=" + ch);
+
       if ( nxtUpperCase ) {
         // we are looking for an uppercase character
         if ( !Character.isUpperCase(ch) ) {
-          System.out.println("Failed to find uppercase");
           return(-1);
         }
         nxtUpperCase = false;
       } else {
         // we are looking for a fullstop
         if ( ch != '.' ) {
-          System.out.println("Failed to find .");
           return(-1);
         }
         nxtUpperCase = true;
@@ -273,7 +400,7 @@ public class AbbreviatedName extends Evaluator {
       i += inc;
     }
     
-    if ( !ignoreMatch && !match ) {
+    if ( !match ) {
       return(-1);
     }
     

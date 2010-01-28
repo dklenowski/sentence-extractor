@@ -24,7 +24,7 @@ public class SuspensionTest extends TestCase {
   
   public void test_isSuspension() {
     try {
-      Suspension suspension = new Suspension(EvaluatorType.START);
+      Suspension suspension = new Suspension(EvaluatorType.END);
       
       assertTrue(suspension.evaluate("Mr.".toCharArray(), 2));
       assertTrue(suspension.evaluate("Il.".toCharArray(), 2));
@@ -34,12 +34,13 @@ public class SuspensionTest extends TestCase {
   }
 
   public void test_notSuspension() {
-    boolean ret;
-
+    Suspension suspension;
+    
     try {
-      Suspension suspension = new Suspension(EvaluatorType.START);
+      suspension = new Suspension(EvaluatorType.START);
+      assertFalse(suspension.evaluate("Tomato".toCharArray(), 0));
       
-      assertFalse(suspension.evaluate("Tomato".toCharArray(), 5));
+      suspension = new Suspension(EvaluatorType.END);      
       assertFalse(suspension.evaluate("empty.".toCharArray(), 5));
     } catch ( FileNotFoundException fnfe ) {
       fail("Failed to open suspensions txt file");

@@ -21,17 +21,24 @@ public class UrlText extends Evaluator {
   /**
    * The regular expression pattern that is used to match a URL.
    */
-  private Pattern url_pattern;
+  private static Pattern url_pattern;
+  
+  static {
+    url_pattern = Pattern.compile(Config.URL_REGEX.asStr());    
+  }
   
   /**
    * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
    */
   public UrlText(EvaluatorType type) {
     super("UrlText", type);
-    url_pattern = Pattern.compile(Config.URL_REGEX.asStr());
   }
   
   public boolean recordAsUnlikely() {
+    return(false);
+  }
+  
+  public boolean recordAsPause() {
     return(false);
   }
   
@@ -47,11 +54,11 @@ public class UrlText extends Evaluator {
    *            a likely sentence end, <code>false</code> otherwise.
    */  
   public boolean evaluate(final char[] buf, int idx) {
-    String str;
     char ch;
     int i;
-    
-    str = "";
+    StringBuilder sb;
+ 
+    sb = new StringBuilder();
     
     // if the next character is punctuation, then return false
     // this handles the special case of www.google.com.'.' (i.e. the second 
@@ -73,13 +80,13 @@ public class UrlText extends Evaluator {
           break;
         }
         
-        str += ch;
+        sb.append(ch);
         i--;
       }
     }
     
-    str = new StringBuffer(str).reverse().toString();
-    
+    sb = sb.reverse();
+
     // add from idx to a whitespace
     i = idx;
     while ( i < buf.length ) {
@@ -87,16 +94,16 @@ public class UrlText extends Evaluator {
       if ( Character.isWhitespace(ch) ) {
         break;
       }
-      
-      str += ch;
+ 
+      sb.append(ch);
       i++;
     }
 
-    Matcher matcher = url_pattern.matcher(str);
+    Matcher matcher = url_pattern.matcher(sb.toString());
     boolean result = matcher.find();
     
     if ( logger.isDebugEnabled() ) {
-      logger.debug("String=" + str + " Match=" + 
+      logger.debug("String=" + sb.toString() + " Match=" + 
           String.valueOf(result).toUpperCase());
     }
 

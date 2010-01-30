@@ -43,7 +43,7 @@ public class WhitespaceRemover {
     boolean hasText;
     char[] buf;
     char ch;
-    String str;
+    StringBuilder sb;
     int letterStartPos;
     
     if ( (idx < 0) || (idx >= text.size()) ) {
@@ -61,19 +61,19 @@ public class WhitespaceRemover {
     
     inWhitespace = false;
     hasText = false;
-    str = "";
+    sb = new StringBuilder();
 
     for ( int i = 0; i < buf.length; i++ ) {
       ch = buf[i];
       if ( !Character.isWhitespace(ch) ) {  
         hasText = true;
         inWhitespace = false;        
-        str += ch;
+        sb.append(ch);
       } else {
         if ( !inWhitespace ) {
           if ( (i != 0) && (ch != '\n') ) {
             // we dont add whitespace to the start
-            str += ch;
+            sb.append(ch);
           }
           inWhitespace = true;
         }
@@ -91,18 +91,18 @@ public class WhitespaceRemover {
     // end of the text (because we have removed the newline)
     // we dont add a whitespace if the last character is a '-' 
     // otherwise we add a space
-    int ct = hasHyphenAtEnd(str);
+    int ct = hasHyphenAtEnd(sb.toString());
     if ( ct != -1 ) {
       // hyphenated at end, strip any whitespace 
-      str = String.copyValueOf(str.toCharArray(), 0, ct);
-    } else if ( !Character.isWhitespace(str.charAt(str.length()-1)) ) {
-      str += " ";
+      sb = new StringBuilder(sb.substring(0, ct));
+    } else if ( !Character.isWhitespace(sb.charAt(sb.length()-1)) ) {
+      sb.append(" ");
     }
 
     // once we have cleaned the string we need to find position of the first letter
     //
     letterStartPos = -1;
-    buf = str.toCharArray();
+    buf = sb.toString().toCharArray();
     for ( int i = 0; i < buf.length; i++ ) {
       if ( Character.isLetter(buf[i]) ) {
         letterStartPos = i;
@@ -112,11 +112,11 @@ public class WhitespaceRemover {
     
     if ( logger.isDebugEnabled() ) {
       logger.debug("Idx=" + idx + " letterStartPos=" + letterStartPos +
-          "\n\tCleansed=|" + str + 
+          "\n\tCleansed=|" + sb.toString() + 
           "|\n\tOriginal=|" + text.get(idx) + "|");
     }
 
-    return(str);
+    return(sb.toString());
   }
   
   /**

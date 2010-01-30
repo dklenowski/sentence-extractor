@@ -13,6 +13,10 @@ public class InnerQuote extends Evaluator {
     return(true);
   }
   
+  public boolean recordAsPause() {
+    return(false);
+  }
+  
   public boolean evaluate(final char[] buf, int idx) {
     if ( (idx < 0) || (idx >= buf.length) ) {
       throw new ArrayIndexOutOfBoundsException("Invalid index=" + idx);

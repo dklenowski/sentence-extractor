@@ -32,7 +32,8 @@ public class TextParserTest extends TestCase {
     try {
       parser.parse();
       fail("No FileNotFoundException thrown"); 
-    } catch ( FileNotFoundException fnfe ) {   
+    } catch ( FileNotFoundException fnfe ) {
+      // we expect this to be thrown ..
     } catch (IOException ioe ) {
       fail("Wrong Exception (IOException) thrown.");
     }
@@ -52,7 +53,7 @@ public class TextParserTest extends TestCase {
       fail("IOException thrown");
     }
     
-    char[] buffer = parser.buffer();
+    char[] buffer = parser._buffer();
     String str = String.copyValueOf(buffer);
     
     String expected = "The Project Gutenberg EBook of Punch, or the London Charivari, Volume 1, " +
@@ -84,7 +85,9 @@ public class TextParserTest extends TestCase {
         Arrays.asList(
             "The Project Gutenberg EBook of Punch , or the London Charivari , Volume 1 , Complete , by Various ." , 
             "This eBook is for the use of anyone anywhere at no cost and with almost no restrictions whatsoever .", 
-            "You may copy it , give it away or re-use it under the terms of the Project Gutenberg License included with this eBook or online at www.gutenberg.net ."
+            "You may copy it , give it away or re-use it under the terms of the Project Gutenberg License included with this eBook or online at www.gutenberg.net .",
+            "Punch , or the London Charivari , Volume 1 , Complete Author :",
+            "English Character set encoding :"
         ));
             
     try {
@@ -100,10 +103,9 @@ public class TextParserTest extends TestCase {
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr();
     
-    //assertEquals(expected.size(), sentences.size());   
+    assertEquals(expected.size(), sentences.size());   
     for ( int i = 0; i < sentences.size(); i++ ) {
-      System.out.println(sentences.get(i));
-      /*if ( !expected.get(i).equals(sentences.get(i)) ) {
+      if ( !expected.get(i).equals(sentences.get(i)) ) {
         diff_match_patch dmp = new diff_match_patch();
         LinkedList<Diff> d = dmp.diff_main(expected.get(i), sentences.get(i));
 
@@ -111,7 +113,8 @@ public class TextParserTest extends TestCase {
                            "Actual  =|" + sentences.get(i) + "|\n" + 
                            "Diff    =" + d);
         fail();
-      }*/
+      }
+      //System.out.println(sentences.get(i));
     }
   }
 
@@ -127,7 +130,7 @@ public class TextParserTest extends TestCase {
             "\" Punch \" himself does the Drama .",
             "A Prophet is engaged !",
             "He foretells not only the winners of each race , but also the \" VATES \" and colours of the riders .",
-            "THE FACETIAE Are contributed by the members of the following learned bodies :-- THE COURT OF COMMON COUNCIL AND THE ZOOLOGICAL SOCIETY :-- THE TEMPERANCE ASSOCIATION AND THE WATERPROOFING COMPANY :-- THE COLLEGE OF PHYSICIANS AND THE HIGHGATE CEMETERY :-- THE DRAMATIC AUTHORS' AND THE MENDICITY SOCIETIES :-- THE BEEFSTEAK CLUB AND THE ANTI-DRY-ROT COMPANY .",
+            "Are contributed by the members of the following learned bodies :",
             "Together with original , humorous , and satirical articles in verse and prose , from all the [ Illustration : FUNNY DOGS WITH COMIC TALES . ]"
         ));
             
@@ -146,7 +149,7 @@ public class TextParserTest extends TestCase {
   
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
-     if ( !expected.get(i).equals(sentences.get(i)) ) {
+      if ( !expected.get(i).equals(sentences.get(i)) ) {
         diff_match_patch dmp = new diff_match_patch();
         LinkedList<Diff> d = dmp.diff_main(expected.get(i), sentences.get(i));
 
@@ -155,6 +158,7 @@ public class TextParserTest extends TestCase {
                            "Diff    =" + d);
         fail();
       }
+      //System.out.println(sentences.get(i));
     }    
   }
 
@@ -193,9 +197,9 @@ public class TextParserTest extends TestCase {
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr();
     
-    //assertEquals(expected.size(), sentences.size());    
+    assertEquals(expected.size(), sentences.size());    
     for ( int i = 0; i < sentences.size(); i++ ) {
-     /*if ( !expected.get(i).equals(sentences.get(i)) ) {
+     if ( !expected.get(i).equals(sentences.get(i)) ) {
         diff_match_patch dmp = new diff_match_patch();
         LinkedList<Diff> d = dmp.diff_main(expected.get(i), sentences.get(i));
 
@@ -203,8 +207,8 @@ public class TextParserTest extends TestCase {
                            "Actual  =|" + sentences.get(i) + "|\n" + 
                            "Diff    =" + d);
         fail();
-      }*/
-      System.out.println(sentences.get(i));
+      }
+      //System.out.println(sentences.get(i));
     }    
   }
 
@@ -262,8 +266,8 @@ public class TextParserTest extends TestCase {
             "At length out steps P. Petronius , an old chum of his , a finished scholar in the Claudian tongue and claims a remand .",
             "Pedo Pompeius prosecutes with loud outcry .",
             "The counsel for the defence tries to reply ; but Aeacus , who is the soul of justice , will not have it .",
-            "Aeacus hears the case against Claudius , refuses to hear the other side and passes sentence against him , quoting the line :",
-            "\" As he did , so be he done by , this is justice undefiled. \"" ));
+            "Aeacus hears the case against Claudius , refuses to hear the other side and passes sentence against him , quoting the line : \" As he did , so be he done by , this is justice undefiled. \"",
+            "[ Footnote : A proverbial line . ]"));
     try {
       parser.parse();
     } catch ( FileNotFoundException fnfe ) {
@@ -277,9 +281,9 @@ public class TextParserTest extends TestCase {
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr();
     
-    //assertEquals(expected.size(), sentences.size());
+    assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
-      /*if ( !expected.get(i).equals(sentences.get(i)) ) {
+      if ( !expected.get(i).equals(sentences.get(i)) ) {
         diff_match_patch dmp = new diff_match_patch();
         LinkedList<Diff> d = dmp.diff_main(expected.get(i), sentences.get(i));
 
@@ -287,8 +291,8 @@ public class TextParserTest extends TestCase {
                            "Actual  =|" + sentences.get(i) + "|\n" + 
                            "Diff    =" + d);
         fail();
-      }*/
-      System.out.println(sentences.get(i));
+      }
+      //System.out.println(i + "=" + sentences.get(i));
     }    
   }
   

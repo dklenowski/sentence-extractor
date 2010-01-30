@@ -22,6 +22,7 @@ import com.orbious.extractor.evaluator.AcronymTest;
 import com.orbious.extractor.evaluator.UrlTextTest;
 import com.orbious.extractor.Config;
 import com.orbious.extractor.SentenceMapEntry;
+import com.orbious.extractor.TextParser;
 import com.orbious.extractor.TextParserTest;
 import com.orbious.extractor.WhitespaceRemoverTest;
 import com.orbious.extractor.WordTest;
@@ -75,7 +76,9 @@ public class AllExtractorTests {
   }
   
   public static void initEmptyTextParserData() {
-    TextParserData.setTextParserData(new HashSet<Integer>(), 
-        new SentenceMapEntry[5000], -1);
+    TextParserData parserData = new TextParserData();
+    parserData.setTextParserData(new HashSet<Integer>(), 
+        new SentenceMapEntry[5000], 0);
+    TextParser._setTextParserData(parserData);
   }
 }

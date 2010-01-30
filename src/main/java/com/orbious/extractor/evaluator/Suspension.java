@@ -41,6 +41,10 @@ public class Suspension extends Evaluator {
     return(true);
   }
   
+  public boolean recordAsPause() {
+    return(false);
+  }
+  
   /**
    * Determines if the previous word from <code>idx</code>
    * in the buffer <code>buf</code> is a suspension and therefore 

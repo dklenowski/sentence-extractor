@@ -1,8 +1,10 @@
 package com.orbious.extractor.evaluator;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import com.orbious.extractor.SentenceMapEntry;
+import com.orbious.extractor.TextParser;
 import com.orbious.extractor.SentenceMapEntry.Likelihood;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntryType;
 import com.orbious.extractor.TextParser.TextParserData;
@@ -113,6 +115,8 @@ public class InsideLeftRightMarksTest extends TestCase {
         new SentenceMapEntry(Likelihood.LIKELY, SentenceEntryType.END);
     }
     
-    TextParserData.setTextParserData(null, map, -1);
+    TextParserData parserData = new TextParserData();
+    parserData.setTextParserData(new HashSet<Integer>(), map, -1);
+    TextParser._setTextParserData(parserData);
   }
 }

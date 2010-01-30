@@ -19,7 +19,7 @@ public class SentenceMapEntry {
   /**
    * an enum representing the entry types.
    */
-  public enum SentenceEntryType { START, END }
+  public enum SentenceEntryType { START, PAUSE, HEADING, END }
   
   /**
    * An enum representing the 

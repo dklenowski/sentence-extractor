@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Vector;
 import org.apache.log4j.Logger;
-
-import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.evaluator.AbbreviatedName;
 import com.orbious.extractor.evaluator.Acronym;
 import com.orbious.extractor.evaluator.Evaluator;
@@ -183,13 +181,14 @@ public class Sentence {
    */
   public static EndOp isEnd(final char[] buf, int idx) { 
     Evaluator evaluator;
-    String debugStr;
+    StringBuilder debugStr;
     EndOp op;
     int startIdx;
     boolean result;
     
-    debugStr = "End Evaluation idx=" + idx + "\n" + 
-        Helper.getDebugStringFromCharBuf(buf, idx, 50) + "\n";
+    debugStr = new StringBuilder();
+    debugStr.append("End Evaluation idx=" + idx + "\n" + 
+        Helper.getDebugStringFromCharBuf(buf, idx, 50) + "\n");
     op = new EndOp(false, -1);
     
     if ( buf[idx] == ':' ) {
@@ -199,20 +198,20 @@ public class Sentence {
     
     if ( hasLaterEnd(buf, idx) ) {
       if ( logger.isDebugEnabled() ) {
-        debugStr += "\thasLaterEnd=TRUE\n";
+        debugStr.append("\thasLaterEnd=TRUE\n");
         logger.debug(debugStr);
       }
       
-      return(op);
+      return(null);
     }
     
     if ( (buf[idx] == '"') && hasLaterQuotation(buf, idx) ) {
       if ( logger.isDebugEnabled() ) {
-        debugStr += "\thasLaterQuotation=TRUE\n";
+        debugStr.append("\thasLaterQuotation=TRUE\n");
         logger.debug(debugStr);
       }
       
-      return(op);
+      return(null);
     }
     
     startIdx = hasUpper(buf, idx);
@@ -220,7 +219,7 @@ public class Sentence {
     
     if ( startIdx < -1 ) {
       if ( logger.isDebugEnabled() ) {
-        debugStr += "\thasUpper=FALSE\n";
+        debugStr.append("\thasUpper=FALSE\n");
         logger.debug(debugStr);  
       }
 
@@ -245,7 +244,7 @@ public class Sentence {
 
       if ( result ) {
         if ( logger.isDebugEnabled() ) {
-          debugStr += "\t" + evaluator.name() + " Result=TRUE\n";
+          debugStr.append("\t" + evaluator.name() + " Result=TRUE\n");
           logger.debug(debugStr);
         }
         op.failedEvaluator = evaluator;
@@ -253,7 +252,7 @@ public class Sentence {
         
       } else {
         if ( logger.isDebugEnabled() ) {
-          debugStr += "\t" + evaluator.name() + " Result=FALSE\n";
+          debugStr.append("\t" + evaluator.name() + " Result=FALSE\n");
         }       
       }
     }
@@ -326,11 +325,11 @@ public class Sentence {
     int i = Helper.moveToNonWhitespace(ParseDirn.RIGHT, buf, idx);
     if ( i == -1 ) {
       return(false);
-    } else if ( !Character.isLowerCase(buf[i]) ) {
-      return(false);
+    } else if ( Character.isLowerCase(buf[i]) || (buf[i] == '"') ) {
+      return(true);
     }
    
-    return(true);
+    return(false);
   }
   
   protected static boolean isColonInsideMarks(final char[] buf, int idx) {
@@ -344,7 +343,7 @@ public class Sentence {
     char ch;
     int markCt;
     
-    startIdx = TextParserData.findPreviousMapEnd(idx);
+    startIdx = TextParser.parserData().findPreviousLikelyEnd(idx);
     if ( startIdx == -1 ) {
       return(false);
     }
@@ -548,17 +547,20 @@ public class Sentence {
    *              in the <code>buf</code> is a likely sentence start, 
    *              <code>false</code> otherwise.
    */
-  public static StartOp isStart(final char[] buf, int idx, boolean ignoreStop) {
+  public static StartOp isStart(final char[] buf, int idx, boolean inHeading) {
     int stopIdx;
     Evaluator evaluator;
-    String debugStr;
+    StringBuilder debugStr;
     StartOp op;
+    boolean unlikelyStop;
    
-    debugStr = "Start Evaluation idx=" + idx + "\n" + 
-      Helper.getDebugStringFromCharBuf(buf, idx, 50) + "\n";
+    debugStr = new StringBuilder();
+    debugStr.append("Start Evaluation idx=" + idx + "\n" + 
+      Helper.getDebugStringFromCharBuf(buf, idx, 50) + "\n");
 
     op = new StartOp(false, -1);
-
+    unlikelyStop = false;
+    
     if ( !Character.isUpperCase(buf[idx]) ) {
       if ( logger.isDebugEnabled() ) {
         logger.debug(debugStr + "\tResult=FALSE (no uppercase).\n");
@@ -574,20 +576,28 @@ public class Sentence {
       return(op);
     }
     
-    if ( !ignoreStop ) {
+    if ( !inHeading ) {
       stopIdx = hasStop(buf, idx);
       op.stopIdx = stopIdx;
       
-      if ( stopIdx < -1 ) {
+      if ( logger.isDebugEnabled() ) {
+        debugStr.append("\thasStop (Result)=" + stopIdx + "\n");
+      }
+      
+      if ( stopIdx == -1 ) {
+        // unlikely stop
+        unlikelyStop = true;
+      } else if ( stopIdx < -1 ) {
+        // no stop
         if ( logger.isDebugEnabled() ) {
-          debugStr += "\thasStop=FALSE\n";
+          debugStr.append("\thasStop=FALSE\n");
           logger.debug(debugStr);  
         }
   
         return(null);
       }
     }
-    
+
     // now run some evaluators
     if ( start_evaluators == null ) {
       initDefaultStartEvaluators();
@@ -608,7 +618,7 @@ public class Sentence {
       
       if ( result ) {
         if ( logger.isDebugEnabled() ) {
-          debugStr += "\t" + evaluator.name() + " Result=TRUE\n";
+          debugStr.append("\t" + evaluator.name() + " Result=TRUE\n");
           logger.debug(debugStr);
         }
         op.failedEvaluator = evaluator;
@@ -616,7 +626,7 @@ public class Sentence {
         
       } else {
         if ( logger.isDebugEnabled() ) {
-          debugStr += "\t" + evaluator.name() + " Result=FALSE\n";
+          debugStr.append("\t" + evaluator.name() + " Result=FALSE\n");
         }         
       }
     }
@@ -625,7 +635,9 @@ public class Sentence {
       logger.debug(debugStr);
     }
     
-    op.isStart = true;
+    if  ( !unlikelyStop ) {
+      op.isStart = true;
+    }
     return(op);
   }
 
@@ -637,8 +649,9 @@ public class Sentence {
    * 
    * @return
    * <ul>
-   * <li><code>-1<code> if the extremium's were reached.
-   * <li><code>-2</code> if no sentence end was found.
+   * <li><code>-1</code> an end was found but it is unlikely.
+   * <li><code>-2<code> if the extremium's were reached.
+   * <li><code>-3</code> if no sentence end was found.
    * <li>Otherwise returns the position in teh buffer where the potential
    * sentence end was found.
    */
@@ -647,7 +660,7 @@ public class Sentence {
     char ch;
 
     if ( idx-1 < 0 ) {
-      return(-1);
+      return(-2);
     }
     
     i = idx-1;
@@ -656,17 +669,36 @@ public class Sentence {
     while ( Character.isWhitespace(ch) ) {
       i--;
       if ( i < 0 ) {
-        return(-1);
+        return(-2);
       }
       
       ch = buf[i];
     }
     
     if ( allowable_ends.contains(ch) ) {
-      return(i);
+      // we now need to check that the character is not attached to 
+      // a suspension etc
+      int j;
+      
+      j = TextParser.parserData().findPreviousUnlikelyEnd(i+1);
+      if ( i == j ) {
+        // unlikely end matches the stop we found, therefore this start
+        // is unlikely as well
+        return(-1);
+      }
+      
+      j = TextParser.parserData().findPreviousPause(i+1);
+      if ( i == j ) {
+        // likely end found that mataches what we found
+        return(i);
+      } else {
+        // we did find a stop, but has not been recorded as a likely
+        // stop
+        return(-1);
+      }
     }
     
-    return(-2);
+    return(-3);
   }
   
   

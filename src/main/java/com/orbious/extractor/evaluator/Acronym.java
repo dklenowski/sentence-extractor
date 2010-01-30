@@ -59,6 +59,10 @@ public class Acronym extends Evaluator {
     return(true);
   }
   
+  public boolean recordAsPause() {
+    return(false);
+  }
+  
   /**
    * Determines if the previous word from <code>idx</code> in the buffer
    * <code>buf</code> is part of an acronym and therefore not a likely

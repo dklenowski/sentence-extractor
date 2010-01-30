@@ -31,6 +31,8 @@ public abstract class Evaluator {
    */
   protected EvaluatorType type;
   
+  protected StringBuilder debug_str;
+  
   /**
    * Logger object.
    */
@@ -45,6 +47,7 @@ public abstract class Evaluator {
   public Evaluator(String name, EvaluatorType type) {
     this.name = name;
     this.type = type;
+    debug_str = new StringBuilder();
   }
   
   /**
@@ -60,7 +63,13 @@ public abstract class Evaluator {
     return(type);
   }
   
+  public String debugStr() {
+    return(debug_str.toString());
+  }
+  
   public abstract boolean recordAsUnlikely();
+  
+  public abstract boolean recordAsPause();
   
   /**
    * Runs an evaluation based on position <code>idx</code> in the 

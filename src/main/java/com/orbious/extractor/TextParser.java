@@ -96,6 +96,11 @@ public class TextParser {
   private Vector< Vector<String> > sentences;
   
   /**
+   * 
+   */
+  private static TextParserData parser_data;
+  
+  /**
    * The most recent sentence start index found in <code>buffer</code>.
    */
   private int sent_start_idx;
@@ -137,17 +142,16 @@ public class TextParser {
     left_punctuation_marks = Helper.cvtStringToHashSet(Config.LEFT_PUNCTUATION_MARKS.asStr());
     right_punctuation_marks = Helper.cvtStringToHashSet(Config.RIGHT_PUNCTUATION_MARKS.asStr());
   }
-
-  /**
-   * Returns the in-memory representation of {@link TextParser#filename} as a 
-   * <code>char</code> array with whitespace removed.
-   * <p>
-   * @return  The parsed <code>char</code> buffer.
-   */
-  protected char[] buffer() {
-    return(buffer);
+  
+  public static TextParserData parserData() {
+    return(parser_data);
   }
 
+  // SHOULD REALLY ONLY BE USED IN TESTING
+  public char[] _buffer() {
+    return(buffer);
+  }
+  
   /**
    * Returns a <code>Vector</code> of sentences extracted from 
    * {@link TextParser#filename}. Each sentence put into a <code>Vector</code>, 
@@ -173,20 +177,21 @@ public class TextParser {
   public Vector<String> sentencesAsStr() {
     Vector<String> sent = new Vector<String>();
     Vector<String> words;
-    String str;
+    StringBuilder sb;
+    
+    sb = new StringBuilder();
     
     for ( int i = 0; i < sentences.size(); i++ ) {
       words = sentences.get(i);
-      str = "";
+      sb.setLength(0);
       for ( int j = 0; j < words.size(); j++ ) {
+        sb.append(words.get(j));
         if ( j+1 < words.size() ) {
-          str += words.get(j) + " ";
-        } else {
-          str += words.get(j);
+          sb.append(" ");
         }
       }
 
-      sent.add(str);
+      sent.add(sb.toString());
     }
     
     return(sent);
@@ -242,17 +247,18 @@ public class TextParser {
       System.arraycopy(buf, 0, buffer, pos, buf.length);
       pos += buf.length;
     }
-
-    TextParserData.line_starts = line_starts;
-    TextParserData.sentence_map = sentence_map;
-    TextParserData.avg_line_char_ct = len/lineCt;
+    
+    sentence_map = new SentenceMapEntry[buffer.length];
+    
+    parser_data = new TextParserData();
+    parser_data.setTextParserData(line_starts, sentence_map, (len/lineCt));
     
     if ( logger.isInfoEnabled() ) {
       logger.info("Statistics for " + filename +
           " Raw: LineCt=" + raw.size() + 
           " Cleansed: LineStarts=" + line_starts.size() +
           " CharCt=" + buffer.length +
-          " AvgLineCharCt=" + TextParserData.avg_line_char_ct);
+          " AvgLineCharCt=" + parser_data.avg_line_char_ct);
     }
   }
  
@@ -264,7 +270,6 @@ public class TextParser {
     SentenceMapEntry entry;
     SentenceEntryType type;
     Likelihood likelihood;
-    String debugStr;
     ExtractionOp op;
     
     genSentenceMap();    
@@ -282,8 +287,7 @@ public class TextParser {
     sent_unlikely_start_idx = -1;
     sent_end_idx = -1;
     sent_unlikely_end_idx = -1;
-    debugStr = "";
-
+    
     for ( int i = 0; i < sentence_map.length; i++ ) {      
       entry = sentence_map[i];
       if ( entry == null ) {
@@ -292,7 +296,7 @@ public class TextParser {
       
       type = entry.type();
       likelihood = entry.likelihood();
-
+      
       if ( type == SentenceEntryType.START ) {
         if ( likelihood == Likelihood.UNLIKELY ) {
           if ( sent_unlikely_start_idx == -1 ) {
@@ -316,13 +320,6 @@ public class TextParser {
           sent_end_idx = i;
           checkIndexes();
         }
-      }
-
-      if ( (debugStr.length() != 0) && logger.isDebugEnabled() ) {
-        logger.debug(debugStr + "\n" + 
-            Helper.getDebugStringFromSentenceMap(buffer, sentence_map, i, 200, -1) + "\n" +
-            Helper.getDebugStringFromCharBuf(buffer, i, 200, -1) + "\n");
-        debugStr = "";
       }
     }
 
@@ -442,12 +439,10 @@ public class TextParser {
     char ch;
     EndOp endOp;
     StartOp startOp;
-    boolean ignoreStop;
+    boolean inHeading;
     Evaluator evaluator;
     
-    sentence_map = new SentenceMapEntry[buffer.length];
-    TextParserData.sentence_map = sentence_map;
-    ignoreStop = false;
+    inHeading = false;
     
     for ( int i = 0; i < buffer.length; i++ ) {
       ch = buffer[i];
@@ -458,8 +453,12 @@ public class TextParser {
           if ( !endOp.isEnd() ) {
             evaluator = endOp.failedEvaluator();
 
-            if ( (evaluator != null) && evaluator.recordAsUnlikely() ) {
-              addToMap(i, Likelihood.UNLIKELY, SentenceEntryType.END, null);
+            if ( evaluator != null ) {
+              if ( evaluator.recordAsUnlikely() ) {
+                addToMap(i, Likelihood.UNLIKELY, SentenceEntryType.END, null);
+              } else if ( evaluator.recordAsPause() ) {
+                addToMap(i, Likelihood.LIKELY, SentenceEntryType.PAUSE, null);
+              }
             }
           } else {
             addToMap(i, Likelihood.LIKELY, SentenceEntryType.END, null);
@@ -470,8 +469,8 @@ public class TextParser {
             }
           }
           
-          if ( ignoreStop ) {
-            ignoreStop = false;
+          if ( inHeading ) {
+            inHeading = false;
           }
         }
 
@@ -479,21 +478,25 @@ public class TextParser {
         // run a quick check to reduce the workload
         if ( !Character.isUpperCase(ch) ) {
           continue;
-        } else if ( (i > 0) && !Character.isWhitespace(buffer[i-1]) ) {
+        } else if ( (i > 0) && !Character.isWhitespace(buffer[i-1]) &&
+            !sentence_ends.contains(buffer[i-1]) ) {
+          // the setence_ends conditional is included for the case
+          // ...: "As ...
           continue;
         }
 
-        startOp = Sentence.isStart(buffer, i, ignoreStop);
+        startOp = Sentence.isStart(buffer, i, inHeading);
         if ( startOp != null ) {
           if ( !startOp.isStart() ) {
             evaluator = startOp.failedEvaluator();
             
-            if ( (evaluator != null) && evaluator.recordAsUnlikely() ) {
-              addToMap(i, Likelihood.UNLIKELY, SentenceEntryType.START, null);
-            }
-            
-            if ( evaluator instanceof HeadingEvaluator ) {
-              ignoreStop = true;
+            if ( evaluator != null ) { 
+              if ( evaluator instanceof HeadingEvaluator ) {
+                addToMap(i, Likelihood.LIKELY, SentenceEntryType.HEADING, null);
+                inHeading = true;
+              } else if ( evaluator.recordAsUnlikely() ) {
+                addToMap(i, Likelihood.UNLIKELY, SentenceEntryType.START, null);
+              }
             }
           } else {
             addToMap(i, Likelihood.LIKELY, SentenceEntryType.START, null);
@@ -536,7 +539,9 @@ public class TextParser {
       replace = true;
     }
 
-    if ( replace ) {
+    if ( replace || 
+        (type == SentenceEntryType.PAUSE) || 
+        (type == SentenceEntryType.HEADING) ) {
       entry = new SentenceMapEntry(likelihood, type, subtype);
       sentence_map[idx] = entry;
     }
@@ -655,7 +660,7 @@ public class TextParser {
     Vector<String> cleanwords = new Vector<String>();
     int p = 0;
     boolean skipMunge;
-    String tmpwd;
+    StringBuilder tmpwd;
     
     while ( p < words.size() ) {
       wd = words.get(p);
@@ -671,18 +676,18 @@ public class TextParser {
       if ( skipMunge ) {
         cleanwords.add(wd);
       } else {
-        tmpwd = wd;
+        tmpwd = new StringBuilder(wd);
         while ( p < words.size() ) {
           wd = words.get(p);
           if ( (wd.length() != 1) || sentence_ends.contains(wd.charAt(0)) || 
               !preserved_punctuation.contains(wd.charAt(0)) ) {
             break;
           } else {
-            tmpwd += wd;
+            tmpwd.append(wd);
             p++;
           }
         }
-        cleanwords.add(tmpwd);
+        cleanwords.add(tmpwd.toString());
       }
     }
     
@@ -793,6 +798,10 @@ public class TextParser {
     return(adjustment);
   }
   
+  // USED IN TESTING
+  public static void _setTextParserData(TextParserData data) {
+    parser_data = data;
+  }
   
   /**
    * An inner class to share <code>TextParser</code> data.
@@ -806,39 +815,78 @@ public class TextParser {
     /**
      * Copy of {@link TextParser#line_starts}
      */
-    protected static HashSet<Integer> line_starts;
+    protected HashSet<Integer> line_starts;
 
-    protected static SentenceMapEntry[] sentence_map;
+    protected SentenceMapEntry[] sentence_map;
     
-    protected static int avg_line_char_ct = -1;
+    protected int avg_line_char_ct = -1;
     
     /**
      * Private constructor.
      */
-    private TextParserData() { }
+    public TextParserData() { }
 
-    
-    // USED ONLY IN DEBUGGING
-    public static void setTextParserData(HashSet<Integer> lineStarts,
+    public void setTextParserData(HashSet<Integer> lineStarts,
         SentenceMapEntry[] sentenceMap, int avgLineCharCt) {
       line_starts = lineStarts;
       sentence_map = sentenceMap;
       avg_line_char_ct = avgLineCharCt;
     }
     
-    public static boolean containsLineStart(int idx) {
+    public boolean containsLineStart(int idx) {
       if ( line_starts == null ) {
-        throw new NullPointerException("TextParserData not initialized correctly");
+        throw new NullPointerException("TextParserData (line_starts) not initialized correctly");
       }
       
       return( line_starts.contains(idx) );
     }
     
-    public static int findPreviousMapEnd(int idx) {
+    public boolean containsHeading(int idx) {
       if ( sentence_map == null ) {
-        throw new NullPointerException("TextParserData not initialized correctly");
+        throw new NullPointerException("TextParserData (sentence_map) not initialized correctly");
+      } else if ( line_starts == null ) {
+        throw new NullPointerException("TextParserData (line_starts) not initialized correctly");
       }
       
+      int i = idx-1;
+      if ( i < 0 ) {
+        return(false);
+      }
+      
+      SentenceMapEntry entry;
+      SentenceEntryType type;
+
+      while ( i > 0 ) {
+        entry = sentence_map[i];
+
+        if ( line_starts.contains(i) ) {
+          if ( (entry != null) && (entry.type() == SentenceEntryType.HEADING) ) {
+            return(true);
+          }
+          return(false);
+        } 
+
+        if ( entry == null ) {
+          i--;
+          continue;
+        } 
+        
+        type = entry.type();
+        if ( type == SentenceEntryType.HEADING ) {
+          return(true);
+        }
+        
+        return(false);
+      }
+      
+      return(false);
+    }
+    
+    public int findPreviousPause(int idx) {
+      if ( sentence_map == null ) {
+        throw new NullPointerException("TextParserData (sentence_map) not initialized correctly");
+      }
+
       int i = idx-1;
       if ( i < 0 ) {
         return(-1);
@@ -854,8 +902,9 @@ public class TextParser {
           continue;
         }
         
-        if ( (entry.type() == SentenceEntryType.END) &&
-             (entry.likelihood() == Likelihood.LIKELY) ) {
+        if ( entry.likelihood() == Likelihood.LIKELY &&
+            ((entry.type() == SentenceEntryType.END) ||
+             (entry.type() == SentenceEntryType.PAUSE)) ) {
           endIdx = i;
           break;
         }
@@ -864,8 +913,70 @@ public class TextParser {
       
       return(endIdx);
     }
+    
+    public int findPreviousLikelyEnd(int idx) {
+      if ( sentence_map == null ) {
+        throw new NullPointerException("TextParserData (sentence_map) not initialized correctly");
+      }
 
-    public static int avgLineCharCt() {
+      int i = idx-1;
+      if ( i < 0 ) {
+        return(-1);
+      }
+      
+      SentenceMapEntry entry;
+      int endIdx = -1;
+      
+      while ( i > 0 ) {
+        entry = sentence_map[i];
+        if ( entry == null ) {
+          i--;
+          continue;
+        }
+        
+        if ( (entry.likelihood() == Likelihood.LIKELY) &&
+             (entry.type() == SentenceEntryType.END) ) {
+          endIdx = i;
+          break;
+        }
+        i--;
+      }
+      
+      return(endIdx);
+    }
+    
+    public int findPreviousUnlikelyEnd(int idx) {
+      if ( sentence_map == null ) {
+        throw new NullPointerException("TextParserData (sentence_map) not initialized correctly");
+      }
+
+      int i = idx-1;
+      if ( i < 0 ) {
+        return(-1);
+      }
+
+      SentenceMapEntry entry;
+      int endIdx = -1;
+      
+      while ( i > 0 ) {
+        entry = sentence_map[i];
+        if ( entry == null ) {
+          i--;
+          continue;
+        }
+
+        if ( (entry.type() == SentenceEntryType.END) &&
+             (entry.likelihood() == Likelihood.UNLIKELY) ) {
+          endIdx = i;
+          break;
+        }
+        i--;
+      }
+
+      return(endIdx);
+    }
+
+    public int avgLineCharCt() {
       return(avg_line_char_ct);
     }
   }

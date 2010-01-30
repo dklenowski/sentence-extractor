@@ -33,11 +33,6 @@ import com.orbious.extractor.util.Helper;
 public class AbbreviatedName extends Evaluator {
   
   /**
-   * Debugging string.
-   */
-  private String debugStr;
-  
-  /**
    * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
    */
   public AbbreviatedName(EvaluatorType type) {
@@ -48,9 +43,8 @@ public class AbbreviatedName extends Evaluator {
     return(true);
   }
   
-  // DEBUGGIN ONLY 
-  public String debugStr() { 
-    return(debugStr);
+  public boolean recordAsPause() {
+    return(false);
   }
 
   /**
@@ -73,11 +67,11 @@ public class AbbreviatedName extends Evaluator {
       return(false);
     }
 
-    debugStr = "";
+    debug_str.setLength(0);
     b = evaluateLeftToRight(buf, idx);
     if ( b ) {
-      if ( logger.isDebugEnabled() && (debugStr.length() != 0) ) {
-        logger.debug("AbbreviatedName:" + debugStr + 
+      if ( logger.isDebugEnabled() && (debug_str.length() != 0) ) {
+        logger.debug(debug_str + 
             " RESULT=" + String.valueOf(b).toUpperCase());
       }
       return(b);
@@ -85,8 +79,8 @@ public class AbbreviatedName extends Evaluator {
     
     b = evaluateRightToLeft(buf, idx);
     
-    if ( logger.isDebugEnabled() && (debugStr.length() != 0) ) {
-      logger.debug("AbbreviatedName:" + debugStr + 
+    if ( logger.isDebugEnabled() && (debug_str.length() != 0) ) {
+      logger.debug(debug_str + 
           " RESULT=" + String.valueOf(b).toUpperCase());
     }
     
@@ -114,7 +108,7 @@ public class AbbreviatedName extends Evaluator {
     int i;
     
     if ( logger.isDebugEnabled() ) {
-      debugStr += "LtoR: ";
+      debug_str.append("LtoR: ");
     }
     
     if ( Character.isUpperCase(buf[idx]) ) {
@@ -129,7 +123,7 @@ public class AbbreviatedName extends Evaluator {
         i = checkCase(buf, idx, ParseDirn.RIGHT);
         if ( i == -1 ) {
           if ( logger.isDebugEnabled() ) {
-            debugStr += "Case 1-Failed Checkcase, ";
+            debug_str.append("Case 1-Failed Checkcase, ");
           }
           return(false);
         } 
@@ -137,13 +131,13 @@ public class AbbreviatedName extends Evaluator {
         i = Helper.moveToNonWhitespace(ParseDirn.RIGHT, buf, i+1);
         if ( (i != -1) && Character.isUpperCase(buf[i]) ) {
           if ( logger.isDebugEnabled() ) {
-            debugStr += "Case 1-TRUE, ";
+            debug_str.append("Case 1-TRUE, ");
           }
           return(true);
         }
 
         if ( logger.isDebugEnabled() ) {
-          debugStr += "Case 1-Default FALSE, ";
+          debug_str.append("Case 1-Default FALSE, ");
         }
         return(false);
         
@@ -154,7 +148,7 @@ public class AbbreviatedName extends Evaluator {
         i = Helper.moveToNonWhitespace(ParseDirn.LEFT, buf, idx-1);
         if ( i == -1 ) {
           if ( logger.isDebugEnabled() ) {
-            debugStr += "Case 3-Failed move left, ";
+            debug_str.append("Case 3-Failed move left, ");
           }
           return(false);
         } 
@@ -162,20 +156,20 @@ public class AbbreviatedName extends Evaluator {
         i = checkCase(buf, idx, ParseDirn.LEFT);
         if ( i == -1 ) {
           if ( logger.isDebugEnabled() ) {
-            debugStr += "Case 1-Failed Checkcase, ";
+            debug_str.append("Case 1-Failed Checkcase, ");
           }
           return(false);
         } 
         
         if ( logger.isDebugEnabled() ) {
-          debugStr += "Case 3-TRUE, ";
+          debug_str.append("Case 3-TRUE, ");
         }
         return(true);
         
         
       } else {
         if ( logger.isDebugEnabled() ) {
-          debugStr += "Case 1,3-Default FALSE, ";
+          debug_str.append("Case 1,3-Default FALSE, ");
         }
         return(false);
       }
@@ -187,7 +181,7 @@ public class AbbreviatedName extends Evaluator {
       i = checkCase(buf, idx, ParseDirn.LEFT);
       if ( i == -1 ) {
         if ( logger.isDebugEnabled() ) {
-          debugStr += "Case 2-Failed Checkcase, ";
+          debug_str.append("Case 2-Failed Checkcase, ");
         }
         return(false);
       }  
@@ -195,19 +189,19 @@ public class AbbreviatedName extends Evaluator {
       i = Helper.moveToNonWhitespace(ParseDirn.RIGHT, buf, idx+1);
       if ( (i != -1) && Character.isUpperCase(buf[i]) ) {
         if ( logger.isDebugEnabled() ) {
-          debugStr += "Case 2-TRUE, ";
+          debug_str.append("Case 2-TRUE, ");
         }
         return(true);
       }
 
       if ( logger.isDebugEnabled() ) {
-        debugStr += "Case 2-Default FALSE, ";
+        debug_str.append("Case 2-Default FALSE, ");
       }
       return(false);
     }
     
     if ( logger.isDebugEnabled() ) {
-      debugStr += "Default FALSE, ";
+      debug_str.append("Default FALSE, ");
     }
     return(false);
   }
@@ -234,7 +228,7 @@ public class AbbreviatedName extends Evaluator {
     WordOp op;
     
     if ( logger.isDebugEnabled() ) {
-      debugStr += "RtoL: ";
+      debug_str.append("RtoL: ");
     }
     
     if ( Character.isUpperCase(buf[idx]) ) {
@@ -249,7 +243,7 @@ public class AbbreviatedName extends Evaluator {
         i = checkCase(buf, idx, ParseDirn.RIGHT);
         if ( i == -1 ) {
           if ( logger.isDebugEnabled() ) {
-            debugStr += "Case 2-Failed Checkcase, ";
+            debug_str.append("Case 2-Failed Checkcase, ");
           }
           return(false);
         }
@@ -258,14 +252,14 @@ public class AbbreviatedName extends Evaluator {
         
         if ( (op == null) || (op.word().length() == 0) ) {
           if ( logger.isDebugEnabled() ) {
-            debugStr += "Case 2-Failed Word, ";
+            debug_str.append("Case 2-Failed Word, ");
           }
           return(true);
         }
 
         if ( Character.isUpperCase(op.word().charAt(0)) ) {
           if ( logger.isDebugEnabled() ) {
-            debugStr += "Case 2-TRUE, ";
+            debug_str.append("Case 2-TRUE, ");
           }
           return(true);
         }
@@ -282,7 +276,7 @@ public class AbbreviatedName extends Evaluator {
         i = Helper.moveToNonWhitespace(ParseDirn.RIGHT, buf, i);
         if ( i == -1 ) {
           if ( logger.isDebugEnabled() ) {
-            debugStr += "Case 1-Failed Move, ";
+            debug_str.append("Case 1-Failed Move, ");
           }
           return(false);
         }
@@ -290,13 +284,13 @@ public class AbbreviatedName extends Evaluator {
         i = checkCase(buf, i, ParseDirn.RIGHT);
         if ( i == -1 ) {
           if ( logger.isDebugEnabled() ) {
-            debugStr += "Case 1-Failed Checkcase, ";
+            debug_str.append("Case 1-Failed Checkcase, ");
           }
           return(false);
         }
         
         if ( logger.isDebugEnabled() ) {
-          debugStr += "Case 1-TRUE, ";
+          debug_str.append("Case 1-TRUE, ");
         }
         return(true);
       }
@@ -308,7 +302,7 @@ public class AbbreviatedName extends Evaluator {
       i = checkCase(buf, idx, ParseDirn.LEFT);
       if ( i == -1 ) {
         if ( logger.isDebugEnabled() ) {
-          debugStr += "Case 3-Failed Checkcase, ";
+          debug_str.append("Case 3-Failed Checkcase, ");
         }
         return(false);
       }
@@ -317,21 +311,21 @@ public class AbbreviatedName extends Evaluator {
 
       if ( (op == null) || (op.word().length() == 0) ) {
         if ( logger.isDebugEnabled() ) {
-          debugStr += "Case 3-Failed Word, ";
+          debug_str.append("Case 3-Failed Word, ");
         }
         return(true);
       }
 
       if ( Character.isUpperCase(op.word().charAt(0)) ) {
         if ( logger.isDebugEnabled() ) {
-          debugStr += "Case 3-TRUE, ";
+          debug_str.append("Case 3-TRUE, ");
         }
         return(true);
       }
     }
     
     if ( logger.isDebugEnabled() ) {
-      debugStr += "Default FALSE, ";
+      debug_str.append("Default FALSE, ");
     }
     return(false);
   }

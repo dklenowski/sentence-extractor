@@ -4,7 +4,6 @@ import java.util.HashSet;
 
 import com.orbious.extractor.Config;
 import com.orbious.extractor.TextParser;
-import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.util.Helper;
 
 /**
@@ -23,17 +22,24 @@ public class NumberedHeading extends Evaluator {
    */
   private static HashSet< Character > roman_numerals;
   
+  static {
+    roman_numerals = Helper.cvtStringToHashSet(Config.ROMAN_NUMERALS.asStr());    
+  }
+  
   /**
    * Constructor, sets the name of this <code>Evaluator</code>
    * and initializes {@link NumberedHeading#roman_numerals} 
    */
   public NumberedHeading(EvaluatorType type) {
     super("NumberedHeading", type);
-    roman_numerals = Helper.cvtStringToHashSet(Config.ROMAN_NUMERALS.asStr());
   }
   
   public boolean recordAsUnlikely() {
     return(false);
+  }
+  
+  public boolean recordAsPause() {
+    return(true);
   }
   
   /**
@@ -103,7 +109,7 @@ public class NumberedHeading extends Evaluator {
       firstIdx = 0;
     }
       
-    if ( !hasNonNumber && TextParserData.containsLineStart(firstIdx) ) {
+    if ( !hasNonNumber && TextParser.parserData().containsLineStart(firstIdx) ) {
       fnd = true;
     }
     
@@ -160,7 +166,7 @@ public class NumberedHeading extends Evaluator {
       firstIdx = 0;
     }
 
-    if ( !hasNonRoman && TextParserData.containsLineStart(firstIdx) ) {
+    if ( !hasNonRoman && TextParser.parserData().containsLineStart(firstIdx) ) {
       fnd = true;
     }
     

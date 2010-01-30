@@ -38,6 +38,10 @@ public class Name extends Evaluator {
     return(true);
   }
   
+  public boolean recordAsPause() {
+    return(false);
+  }
+  
   /**
    * Determines if the previous word from <code>idx</code>
    * in the buffer <code>buf</code> is a common name and therefore not a
@@ -54,11 +58,11 @@ public class Name extends Evaluator {
       idx--;
     }
     WordOp op = Word.getNextWord(buf, idx, false);
-    String wd = op.word();
-    
     if ( op == null ) {
       return(false);
     }
+    
+    String wd = op.word();
 
     if ( names == null ) {
       names = Helper.cvtFileToHashSet(Config.NAMES_FILENAME.asStr(), false);

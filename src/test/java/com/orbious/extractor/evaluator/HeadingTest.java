@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Vector;
 
 import com.orbious.AllExtractorTests;
+import com.orbious.extractor.SentenceMapEntry;
+import com.orbious.extractor.TextParser;
 import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
 
@@ -29,10 +31,7 @@ public class HeadingTest extends TestCase {
             "2. If the character is a sentence end (e.g. '.', '!' etc) run the End Evaluation Process." ));
  
     char[] buf = initTextParserData(data);
-    for ( int i = 0; i < buf.length; i++ ) {
-      System.out.println(i + "=" + buf[i]);
-    }
-    
+
     HeadingEvaluator evaluator = new HeadingEvaluator(EvaluatorType.START);
     boolean ret;
     try {
@@ -60,8 +59,6 @@ public class HeadingTest extends TestCase {
       charCt += data.get(i).length();
     }
     
-    TextParserData.setTextParserData( lineStarts, null, (charCt/data.size()) );
-    
     char[] buffer;
     char[] buf;
     int pos;
@@ -73,6 +70,12 @@ public class HeadingTest extends TestCase {
       System.arraycopy(buf, 0, buffer, pos, buf.length);
       pos += buf.length;
     }
+    
+    
+    TextParserData parserData = new TextParserData();
+    parserData.setTextParserData(lineStarts, new SentenceMapEntry[buffer.length], 
+        (charCt/data.size()));
+    TextParser._setTextParserData(parserData);
     
     return(buffer);
   }

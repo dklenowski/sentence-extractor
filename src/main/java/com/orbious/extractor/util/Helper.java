@@ -54,13 +54,13 @@ public class Helper {
    */
 
   public static String getDebugStringFromCharBuf(char[] buf, int idx, int size) {
-    String str;
-    String id;
+    StringBuilder str;
+    StringBuilder id;
     int start;
     int end;
 
-    str = "";
-    id = "";
+    str = new StringBuilder();
+    id = new StringBuilder();
 
     start = idx-(size/2);
     if ( start < 0 ) {
@@ -74,11 +74,11 @@ public class Helper {
     }
     
     for ( int i = start; i < end; i++ ) {
-      str += buf[i];
+      str.append(buf[i]);
       if ( i == idx ) {
-        id += "|";
+        id.append("|");
       } else {
-        id += "-";
+        id.append("-");
       }
     }
 
@@ -104,19 +104,18 @@ public class Helper {
    */
   public static String getDebugStringFromCharBuf(final char[] buf,
       int idx, int size, int width) { 
-    String str;
+    StringBuilder sb;
     int modct;
     int start;
     int end;
     int lineCt;
     
+    sb = new StringBuilder();
     lineCt = 0;
     if ( width != -1 ) {
-      str = String.format("%5s :", lineCt);
+      sb.append(String.format("%5s :", lineCt));
       lineCt++;
-    } else {
-      str = "";
-    }
+    } 
     modct = 1;
     
     start = idx-(size/2);
@@ -131,17 +130,17 @@ public class Helper {
     }
  
     for ( int i = start; i < end; i++ ) {
-      str += buf[i];
+      sb.append(buf[i]);
       
       if ( (width != -1) && (modct % width == 0) ) {
-        str += "\n"  + String.format("%5s :", lineCt);
+        sb.append("\n"  + String.format("%5s :", lineCt));
         lineCt++;
       }
       modct++;
     }
     
-    str += "\n";
-    return(str);        
+    sb.append("\n");
+    return(sb.toString());        
   }
   
   /**
@@ -162,19 +161,18 @@ public class Helper {
    */
   public static String getDebugStringFromBoolBuf(final char[] template, 
       final boolean[] buf, int idx, int size, int width) { 
-    String str;
+    StringBuilder sb;
     int modct;
     int start;
     int end;
     int lineCt;
     
+    sb = new StringBuilder();
     lineCt = 0;
     if ( width != -1 ) {
-      str = String.format("%5s :", lineCt);
+      sb.append(String.format("%5s :", lineCt));
       lineCt++;
-    } else {
-      str = "";
-    }
+    } 
     modct = 1;
     
     start = idx-(size/2);
@@ -190,24 +188,24 @@ public class Helper {
  
     for ( int i = start; i < end; i++ ) {
       if ( Character.isWhitespace(template[i]) ) {
-        str += " ";
+        sb.append(" ");
       } else {
         if ( buf[i] ) {
-          str += ".";
+          sb.append(".");
         } else {
-          str += "+";
+          sb.append("+");
         }
       }
       
       if ( (width != -1) && (modct % width == 0) ) {
-        str += "\n" + String.format("%5s :", lineCt);
+        sb.append("\n" + String.format("%5s :", lineCt));
         lineCt++;
       }
       modct++;
     }
     
-    str += "\n";
-    return(str);    
+    sb.append("\n");
+    return(sb.toString());    
   }
   
   /**
@@ -227,20 +225,21 @@ public class Helper {
    */
   public static String getDebugStringFromSentenceMap(final char[] template,
       final SentenceMapEntry[] buf, int idx, int size, int width) { 
-    String str;
+    StringBuilder sb;
     int modct;
     SentenceMapEntry entry;
+    SentenceEntryType type;
+    SentenceEntrySubType subtype;
     int start;
     int end;
     int lineCt;
     
+    sb = new StringBuilder();
     lineCt = 0;
     if ( width != -1 ) {
-      str = String.format("%5s :", lineCt);
+      sb.append(String.format("%5s :", lineCt));
       lineCt++;
-    } else {
-      str = "";
-    }
+    } 
     modct = 1;
     
     start = idx-(size/2);
@@ -260,48 +259,59 @@ public class Helper {
     // s - Likely start from end
     // S - likely start
     // u - unlikely start
+    // P - pause
+    // H - Heading
     for ( int i = start; i < end; i++ ) {
       if ( Character.isWhitespace(template[i]) ) {
-        str += " ";
+        sb.append(" ");
       } else {
         entry = buf[i];
         if ( entry == null ) {
-          str += ".";
-        } else if ( entry.type() == SentenceEntryType.END ) {
-          if ( entry.subtype() == SentenceEntrySubType.END_FROM_START ) {
-            // this is always likely
-            str += "e";
-          } else {
-            // 
-            if ( entry.likelihood() == Likelihood.LIKELY ) {
-              str += "E";
+          sb.append(".");
+        } else {
+          type = entry.type();
+          subtype = entry.subtype();
+          
+          if ( type == SentenceEntryType.PAUSE ) {
+            sb.append("P");
+          } else if ( type == SentenceEntryType.HEADING ) {
+            sb.append("H");
+          } else if ( type == SentenceEntryType.END ) {
+            if ( subtype == SentenceEntrySubType.END_FROM_START ) {
+              // this is always likely
+              sb.append("e");
             } else {
-              str += "U";
+              // 
+              if ( entry.likelihood() == Likelihood.LIKELY ) {
+                sb.append("E");
+              } else {
+                sb.append("U");
+              }
             }
-          }
-        } else if ( entry.type() == SentenceEntryType.START ) {
-          if ( entry.subtype() == SentenceEntrySubType.START_FROM_END ) {
-            // always likely 
-            str += "s";
-          } else {
-            if ( entry.likelihood() == Likelihood.LIKELY ) {
-              str += "S";
+          } else if ( type == SentenceEntryType.START ) {
+            if ( subtype == SentenceEntrySubType.START_FROM_END ) {
+              // always likely 
+              sb.append("s");
             } else {
-              str += "n";
+              if ( entry.likelihood() == Likelihood.LIKELY ) {
+                sb.append("S");
+              } else {
+                sb.append("n");
+              }
             }
-          }
+          } 
         }
       }
       
       if ( (width != -1) && (modct % width == 0) ) {
-        str += "\n" + String.format("%5s :", lineCt);
+        sb.append("\n" + String.format("%5s :", lineCt));
         lineCt++;
       }
       modct++;
     }
     
-    str += "\n";
-    return(str);
+    sb.append("\n");
+    return(sb.toString());
   }
   
   /**
@@ -369,6 +379,10 @@ public class Helper {
           Config.NAMES_FILENAME, ioe);
     }
     
+    try {
+      br.close();
+    } catch ( IOException ioe ) { } 
+    
     logger.info("Extracted " + hs.size() + " entries from " + filename);
     return(hs);
   }
@@ -384,18 +398,17 @@ public class Helper {
    */
   
   public static String cvtVectorToString(Vector<String> words) {
-    String str = "";
+    StringBuilder sb;
 
+    sb = new StringBuilder();
     for ( int i = 0; i < words.size(); i++ ) {
+      sb.append(words.get(i));
       if ( i+1 < words.size() ) {
-        str += words.get(i) + " ";
-      } else {
-        str += words.get(i);
-      }
+        sb.append(" ");
+      } 
     }
 
-    str += "";
-    return(str);
+    return(sb.toString());
   }
   
   /**

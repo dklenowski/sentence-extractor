@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import com.orbious.AllExtractorTests;
+import com.orbious.extractor.TextParser;
 import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
 
@@ -76,6 +77,8 @@ public class NumberedHeadingTest extends TestCase {
       lineStarts.add(list.get(i));
     }
     
-    TextParserData.setTextParserData(lineStarts, null, -1);
+    TextParserData parserData = new TextParserData();
+    parserData.setTextParserData(lineStarts, null, -1);
+    TextParser._setTextParserData(parserData);
   }
 }

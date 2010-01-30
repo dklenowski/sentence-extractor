@@ -2,8 +2,13 @@ package com.orbious.extractor;
 
 // $Id: SentenceTest.java 14 2009-12-06 10:03:53Z app $
 
+import java.util.HashSet;
 import com.orbious.AllExtractorTests;
 import com.orbious.extractor.Sentence.StartOp;
+import com.orbious.extractor.SentenceMapEntry.Likelihood;
+import com.orbious.extractor.SentenceMapEntry.SentenceEntryType;
+import com.orbious.extractor.TextParser.TextParserData;
+
 import junit.framework.TestCase;
 
 /**
@@ -34,7 +39,7 @@ public class SentenceTest extends TestCase {
     str = "fantastic. The";
     buf = str.toCharArray();
     
-    assertEquals(true, Sentence.isEnd(buf, 9).isEnd());
+    assertTrue(Sentence.isEnd(buf, 9).isEnd());
   }
 
   public void test_isEndWithPunct() {
@@ -44,8 +49,8 @@ public class SentenceTest extends TestCase {
     str = "hope\". Too";
     buf = str.toCharArray();
  
-    assertEquals(false, Sentence.isEnd(buf, 4).isEnd());    
-    assertEquals(true, Sentence.isEnd(buf, 5).isEnd()); 
+    assertNull(Sentence.isEnd(buf, 4));    
+    assertTrue(Sentence.isEnd(buf, 5).isEnd()); 
   }
 
   public void test_isEndWithNoCapEnd() {
@@ -55,7 +60,7 @@ public class SentenceTest extends TestCase {
     str = "Mr. wiggles";
     buf = str.toCharArray();
     
-    assertEquals(false, Sentence.isEnd(buf, 2).isEnd());    
+    assertFalse(Sentence.isEnd(buf, 2).isEnd());    
   }
   
   //
@@ -69,7 +74,7 @@ public class SentenceTest extends TestCase {
     str = "fantastic. The";
     buf = str.toCharArray();
     
-    assertEquals(false, Sentence.hasLaterEnd(buf, 9));  
+    assertFalse(Sentence.hasLaterEnd(buf, 9));  
   }
 
   public void test_hasLaterPunctuationPunct() {
@@ -79,8 +84,8 @@ public class SentenceTest extends TestCase {
     str = "google.com..";
     buf = str.toCharArray();
 
-    assertEquals(true, Sentence.hasLaterEnd(buf, 10)); 
-    assertEquals(false, Sentence.hasLaterEnd(buf, 11));      
+    assertTrue(Sentence.hasLaterEnd(buf, 10)); 
+    assertFalse(Sentence.hasLaterEnd(buf, 11));      
   }
   
   public void test_hasLaterPunctuationPunct2() {
@@ -90,8 +95,8 @@ public class SentenceTest extends TestCase {
     str = "google.com. .";
     buf = str.toCharArray();
 
-    assertEquals(true, Sentence.hasLaterEnd(buf, 10));  
-    assertEquals(false, Sentence.hasLaterEnd(buf, 12));  
+    assertTrue(Sentence.hasLaterEnd(buf, 10));  
+    assertFalse(Sentence.hasLaterEnd(buf, 12));  
   }
 
   public void test_hasPunctuationLaterPunctWithLetters() {
@@ -101,7 +106,7 @@ public class SentenceTest extends TestCase {
     str = "google.com. and";
     buf = str.toCharArray();
 
-    assertEquals(false, Sentence.hasLaterEnd(buf, 10));   
+    assertFalse(Sentence.hasLaterEnd(buf, 10));   
   }
   
   //
@@ -154,12 +159,7 @@ public class SentenceTest extends TestCase {
     
     str = "Process. 2. The";
     buf = str.toCharArray();
-    
-    for ( int i = 0; i < buf.length; i++ ) {
-      System.out.println(i + "=" + buf[i]);
-    }
     assertEquals(12, Sentence.hasUpper(buf, 7));
-   
   }
   
   //
@@ -169,19 +169,35 @@ public class SentenceTest extends TestCase {
   public void test_isStartBasic() { 
     String str;
     char[] buf;
-
+    SentenceMapEntry[] map;
+    
     str = "sample. The";
     buf = str.toCharArray();
 
-    assertEquals(true, Sentence.isStart(buf, 8, false).isStart());    
+    map = new SentenceMapEntry[buf.length];
+    map[6] = new SentenceMapEntry(Likelihood.LIKELY, SentenceEntryType.END);
+
+    TextParserData parserData = new TextParserData();
+    parserData.setTextParserData(new HashSet<Integer>(), map, -1);
+    TextParser._setTextParserData(parserData);
+    
+    assertTrue(Sentence.isStart(buf, 8, false).isStart());    
   }
   
   public void test_isStartWithPunct() { 
     String str;
     char[] buf;
-    
+    SentenceMapEntry[] map;
+
     str = "Mr. McGoo";
     buf = str.toCharArray();
+    
+    map = new SentenceMapEntry[buf.length];
+    map[2] = new SentenceMapEntry(Likelihood.UNLIKELY, SentenceEntryType.END);
+
+    TextParserData parserData = new TextParserData();
+    parserData.setTextParserData(new HashSet<Integer>(), map, -1);
+    TextParser._setTextParserData(parserData);
 
     StartOp op = Sentence.isStart(buf, 4, false);
     assertEquals(false, op.isStart());    

@@ -3,6 +3,8 @@ package com.orbious.extractor.evaluator;
 // $Id$
 
 import com.orbious.extractor.Config;
+import com.orbious.extractor.TextParser.TextParserData;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -48,7 +50,7 @@ public class Acronym extends Evaluator {
   /**
    * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
    */
-  public Acronym(EvaluatorType type) {
+  public Acronym(TextParserData parserData, EvaluatorType type) {
     super("Acronym", type);
   }
 

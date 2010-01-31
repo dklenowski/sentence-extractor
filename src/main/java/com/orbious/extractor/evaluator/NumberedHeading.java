@@ -1,9 +1,8 @@
 package com.orbious.extractor.evaluator;
 
 import java.util.HashSet;
-
 import com.orbious.extractor.Config;
-import com.orbious.extractor.TextParser;
+import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.util.Helper;
 
 /**
@@ -30,8 +29,8 @@ public class NumberedHeading extends Evaluator {
    * Constructor, sets the name of this <code>Evaluator</code>
    * and initializes {@link NumberedHeading#roman_numerals} 
    */
-  public NumberedHeading(EvaluatorType type) {
-    super("NumberedHeading", type);
+  public NumberedHeading(TextParserData parserData, EvaluatorType type) {
+    super("NumberedHeading", parserData, type);
   }
   
   public boolean recordAsUnlikely() {
@@ -109,7 +108,7 @@ public class NumberedHeading extends Evaluator {
       firstIdx = 0;
     }
       
-    if ( !hasNonNumber && TextParser.parserData().containsLineStart(firstIdx) ) {
+    if ( !hasNonNumber && parser_data.containsLineStart(firstIdx) ) {
       fnd = true;
     }
     
@@ -166,7 +165,7 @@ public class NumberedHeading extends Evaluator {
       firstIdx = 0;
     }
 
-    if ( !hasNonRoman && TextParser.parserData().containsLineStart(firstIdx) ) {
+    if ( !hasNonRoman && parser_data.containsLineStart(firstIdx) ) {
       fnd = true;
     }
     

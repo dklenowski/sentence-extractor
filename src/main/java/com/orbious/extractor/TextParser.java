@@ -15,7 +15,7 @@ import com.orbious.extractor.SentenceMapEntry.Likelihood;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntrySubType;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntryType;
 import com.orbious.extractor.evaluator.Evaluator;
-import com.orbious.extractor.evaluator.HeadingEvaluator;
+import com.orbious.extractor.evaluator.Heading;
 import com.orbious.extractor.evaluator.UrlText;
 import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
 import com.orbious.extractor.util.Helper;
@@ -98,7 +98,7 @@ public class TextParser {
   /**
    * 
    */
-  private static TextParserData parser_data;
+  private TextParserData parser_data;
   
   /**
    * The most recent sentence start index found in <code>buffer</code>.
@@ -132,6 +132,8 @@ public class TextParser {
    */
   public TextParser(String filename) {
     this.filename = filename;
+    parser_data = new TextParserData();
+    
     logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
     
     sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
@@ -141,10 +143,6 @@ public class TextParser {
     
     left_punctuation_marks = Helper.cvtStringToHashSet(Config.LEFT_PUNCTUATION_MARKS.asStr());
     right_punctuation_marks = Helper.cvtStringToHashSet(Config.RIGHT_PUNCTUATION_MARKS.asStr());
-  }
-  
-  public static TextParserData parserData() {
-    return(parser_data);
   }
 
   // SHOULD REALLY ONLY BE USED IN TESTING
@@ -249,8 +247,6 @@ public class TextParser {
     }
     
     sentence_map = new SentenceMapEntry[buffer.length];
-    
-    parser_data = new TextParserData();
     parser_data.setTextParserData(line_starts, sentence_map, (len/lineCt));
     
     if ( logger.isInfoEnabled() ) {
@@ -441,14 +437,16 @@ public class TextParser {
     StartOp startOp;
     boolean inHeading;
     Evaluator evaluator;
+    Sentence sentence;
     
     inHeading = false;
+    sentence = new Sentence(parser_data);
     
     for ( int i = 0; i < buffer.length; i++ ) {
       ch = buffer[i];
       
       if ( sentence_ends.contains(ch) ) {
-        endOp = Sentence.isEnd(buffer, i);
+        endOp = sentence.isEnd(buffer, i);
         if ( endOp != null ) {
           if ( !endOp.isEnd() ) {
             evaluator = endOp.failedEvaluator();
@@ -485,13 +483,13 @@ public class TextParser {
           continue;
         }
 
-        startOp = Sentence.isStart(buffer, i, inHeading);
+        startOp = sentence.isStart(buffer, i, inHeading);
         if ( startOp != null ) {
           if ( !startOp.isStart() ) {
             evaluator = startOp.failedEvaluator();
             
             if ( evaluator != null ) { 
-              if ( evaluator instanceof HeadingEvaluator ) {
+              if ( evaluator instanceof Heading ) {
                 addToMap(i, Likelihood.LIKELY, SentenceEntryType.HEADING, null);
                 inHeading = true;
               } else if ( evaluator.recordAsUnlikely() ) {
@@ -617,7 +615,7 @@ public class TextParser {
             if ( inner_punctuation.contains(ch) ) {
               // punctuation attached to the word.
               wd += ch;
-            } else if ( (ch == '.') && new UrlText(EvaluatorType.END).evaluate(buffer, i) ) {
+            } else if ( (ch == '.') && new UrlText(parser_data, EvaluatorType.END).evaluate(buffer, i) ) {
               // web address 
               wd += ch;
             } else if ( (ch == ',') && Helper.isPreviousNumber(buffer, i) &&
@@ -796,11 +794,6 @@ public class TextParser {
     }
     
     return(adjustment);
-  }
-  
-  // USED IN TESTING
-  public static void _setTextParserData(TextParserData data) {
-    parser_data = data;
   }
   
   /**

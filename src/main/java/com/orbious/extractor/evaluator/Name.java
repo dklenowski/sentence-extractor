@@ -4,6 +4,7 @@ package com.orbious.extractor.evaluator;
 
 import com.orbious.extractor.Config;
 import com.orbious.extractor.Word;
+import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.Word.WordOp;
 import com.orbious.extractor.util.Helper;
 
@@ -30,7 +31,7 @@ public class Name extends Evaluator {
   /**
    * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
    */
-  public Name(EvaluatorType type) {
+  public Name(TextParserData parserData, EvaluatorType type) {
     super("Name", type);
   }
 

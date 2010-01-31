@@ -2,7 +2,7 @@ package com.orbious.extractor.evaluator;
 
 import java.util.HashSet;
 import com.orbious.extractor.Config;
-import com.orbious.extractor.TextParser;
+import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.util.Helper;
 
 public class InsideLeftRightMarks extends Evaluator {
@@ -17,8 +17,8 @@ public class InsideLeftRightMarks extends Evaluator {
     sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());    
   }
   
-  public InsideLeftRightMarks(EvaluatorType type) {
-    super("InsideLeftRightMarks", type);
+  public InsideLeftRightMarks(TextParserData parserData, EvaluatorType type) {
+    super("InsideLeftRightMarks", parserData, type);
   }
 
   public boolean recordAsUnlikely() {
@@ -37,7 +37,7 @@ public class InsideLeftRightMarks extends Evaluator {
       return(false);
     }
     
-    startIdx = TextParser.parserData().findPreviousLikelyEnd(idx);
+    startIdx = parser_data.findPreviousLikelyEnd(idx);
     if ( startIdx == -1 ) {
       return(false);
     }

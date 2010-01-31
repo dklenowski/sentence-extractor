@@ -4,6 +4,7 @@ package com.orbious.extractor.evaluator;
 
 import org.apache.log4j.Logger;
 import com.orbious.extractor.Config;
+import com.orbious.extractor.TextParser.TextParserData;
 
 /**
  * A class that is sub-class for running evaluations on sentence start/ends.
@@ -31,6 +32,8 @@ public abstract class Evaluator {
    */
   protected EvaluatorType type;
   
+  protected TextParserData parser_data;
+  
   protected StringBuilder debug_str;
   
   /**
@@ -44,6 +47,13 @@ public abstract class Evaluator {
    * @param name    The name of this <code>Evaluator</code>, used in 
    *                debugging.
    */
+  public Evaluator(String name, TextParserData parserData, EvaluatorType type) {
+    this.name = name;
+    this.type = type;
+    this.parser_data = parserData;
+    debug_str = new StringBuilder();
+  }
+
   public Evaluator(String name, EvaluatorType type) {
     this.name = name;
     this.type = type;

@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.HashSet;
 import com.orbious.extractor.Config;
 import com.orbious.extractor.Word;
+import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.Word.WordOp;
 import com.orbious.extractor.util.Helper;
 
@@ -33,7 +34,7 @@ public class Suspension extends Evaluator {
   /**
    * Constructor, initializes the <code>Suspension</code> class.
    */
-  public Suspension(EvaluatorType type) {
+  public Suspension(TextParserData parserData, EvaluatorType type) {
     super("Suspension", type);
   }
   

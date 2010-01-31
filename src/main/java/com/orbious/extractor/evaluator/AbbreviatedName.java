@@ -2,6 +2,7 @@ package com.orbious.extractor.evaluator;
 
 import com.orbious.extractor.ParseDirn;
 import com.orbious.extractor.Word;
+import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.Word.WordOp;
 import com.orbious.extractor.util.Helper;
 
@@ -35,7 +36,7 @@ public class AbbreviatedName extends Evaluator {
   /**
    * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
    */
-  public AbbreviatedName(EvaluatorType type) {
+  public AbbreviatedName(TextParserData parserData, EvaluatorType type) {
     super("AbbreviatedName", type);
   }  
   

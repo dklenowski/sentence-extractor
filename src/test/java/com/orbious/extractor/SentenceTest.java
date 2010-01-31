@@ -19,13 +19,15 @@ import junit.framework.TestCase;
 
 public class SentenceTest extends TestCase {
   
+  private TextParserData parser_data;
+  
   public SentenceTest(String name) {
     super(name);
     AllExtractorTests.initLogger();
   }
 
   public void setUp() {
-    AllExtractorTests.initEmptyTextParserData();
+    parser_data = AllExtractorTests.initEmptyTextParserData();
   }
   
   //
@@ -35,32 +37,38 @@ public class SentenceTest extends TestCase {
   public void test_IsEndBasic() {
     String str;
     char[] buf;
-
+    Sentence sentence;
+    
     str = "fantastic. The";
     buf = str.toCharArray();
+    sentence = new Sentence(parser_data);
     
-    assertTrue(Sentence.isEnd(buf, 9).isEnd());
+    assertTrue(sentence.isEnd(buf, 9).isEnd());
   }
 
   public void test_isEndWithPunct() {
     String str;
     char[] buf;
-
+    Sentence sentence;
+    
     str = "hope\". Too";
     buf = str.toCharArray();
- 
-    assertNull(Sentence.isEnd(buf, 4));    
-    assertTrue(Sentence.isEnd(buf, 5).isEnd()); 
+    sentence = new Sentence(parser_data);
+    
+    assertNull(sentence.isEnd(buf, 4));    
+    assertTrue(sentence.isEnd(buf, 5).isEnd()); 
   }
 
   public void test_isEndWithNoCapEnd() {
     String str;
     char[] buf;
+    Sentence sentence;
    
     str = "Mr. wiggles";
     buf = str.toCharArray();
+    sentence = new Sentence(parser_data);
     
-    assertFalse(Sentence.isEnd(buf, 2).isEnd());    
+    assertFalse(sentence.isEnd(buf, 2).isEnd());    
   }
   
   //
@@ -70,43 +78,51 @@ public class SentenceTest extends TestCase {
   public void test_hasLaterPunctuationBasic() {
     String str;
     char[] buf;
+    Sentence sentence;
     
     str = "fantastic. The";
     buf = str.toCharArray();
+    sentence = new Sentence(parser_data);
     
-    assertFalse(Sentence.hasLaterEnd(buf, 9));  
+    assertFalse(sentence.hasLaterEnd(buf, 9));  
   }
 
   public void test_hasLaterPunctuationPunct() {
     String str;
     char[] buf;
+    Sentence sentence;
     
     str = "google.com..";
     buf = str.toCharArray();
-
-    assertTrue(Sentence.hasLaterEnd(buf, 10)); 
-    assertFalse(Sentence.hasLaterEnd(buf, 11));      
+    sentence = new Sentence(parser_data);
+    
+    assertTrue(sentence.hasLaterEnd(buf, 10)); 
+    assertFalse(sentence.hasLaterEnd(buf, 11));      
   }
   
   public void test_hasLaterPunctuationPunct2() {
     String str;
     char[] buf;
+    Sentence sentence;
     
     str = "google.com. .";
     buf = str.toCharArray();
-
-    assertTrue(Sentence.hasLaterEnd(buf, 10));  
-    assertFalse(Sentence.hasLaterEnd(buf, 12));  
+    sentence = new Sentence(parser_data);
+    
+    assertTrue(sentence.hasLaterEnd(buf, 10));  
+    assertFalse(sentence.hasLaterEnd(buf, 12));  
   }
 
   public void test_hasPunctuationLaterPunctWithLetters() {
     String str;
     char[] buf;
+    Sentence sentence;
     
     str = "google.com. and";
     buf = str.toCharArray();
-
-    assertFalse(Sentence.hasLaterEnd(buf, 10));   
+    sentence = new Sentence(parser_data);
+    
+    assertFalse(sentence.hasLaterEnd(buf, 10));   
   }
   
   //
@@ -116,50 +132,61 @@ public class SentenceTest extends TestCase {
   public void test_hasUpperBasic() {
   String str;
   char[] buf;
+  Sentence sentence;
 
   str = "fantastic. The";
   buf = str.toCharArray();
+  sentence = new Sentence(parser_data);
   
-  assertEquals(11, Sentence.hasUpper(buf, 9));
+  assertEquals(11, sentence.hasUpper(buf, 9));
   }
   
   public void test_hasUpperWithPunct() {
     String str;
     char[] buf;
+    Sentence sentence;
 
     str = "hope\". Too";
     buf = str.toCharArray();
+    sentence = new Sentence(parser_data);
 
-    assertEquals(7, Sentence.hasUpper(buf, 5));
+    assertEquals(7, sentence.hasUpper(buf, 5));
   }
 
   public void test_hasUpperWithNoCapEnd() {
     String str;
     char[] buf;
+    Sentence sentence;
 
     str = "Mr. wiggles";
     buf = str.toCharArray();
+    sentence = new Sentence(parser_data);
 
-    assertEquals(-2, Sentence.hasUpper(buf, 2));  
+    assertEquals(-2, sentence.hasUpper(buf, 2));  
   }
   
   public void test_hasUpperWithWhitespace() {
     String str;
     char[] buf;
+    Sentence sentence;
 
     str = "sample.    The";
     buf = str.toCharArray();
-
-    assertEquals(11, Sentence.hasUpper(buf, 6));    
+    sentence = new Sentence(parser_data);
+    
+    assertEquals(11, sentence.hasUpper(buf, 6));    
   }
   
   public void test_hasUpperList() {
     String str;
     char[] buf;
+    Sentence sentence;
     
     str = "Process. 2. The";
     buf = str.toCharArray();
-    assertEquals(12, Sentence.hasUpper(buf, 7));
+    sentence = new Sentence(parser_data);
+    
+    assertEquals(12, sentence.hasUpper(buf, 7));
   }
   
   //
@@ -170,6 +197,7 @@ public class SentenceTest extends TestCase {
     String str;
     char[] buf;
     SentenceMapEntry[] map;
+    Sentence sentence;
     
     str = "sample. The";
     buf = str.toCharArray();
@@ -179,16 +207,17 @@ public class SentenceTest extends TestCase {
 
     TextParserData parserData = new TextParserData();
     parserData.setTextParserData(new HashSet<Integer>(), map, -1);
-    TextParser._setTextParserData(parserData);
-    
-    assertTrue(Sentence.isStart(buf, 8, false).isStart());    
+
+    sentence = new Sentence(parserData);
+    assertTrue(sentence.isStart(buf, 8, false).isStart());    
   }
   
   public void test_isStartWithPunct() { 
     String str;
     char[] buf;
     SentenceMapEntry[] map;
-
+    Sentence sentence;
+    
     str = "Mr. McGoo";
     buf = str.toCharArray();
     
@@ -197,9 +226,10 @@ public class SentenceTest extends TestCase {
 
     TextParserData parserData = new TextParserData();
     parserData.setTextParserData(new HashSet<Integer>(), map, -1);
-    TextParser._setTextParserData(parserData);
+    
+    sentence = new Sentence(parserData);
 
-    StartOp op = Sentence.isStart(buf, 4, false);
+    StartOp op = sentence.isStart(buf, 4, false);
     assertEquals(false, op.isStart());    
   }
 }

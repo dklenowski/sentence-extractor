@@ -2,6 +2,7 @@ package com.orbious;
 
 // $Id: AllTests.java 14 2009-12-06 10:03:53Z app $
 
+import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -22,7 +23,6 @@ import com.orbious.extractor.evaluator.AcronymTest;
 import com.orbious.extractor.evaluator.UrlTextTest;
 import com.orbious.extractor.Config;
 import com.orbious.extractor.SentenceMapEntry;
-import com.orbious.extractor.TextParser;
 import com.orbious.extractor.TextParserTest;
 import com.orbious.extractor.WhitespaceRemoverTest;
 import com.orbious.extractor.WordTest;
@@ -74,11 +74,24 @@ public class AllExtractorTests {
       }
     }   
   }
-  
-  public static void initEmptyTextParserData() {
+
+  public static TextParserData initTextParserData(List<Integer> list,
+      SentenceMapEntry[] sentenceMap, int avgLineCharCt) {
+    HashSet<Integer> lineStarts;
+
+    lineStarts = new HashSet<Integer>();
+    for ( int i = 0; i < list.size(); i++ ) {
+      lineStarts.add(list.get(i));
+    }    
+
     TextParserData parserData = new TextParserData();
-    parserData.setTextParserData(new HashSet<Integer>(), 
-        new SentenceMapEntry[5000], 0);
-    TextParser._setTextParserData(parserData);
+    parserData.setTextParserData(lineStarts, sentenceMap, avgLineCharCt);
+    return(parserData);
+  }
+  
+  public static TextParserData initEmptyTextParserData() {
+    TextParserData parserData = new TextParserData();
+    parserData.setTextParserData(new HashSet<Integer>(), new SentenceMapEntry[5000], 80);
+    return(parserData);
   }
 }

@@ -3,8 +3,8 @@ package com.orbious.extractor.evaluator;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import com.orbious.AllExtractorTests;
 import com.orbious.extractor.SentenceMapEntry;
-import com.orbious.extractor.TextParser;
 import com.orbious.extractor.SentenceMapEntry.Likelihood;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntryType;
 import com.orbious.extractor.TextParser.TextParserData;
@@ -16,24 +16,28 @@ public class InsideLeftRightMarksTest extends TestCase {
 
   public InsideLeftRightMarksTest(String name) {
     super(name);
+    AllExtractorTests.initLogger();
   }
   
   public void test_IsNotInsideBracketStart() {
     String str;
     InsideLeftRightMarks inside;
     char[] buf;
+    TextParserData parserData;
     
     try {
-      inside = new InsideLeftRightMarks(EvaluatorType.START);
-      
       str = "I have had to omit a certain number of stories as unsuited for publication.";
       buf = str.toCharArray();
+      parserData = AllExtractorTests.initEmptyTextParserData();
+      
+      inside = new InsideLeftRightMarks(parserData, EvaluatorType.START);
       assertFalse(inside.evaluate(buf, 0));
       
       str = "Australia has the worst public broadcast network in the world. There is absolutely nothing of value. Albeit the news.";
       buf = str.toCharArray();
-      initParserData(str.toCharArray(), Arrays.asList(0, 61, 99, 116));
+      parserData = initParserData(str.toCharArray(), Arrays.asList(0, 61, 99, 116));
       
+      inside = new InsideLeftRightMarks(parserData, EvaluatorType.START);
       assertFalse(inside.evaluate(buf, 0));
       assertFalse(inside.evaluate(buf, 63));   
       assertFalse(inside.evaluate(buf, 101));
@@ -47,17 +51,17 @@ public class InsideLeftRightMarksTest extends TestCase {
     String str;
     InsideLeftRightMarks inside;
     char[] buf;
+    TextParserData parserData;
     
     try {
-      inside = new InsideLeftRightMarks(EvaluatorType.START);
-      
       str = "The matter will probably continue to be decided by every one according to his" +
       "view of Seneca's character and abilities: in the matters of style and of" +
       "sentiment much may be said on both sides. Dion Cassius (lx, 35) says that" +
       "Seneca composed an [Greek: apokolokuntosis] or Pumpkinification of";
       buf = str.toCharArray();
-      initParserData(str.toCharArray(), Arrays.asList(189));
+      parserData = initParserData(str.toCharArray(), Arrays.asList(189));
       
+      inside = new InsideLeftRightMarks(parserData, EvaluatorType.START);
       assertTrue(inside.evaluate(buf, 242));
       
     } catch ( Exception e ) {
@@ -69,14 +73,14 @@ public class InsideLeftRightMarksTest extends TestCase {
     String str;
     InsideLeftRightMarks inside;
     char[] buf;
+    TextParserData parserData;
     
-    try {
-      inside = new InsideLeftRightMarks(EvaluatorType.START);
-      
+    try {      
       str = "or multitude. [Sidenote: Il ix, 385] Claudius find";
       buf = str.toCharArray();
-      initParserData(str.toCharArray(), Arrays.asList(12));
+      parserData = initParserData(str.toCharArray(), Arrays.asList(12));
       
+      inside = new InsideLeftRightMarks(parserData, EvaluatorType.START);
       assertTrue(inside.evaluate(buf, 25));
       
     } catch ( Exception e ) {
@@ -88,17 +92,17 @@ public class InsideLeftRightMarksTest extends TestCase {
     String str;
     InsideLeftRightMarks inside;
     char[] buf;
+    TextParserData parserData;
     
     try {
-      inside = new InsideLeftRightMarks(EvaluatorType.START);
-      
       str = "The matter will probably continue to be decided by every one according to his" +
       "view of Seneca's character and abilities: in the matters of style and of" +
       "sentiment much may be said on both sides. Dion Cassius (lx, 35) says that" +
       "Seneca composed an [greek: apokolokuntosis.] or Pumpkinification of";
       buf = str.toCharArray();
-      initParserData(str.toCharArray(), Arrays.asList(189));
+      parserData = initParserData(str.toCharArray(), Arrays.asList(189));
 
+      inside = new InsideLeftRightMarks(parserData, EvaluatorType.START);
       assertTrue(inside.evaluate(buf, 264));
       
     } catch ( Exception e ) {
@@ -106,7 +110,7 @@ public class InsideLeftRightMarksTest extends TestCase {
     }
   }
   
-  public void initParserData(final char[] buf, List<Integer> likelyEnds) {
+  public TextParserData initParserData(final char[] buf, List<Integer> likelyEnds) {
     SentenceMapEntry[] map;
     
     map = new SentenceMapEntry[buf.length];
@@ -117,6 +121,6 @@ public class InsideLeftRightMarksTest extends TestCase {
     
     TextParserData parserData = new TextParserData();
     parserData.setTextParserData(new HashSet<Integer>(), map, -1);
-    TextParser._setTextParserData(parserData);
+    return(parserData);
   }
 }

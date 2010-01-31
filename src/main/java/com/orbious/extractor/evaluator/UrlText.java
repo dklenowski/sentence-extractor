@@ -5,6 +5,7 @@ package com.orbious.extractor.evaluator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.orbious.extractor.Config;
+import com.orbious.extractor.TextParser.TextParserData;
 
 /**
  * Determines whether a position/word in a text buffer is considered
@@ -30,7 +31,7 @@ public class UrlText extends Evaluator {
   /**
    * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
    */
-  public UrlText(EvaluatorType type) {
+  public UrlText(TextParserData parserData, EvaluatorType type) {
     super("UrlText", type);
   }
   

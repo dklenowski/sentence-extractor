@@ -2,10 +2,10 @@ package com.orbious.extractor.evaluator;
 
 import java.util.HashSet;
 import com.orbious.extractor.Config;
-import com.orbious.extractor.TextParser;
+import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.util.Helper;
 
-public class HeadingEvaluator extends Evaluator {
+public class Heading extends Evaluator {
   
   private static HashSet< Character > sentence_ends;
   
@@ -15,8 +15,8 @@ public class HeadingEvaluator extends Evaluator {
     sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());    
   }
   
-  public HeadingEvaluator(EvaluatorType type) {
-    super("HeadingEvaluator", type);
+  public Heading(TextParserData parserData, EvaluatorType type) {
+    super("Heading", parserData, type);
   }
   
   public boolean recordAsUnlikely() {
@@ -30,9 +30,9 @@ public class HeadingEvaluator extends Evaluator {
   public boolean evaluate(char[] buf, int idx) throws Exception {  
     if ( !Character.isUpperCase(buf[idx]) ) {
       return(false);
-    } else if ( !TextParser.parserData().containsLineStart(idx) ) {
+    } else if ( !parser_data.containsLineStart(idx) ) {
       // check if we are part of a previous heading
-      if ( TextParser.parserData().containsHeading(idx) ) {
+      if ( parser_data.containsHeading(idx) ) {
         return(true);
       }
       
@@ -55,7 +55,7 @@ public class HeadingEvaluator extends Evaluator {
         break;
       }
     
-      if ( TextParser.parserData().containsLineStart(i) ) {
+      if ( parser_data.containsLineStart(i) ) {
         debug_str.append(" found start at " + i + ", ");
         fndStart = true;
         break;
@@ -72,7 +72,7 @@ public class HeadingEvaluator extends Evaluator {
       return(false);
     }
   
-    double thresh = TextParser.parserData().avgLineCharCt()*HEADING_THRESHOLD;
+    double thresh = parser_data.avgLineCharCt()*HEADING_THRESHOLD;
     if ( letterCt >= thresh ) {
       if ( logger.isDebugEnabled() ) {
         logger.debug(debug_str + " failed threshold, letterCt=" + letterCt +  

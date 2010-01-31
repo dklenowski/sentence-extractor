@@ -3,10 +3,8 @@ package com.orbious.extractor.evaluator;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Vector;
-
 import com.orbious.AllExtractorTests;
 import com.orbious.extractor.SentenceMapEntry;
-import com.orbious.extractor.TextParser;
 import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
 
@@ -20,6 +18,7 @@ public class HeadingTest extends TestCase {
   }
   
   public void test_BufWithHeading() {
+    TextParserData parserData;
     Vector<String> data = new Vector<String>(
         Arrays.asList(
             "* Uses heuristic algorithms. ", 
@@ -30,9 +29,10 @@ public class HeadingTest extends TestCase {
             "1. If the first character of a word (has a whitespace previously) is uppercase begin the Start Evaluation Process. ",
             "2. If the character is a sentence end (e.g. '.', '!' etc) run the End Evaluation Process." ));
  
-    char[] buf = initTextParserData(data);
+    parserData = new TextParserData();
+    char[] buf = initTextParserData(data, parserData);
 
-    HeadingEvaluator evaluator = new HeadingEvaluator(EvaluatorType.START);
+    Heading evaluator = new Heading(parserData, EvaluatorType.START);
     boolean ret;
     try {
       ret = evaluator.evaluate(buf, 2);
@@ -48,7 +48,7 @@ public class HeadingTest extends TestCase {
   }
   
   
-  private char[] initTextParserData(Vector<String> data) {
+  private char[] initTextParserData(Vector<String> data, TextParserData parserData) {
     HashSet<Integer> lineStarts;
     int charCt;
     
@@ -70,13 +70,10 @@ public class HeadingTest extends TestCase {
       System.arraycopy(buf, 0, buffer, pos, buf.length);
       pos += buf.length;
     }
-    
-    
-    TextParserData parserData = new TextParserData();
+
     parserData.setTextParserData(lineStarts, new SentenceMapEntry[buffer.length], 
         (charCt/data.size()));
-    TextParser._setTextParserData(parserData);
-    
+
     return(buffer);
   }
 

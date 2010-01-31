@@ -1,11 +1,12 @@
 package com.orbious.extractor.evaluator;
 
 import com.orbious.extractor.ParseDirn;
+import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.util.Helper;
 
 public class InnerQuote extends Evaluator {
   
-  public InnerQuote(EvaluatorType type) {
+  public InnerQuote(TextParserData parserData, EvaluatorType type) {
     super("InnerQuote", type);
   }
   

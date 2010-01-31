@@ -18,7 +18,7 @@ public class AbbreviatedNameTest extends TestCase {
     char[] buf;
     boolean result;
     
-    name = new AbbreviatedName(EvaluatorType.START);
+    name = new AbbreviatedName(null, EvaluatorType.START);
     str = "P. Petro";
     buf = str.toCharArray();
     
@@ -43,7 +43,7 @@ public class AbbreviatedNameTest extends TestCase {
     String str;
     char[] buf;
 
-    name = new AbbreviatedName(EvaluatorType.START);
+    name = new AbbreviatedName(null, EvaluatorType.START);
     str = "A Potato";
     buf = str.toCharArray();
     
@@ -57,7 +57,7 @@ public class AbbreviatedNameTest extends TestCase {
     char[] buf;
     boolean result;
     
-    name = new AbbreviatedName(EvaluatorType.START);
+    name = new AbbreviatedName(null, EvaluatorType.START);
     str = "Petro P.";
     buf = str.toCharArray();
     
@@ -85,13 +85,13 @@ public class AbbreviatedNameTest extends TestCase {
     str = "W.H.D. Rouse";
     buf = str.toCharArray();
 
-    name = new AbbreviatedName(EvaluatorType.START);
+    name = new AbbreviatedName(null, EvaluatorType.START);
     assertTrue(name.evaluate(buf, 0));
     assertTrue(name.evaluate(buf, 2));
     assertTrue(name.evaluate(buf, 4));
     assertTrue(name.evaluate(buf, 7));
     
-    name = new AbbreviatedName(EvaluatorType.END);    
+    name = new AbbreviatedName(null, EvaluatorType.END);    
     assertTrue(name.evaluate(buf, 1));
     assertTrue(name.evaluate(buf, 3));
     assertTrue(name.evaluate(buf, 5));
@@ -99,34 +99,34 @@ public class AbbreviatedNameTest extends TestCase {
     str = "M.A. Little";
     buf = str.toCharArray();
     
-    name = new AbbreviatedName(EvaluatorType.START);
+    name = new AbbreviatedName(null, EvaluatorType.START);
     assertTrue(name.evaluate(buf, 0));
     assertTrue(name.evaluate(buf, 2));
     assertTrue(name.evaluate(buf, 5));
     
-    name = new AbbreviatedName(EvaluatorType.END);    
+    name = new AbbreviatedName(null, EvaluatorType.END);    
     assertTrue(name.evaluate(buf, 1));
     assertTrue(name.evaluate(buf, 3));
 
     str = "B. Thomas";
     buf = str.toCharArray();
 
-    name = new AbbreviatedName(EvaluatorType.START);
+    name = new AbbreviatedName(null, EvaluatorType.START);
     assertTrue(name.evaluate(buf, 0));
     assertTrue(name.evaluate(buf, 3)); 
 
-    name = new AbbreviatedName(EvaluatorType.END);    
+    name = new AbbreviatedName(null, EvaluatorType.END);    
     assertTrue(name.evaluate(buf, 1));
 
     str = "C. H. Bompas.";
     buf = str.toCharArray();
 
-    name = new AbbreviatedName(EvaluatorType.START);
+    name = new AbbreviatedName(null, EvaluatorType.START);
     assertTrue(name.evaluate(buf, 0));
     assertTrue(name.evaluate(buf, 3)); 
     assertTrue(name.evaluate(buf, 6));
     
-    name = new AbbreviatedName(EvaluatorType.END);    
+    name = new AbbreviatedName(null, EvaluatorType.END);    
     assertTrue(name.evaluate(buf, 1));
     assertTrue(name.evaluate(buf, 4));    
   }
@@ -139,25 +139,25 @@ public class AbbreviatedNameTest extends TestCase {
     str = "plenty. The";
     buf = str.toCharArray();
     
-    name = new AbbreviatedName(EvaluatorType.END);
+    name = new AbbreviatedName(null, EvaluatorType.END);
     assertFalse(name.evaluate(buf, 6)); 
 
-    name = new AbbreviatedName(EvaluatorType.START);
+    name = new AbbreviatedName(null, EvaluatorType.START);
     assertFalse(name.evaluate(buf, 8));
     
     str = "riders. THE";
     buf = str.toCharArray();
     
-    name = new AbbreviatedName(EvaluatorType.END);
+    name = new AbbreviatedName(null, EvaluatorType.END);
     assertFalse(name.evaluate(buf, 6)); 
 
-    name = new AbbreviatedName(EvaluatorType.START);
+    name = new AbbreviatedName(null, EvaluatorType.START);
     assertFalse(name.evaluate(buf, 8));
     
     str = "www.gutenberg.net .";
     buf = str.toCharArray();
     
-    name = new AbbreviatedName(EvaluatorType.END);
+    name = new AbbreviatedName(null, EvaluatorType.END);
     assertFalse(name.evaluate(buf, 3)); 
     assertFalse(name.evaluate(buf, 13)); 
     assertFalse(name.evaluate(buf, 18)); 
@@ -165,7 +165,7 @@ public class AbbreviatedNameTest extends TestCase {
     str = "www.gutenberg.net . Title";
     buf = str.toCharArray();
     
-    name = new AbbreviatedName(EvaluatorType.END);
+    name = new AbbreviatedName(null, EvaluatorType.END);
     assertFalse(name.evaluate(buf, 18)); 
   }
 
@@ -177,13 +177,13 @@ public class AbbreviatedNameTest extends TestCase {
     str = "Rouse W.H.D. wore pants";
     buf = str.toCharArray();
 
-    name = new AbbreviatedName(EvaluatorType.START);
+    name = new AbbreviatedName(null, EvaluatorType.START);
     assertTrue(name.evaluate(buf, 0)); 
     assertTrue(name.evaluate(buf, 6)); 
     assertTrue(name.evaluate(buf, 8));
     assertTrue(name.evaluate(buf, 10));
     
-    name = new AbbreviatedName(EvaluatorType.END);
+    name = new AbbreviatedName(null, EvaluatorType.END);
     assertTrue(name.evaluate(buf, 7)); 
     assertTrue(name.evaluate(buf, 9)); 
     assertTrue(name.evaluate(buf, 11));
@@ -191,23 +191,23 @@ public class AbbreviatedNameTest extends TestCase {
     str = "Little M.A. was tenable";
     buf = str.toCharArray();
     
-    name = new AbbreviatedName(EvaluatorType.START);
+    name = new AbbreviatedName(null, EvaluatorType.START);
     assertTrue(name.evaluate(buf, 0)); 
     assertTrue(name.evaluate(buf, 7)); 
     assertTrue(name.evaluate(buf, 9));
     
-    name = new AbbreviatedName(EvaluatorType.END);
+    name = new AbbreviatedName(null, EvaluatorType.END);
     assertTrue(name.evaluate(buf, 8)); 
     assertTrue(name.evaluate(buf, 10)); 
     
     str = "Thomas B. said there were many";
     buf = str.toCharArray();
     
-    name = new AbbreviatedName(EvaluatorType.START);
+    name = new AbbreviatedName(null, EvaluatorType.START);
     assertTrue(name.evaluate(buf, 0)); 
     assertTrue(name.evaluate(buf, 7)); 
     
-    name = new AbbreviatedName(EvaluatorType.END);
+    name = new AbbreviatedName(null, EvaluatorType.END);
     assertTrue(name.evaluate(buf, 8)); 
   }
 
@@ -220,11 +220,11 @@ public class AbbreviatedNameTest extends TestCase {
     str = "At length out steps P. Petronius, an old chum of";
     buf = str.toCharArray();
   
-    name = new AbbreviatedName(EvaluatorType.START);
+    name = new AbbreviatedName(null, EvaluatorType.START);
     assertTrue(name.evaluate(buf, 20));
     assertTrue(name.evaluate(buf, 23));
     
-    name = new AbbreviatedName(EvaluatorType.END);
+    name = new AbbreviatedName(null, EvaluatorType.END);
     assertTrue(name.evaluate(buf, 21));
   }
 }

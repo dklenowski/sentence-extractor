@@ -24,7 +24,7 @@ public class UrlTextTest extends TestCase {
     boolean result;
     UrlText url;
     
-    url = new UrlText(EvaluatorType.END);
+    url = new UrlText(null, EvaluatorType.END);
     
     result = url.evaluate("www.gutenberg.org".toCharArray(), 0);
     assertEquals(true, result);
@@ -39,7 +39,7 @@ public class UrlTextTest extends TestCase {
     String str;
     char[] buf;
     
-    url = new UrlText(EvaluatorType.END);
+    url = new UrlText(null, EvaluatorType.END);
     
     str = "www.gutenberg.org..";
     buf = str.toCharArray();
@@ -63,7 +63,7 @@ public class UrlTextTest extends TestCase {
     boolean result;
     UrlText url;
     
-    url = new UrlText(EvaluatorType.END);
+    url = new UrlText(null, EvaluatorType.END);
     
     result = url.evaluate("gutenberg.".toCharArray(), 0);
     assertEquals(false, result);    
@@ -77,7 +77,7 @@ public class UrlTextTest extends TestCase {
     UrlText url;
     String str;
     
-    url = new UrlText(EvaluatorType.END);
+    url = new UrlText(null, EvaluatorType.END);
     str = "gutenberg.";
     result = url.evaluate(str.toCharArray(), 9);
     assertEquals(false, result);    

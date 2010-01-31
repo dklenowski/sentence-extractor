@@ -6,10 +6,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Vector;
 import org.apache.log4j.Logger;
+
+import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.evaluator.AbbreviatedName;
 import com.orbious.extractor.evaluator.Acronym;
 import com.orbious.extractor.evaluator.Evaluator;
-import com.orbious.extractor.evaluator.HeadingEvaluator;
+import com.orbious.extractor.evaluator.Heading;
 import com.orbious.extractor.evaluator.InnerQuote;
 import com.orbious.extractor.evaluator.InsideLeftRightMarks;
 import com.orbious.extractor.evaluator.Name;
@@ -77,13 +79,16 @@ public class Sentence {
    * A list of <code>Evaluator</code>'s that are used to determine
    * whether a sentence end is likely.
    */
-  private static Vector<Evaluator> end_evaluators;
+  private Vector<Evaluator> end_evaluators;
   
   /**
    * A list of <code>Evaluator</code>'s that are used to determine
    * whether a sentence start is likely.
    */
-  private static Vector<Evaluator> start_evaluators;
+  private Vector<Evaluator> start_evaluators;
+  
+  private TextParserData parser_data;
+  
   
   private static HashSet<Character> leftMarks;
   private static HashSet<Character> rightMarks;
@@ -99,7 +104,9 @@ public class Sentence {
   /**
    * Private constructor.
    */
-  private Sentence() { }
+  public Sentence(TextParserData parserData) { 
+    parser_data = parserData;
+  }
   
   /**
    * Reloads the local copy of allowable ends.
@@ -112,15 +119,15 @@ public class Sentence {
    * Initializes the <code>Evaluator</code>'s that are used for determining
    * the likelihood of sentence starts.
    */
-  public static void initDefaultStartEvaluators() {
+  public void initDefaultStartEvaluators() {
     start_evaluators = new Vector<Evaluator>(
         Arrays.asList(  
-                new Suspension(EvaluatorType.START),
-                new Acronym(EvaluatorType.START),
-                new Name(EvaluatorType.START),
-                new AbbreviatedName(EvaluatorType.START),
-                new HeadingEvaluator(EvaluatorType.START),
-                new InsideLeftRightMarks(EvaluatorType.START) )); 
+                new Suspension(parser_data, EvaluatorType.START),
+                new Acronym(parser_data, EvaluatorType.START),
+                new Name(parser_data, EvaluatorType.START),
+                new AbbreviatedName(parser_data, EvaluatorType.START),
+                new Heading(parser_data, EvaluatorType.START),
+                new InsideLeftRightMarks(parser_data, EvaluatorType.START) )); 
   }
   
   /**
@@ -129,7 +136,7 @@ public class Sentence {
    * 
    * @param evaluator   The <code>Evaluator</code> to add.
    */
-  public static void addStartEvaluator(Evaluator evaluator) {
+  public void addStartEvaluator(Evaluator evaluator) {
     if ( start_evaluators == null ) {
       start_evaluators = new Vector<Evaluator>();
     }
@@ -141,16 +148,16 @@ public class Sentence {
    * Initializes the <code>Evaluator</code>'s that are used for determining
    * the likelihood of sentence ends.
    */
-  public static void initDefaultEndEvaluators() {
+  public void initDefaultEndEvaluators() {
     end_evaluators = new Vector<Evaluator>(
         Arrays.asList(  
-                new NumberedHeading(EvaluatorType.END), // needs to go before suspension
-                new Suspension(EvaluatorType.END), 
-                new Acronym(EvaluatorType.END),
-                new UrlText(EvaluatorType.END),
-                new AbbreviatedName(EvaluatorType.END),
-                new InnerQuote(EvaluatorType.END),
-                new InsideLeftRightMarks(EvaluatorType.END)
+                new NumberedHeading(parser_data, EvaluatorType.END), // needs to go before suspension
+                new Suspension(parser_data, EvaluatorType.END), 
+                new Acronym(parser_data, EvaluatorType.END),
+                new UrlText(parser_data, EvaluatorType.END),
+                new AbbreviatedName(parser_data, EvaluatorType.END),
+                new InnerQuote(parser_data, EvaluatorType.END),
+                new InsideLeftRightMarks(parser_data, EvaluatorType.END)
         ));   
   }
 
@@ -160,7 +167,7 @@ public class Sentence {
    * 
    * @param evaluator   The <code>Evaluator</code> to add.
    */
-  public static void addEndEvaluator(Evaluator evaluator) {
+  public void addEndEvaluator(Evaluator evaluator) {
     if ( end_evaluators == null ) {
       end_evaluators = new Vector<Evaluator>();
     }
@@ -179,7 +186,7 @@ public class Sentence {
    *              in the <code>buf</code> is a likely sentence end, 
    *              <code>false</code> otherwise.
    */
-  public static EndOp isEnd(final char[] buf, int idx) { 
+  public EndOp isEnd(final char[] buf, int idx) { 
     Evaluator evaluator;
     StringBuilder debugStr;
     EndOp op;
@@ -265,7 +272,7 @@ public class Sentence {
     return(op);
   }
   
-  protected static EndOp processColon(final char[] buf, int idx ) {
+  protected EndOp processColon(final char[] buf, int idx ) {
     String debugStr;
     EndOp op;
     
@@ -307,7 +314,7 @@ public class Sentence {
    * @return    <code>true</code> if the colon constitutes a time, 
    *            <code>false</code> otherwise.
    */
-  protected static boolean isColonATime(final char[] buf, int idx) { 
+  protected boolean isColonATime(final char[] buf, int idx) { 
     if ( buf[idx] != ':' ) {
       return(false);
     } else if ( Helper.isPreviousNumber(buf, idx) && 
@@ -332,7 +339,7 @@ public class Sentence {
     return(false);
   }
   
-  protected static boolean isColonInsideMarks(final char[] buf, int idx) {
+  protected boolean isColonInsideMarks(final char[] buf, int idx) {
     if ( buf[idx] != ':' ) {
       return(false);
     } else if ( (idx-1) < 0 ) {
@@ -343,7 +350,7 @@ public class Sentence {
     char ch;
     int markCt;
     
-    startIdx = TextParser.parserData().findPreviousLikelyEnd(idx);
+    startIdx = parser_data.findPreviousLikelyEnd(idx);
     if ( startIdx == -1 ) {
       return(false);
     }
@@ -375,7 +382,7 @@ public class Sentence {
    * @return    <code>true</code> if a later potential sentence end was found,
    *            <code>false</code> otherwise.
    */
-  protected static boolean hasLaterEnd(final char[] buf, int idx) {
+  protected boolean hasLaterEnd(final char[] buf, int idx) {
     boolean fndLater;
     boolean inWhitespace;
     int i;
@@ -457,7 +464,7 @@ public class Sentence {
    * @return     <code>true</code> if a quotation mark appears before a sentence 
    *              end, <code>false</code> otherwise.
    */
-  protected static boolean hasLaterQuotation(final char[] buf, int idx) {
+  protected boolean hasLaterQuotation(final char[] buf, int idx) {
     int i;
     boolean fndLater;
     char ch;
@@ -493,7 +500,7 @@ public class Sentence {
    * <li>Otherwise returns the position in the buffer where the potential
    * sentence start was found.
    */
-  protected static int hasUpper(final char[] buf, int idx) {
+  protected int hasUpper(final char[] buf, int idx) {
     int i;
     char ch;
 
@@ -547,7 +554,7 @@ public class Sentence {
    *              in the <code>buf</code> is a likely sentence start, 
    *              <code>false</code> otherwise.
    */
-  public static StartOp isStart(final char[] buf, int idx, boolean inHeading) {
+  public StartOp isStart(final char[] buf, int idx, boolean inHeading) {
     int stopIdx;
     Evaluator evaluator;
     StringBuilder debugStr;
@@ -655,7 +662,7 @@ public class Sentence {
    * <li>Otherwise returns the position in teh buffer where the potential
    * sentence end was found.
    */
-  protected static int hasStop(final char[] buf, int idx) {
+  protected int hasStop(final char[] buf, int idx) {
     int i;
     char ch;
 
@@ -680,14 +687,14 @@ public class Sentence {
       // a suspension etc
       int j;
       
-      j = TextParser.parserData().findPreviousUnlikelyEnd(i+1);
+      j = parser_data.findPreviousUnlikelyEnd(i+1);
       if ( i == j ) {
         // unlikely end matches the stop we found, therefore this start
         // is unlikely as well
         return(-1);
       }
       
-      j = TextParser.parserData().findPreviousPause(i+1);
+      j = parser_data.findPreviousPause(i+1);
       if ( i == j ) {
         // likely end found that mataches what we found
         return(i);

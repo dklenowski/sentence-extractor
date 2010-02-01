@@ -26,17 +26,25 @@ public class NumberedHeading extends Evaluator {
   }
   
   /**
-   * Constructor, sets the name of this <code>Evaluator</code>
-   * and initializes {@link NumberedHeading#roman_numerals} 
+   * Constructor, initializes this <code>Evaluator</code>.
+   * 
+   * @param parserData  Data generating during <code>TextParser</code> parsing.
+   * @param type    The type of <code>Evaluator</code>.
    */
   public NumberedHeading(TextParserData parserData, EvaluatorType type) {
     super("NumberedHeading", parserData, type);
   }
   
+  /**
+   * Return's <code>false</code>.
+   */
   public boolean recordAsUnlikely() {
     return(false);
   }
   
+  /**
+   * Return's <code>false</code>.
+   */
   public boolean recordAsPause() {
     return(true);
   }
@@ -45,13 +53,6 @@ public class NumberedHeading extends Evaluator {
    * Determines if the previous word from <code>idx</code>
    * in the buffer <code>buf</code> is a numbered heading and therefore 
    * not a likely sentence end.
-   * 
-   * @param buf   Text buffer.
-   * @param idx   Position in buffer where evaluation begins.
-   * 
-   * @return    <code>true</code> if the previous word is a suspension and 
-   *            therefore not a likely sentence end, 
-   *            <code>false</code> otherwise.
    */
   public boolean evaluate(final char[] buf, int idx) {
     boolean b;

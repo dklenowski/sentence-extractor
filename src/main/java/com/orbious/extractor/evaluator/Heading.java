@@ -5,28 +5,60 @@ import com.orbious.extractor.Config;
 import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.util.Helper;
 
+/**
+ * Determines whether a word/position in a text buffer is considered 
+ * an Heading and therefore not a valid sentence start.
+ * 
+ * @author dave
+ * @version 1.0
+ * @since 1.0
+ */
+
 public class Heading extends Evaluator {
   
+  /**
+   * In memory list of sentence ends.
+   */
   private static HashSet< Character > sentence_ends;
   
+  /**
+   * The minimum threshold (a percentage of characters) to consider the 
+   * line as a <code>Heading</code>.
+   */
   private static double HEADING_THRESHOLD = 0.75;
   
   static {
     sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());    
   }
   
+  /**
+   * Constructor, initializes this <code>Evaluator</code>.
+   * 
+   * @param parserData  Data generating during <code>TextParser</code> parsing.
+   * @param type    The type of <code>Evaluator</code>.
+   */
   public Heading(TextParserData parserData, EvaluatorType type) {
     super("Heading", parserData, type);
   }
   
+  /**
+   * Returns <code>true</code> as the position could be an unlikely start.
+   */
   public boolean recordAsUnlikely() {
     return(true);
   }
   
+  /**
+   * Returns <code>true</code> as the position could be a pause between sentences.
+   */
   public boolean recordAsPause() {
     return(true);
   }
   
+  /**
+   * Determines if the current characters are part of an Heading
+   * and therefore not a likely sentence start/end.
+   */
   public boolean evaluate(char[] buf, int idx) throws Exception {  
     if ( !Character.isUpperCase(buf[idx]) ) {
       return(false);

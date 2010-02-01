@@ -29,16 +29,25 @@ public class UrlText extends Evaluator {
   }
   
   /**
-   * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
+   * Constructor, initializes this <code>Evaluator</code>.
+   * 
+   * @param parserData  Data generating during <code>TextParser</code> parsing.
+   * @param type    The type of <code>Evaluator</code>.
    */
   public UrlText(TextParserData parserData, EvaluatorType type) {
     super("UrlText", type);
   }
   
+  /**
+   * Return's <code>false</code>.
+   */
   public boolean recordAsUnlikely() {
     return(false);
   }
   
+  /**
+   * Return's <code>false</code>.
+   */
   public boolean recordAsPause() {
     return(false);
   }
@@ -47,12 +56,6 @@ public class UrlText extends Evaluator {
    * Determines if the previous word from <code>idx</code>
    * in the buffer <code>buf</code> is a url and therefore not a
    * likely sentence end.
-   * 
-   * @param buf   Text buffer.
-   * @param idx   Position in <code>buf</code> where evaluation begins.
-   * 
-   * @return    <code>true</code> if the word is a url and not
-   *            a likely sentence end, <code>false</code> otherwise.
    */  
   public boolean evaluate(final char[] buf, int idx) {
     char ch;

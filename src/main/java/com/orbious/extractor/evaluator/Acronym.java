@@ -48,12 +48,19 @@ public class Acronym extends Evaluator {
 
   
   /**
-   * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
+   * Constructor, initializes this <code>Evaluator</code>.
+   * 
+   * @param parserData  Data generating during <code>TextParser</code> parsing.
+   * @param type    The type of <code>Evaluator</code>.
    */
   public Acronym(TextParserData parserData, EvaluatorType type) {
     super("Acronym", type);
   }
 
+  /**
+   * Return's <code>false</code> when the <code>EvaluatorType</code> is an 
+   * <code>END</code>, <code>true</code> otherwise. 
+   */
   public boolean recordAsUnlikely() {
     if ( type == EvaluatorType.END ) {
       return(false);
@@ -61,6 +68,10 @@ public class Acronym extends Evaluator {
     return(true);
   }
   
+  /**
+   * Return's <code>false</code> as an acronym does not represent
+   * a pause between sentences.
+   */
   public boolean recordAsPause() {
     return(false);
   }
@@ -69,12 +80,6 @@ public class Acronym extends Evaluator {
    * Determines if the previous word from <code>idx</code> in the buffer
    * <code>buf</code> is part of an acronym and therefore not a likely
    * sentence start/end.
-   * 
-   * @param buf   Text Buffer.
-   * @param idx   Position in <code>buf</code> where evaluation begins.
-   * 
-   * @return    <code>true</code> if the word is part of an acronym,
-   *            and not a likely sentence start/end, <code>false</code> otherwise.
    */
   public boolean evaluate(final char[] buf, int idx) {
 

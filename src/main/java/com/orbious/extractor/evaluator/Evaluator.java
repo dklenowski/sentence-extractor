@@ -32,31 +32,49 @@ public abstract class Evaluator {
    */
   protected EvaluatorType type;
   
+  /**
+   * Data generated via <code>TextParser</code> that may be required 
+   * during evaluator.
+   */
   protected TextParserData parser_data;
   
+  /**
+   * A debug string for the current <code>evaluate</code>.
+   */
   protected StringBuilder debug_str;
   
   /**
    * Logger object.
    */
   protected static final Logger logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
+
+  /**
+   * Initializes the <code>Evaluator</code>.
+   * 
+   * @param name    The name of this <code>Evaluator</code>, used in 
+   *                debugging.
+   * @param type    The type of this <code>Evaluator</code>, 
+   *                either <code>START</code> or <code>END</code>.
+   */
+  public Evaluator(String name, EvaluatorType type) {
+    this.name = name;
+    this.type = type;
+    debug_str = new StringBuilder();
+  }
   
   /**
    * Initializes the <code>Evaluator</code>.
    * 
    * @param name    The name of this <code>Evaluator</code>, used in 
    *                debugging.
+   * @param parserData      Data generated via <code>TextParser</code>.  
+   * @param type    The type of this <code>Evaluator</code>, 
+   *                either <code>START</code> or <code>END</code>.
    */
   public Evaluator(String name, TextParserData parserData, EvaluatorType type) {
     this.name = name;
     this.type = type;
     this.parser_data = parserData;
-    debug_str = new StringBuilder();
-  }
-
-  public Evaluator(String name, EvaluatorType type) {
-    this.name = name;
-    this.type = type;
     debug_str = new StringBuilder();
   }
   
@@ -69,28 +87,49 @@ public abstract class Evaluator {
     return(name);
   }
 
+  /**
+   * Returns the type of this <code>Evaluator</code>.
+   * 
+   * @return    The type of this <code>Evaluator</code>.
+   */
   public EvaluatorType type() {
     return(type);
   }
   
+  /**
+   * Returns the debug string for the current evaluation.
+   * 
+   * @return    The debug string for the current evaluation.
+   */
   public String debugStr() {
     return(debug_str.toString());
   }
   
+  /**
+   * Determines whether or not to record a failed evaluation as unlikely.
+   *  
+   * @return  Whether or not to record the failed evaluation as unlikely.
+   */
   public abstract boolean recordAsUnlikely();
   
+  /**
+   * Determines whether or not to record a failed evaluation as a pause.
+   * e.g. a Numbered Heading is recorded as a pause for an <code>END</code>.
+   * 
+   * @return  Whether or not to record the failed evaluation as a pause.
+   */
   public abstract boolean recordAsPause();
   
   /**
    * Runs an evaluation based on position <code>idx</code> in the 
    * <code>buffer</code>. If the evaluation returns <code>true</code>,
-   * the position in the buffer is likely to be not part of a sentence start/end.
+   * the position in the buffer is not likely to be part of a sentence start/end.
    *  
    * @param buf   Text buffer.
    * @param idx   The position in the buffer to obtain the previous word.
    * 
    * @return    <code>true</code> if the position in the buffer is
-   *            not a sentence end, <code>false</code> otherwise.
+   *            not a sentence start/end, <code>false</code> otherwise.
    */
   public abstract boolean evaluate(final char[] buf, int idx) throws Exception;  
 }

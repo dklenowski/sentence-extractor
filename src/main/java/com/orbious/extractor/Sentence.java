@@ -71,10 +71,15 @@ public class Sentence {
   private static HashSet<Character> punctuation;
   
   /**
-   * Logger object.
+   * List of left punctuation marks (see {@link Config#LEFT_PUNCTUATION_MARKS}).
    */
-  private static final Logger logger;
-
+  private static HashSet<Character> leftMarks;
+  
+  /**
+   * List of right punctuation marks (see {@link Config#RIGHT_PUNCTUATION_MARKS}).
+   */
+  private static HashSet<Character> rightMarks;
+  
   /**
    * A list of <code>Evaluator</code>'s that are used to determine
    * whether a sentence end is likely.
@@ -87,11 +92,15 @@ public class Sentence {
    */
   private Vector<Evaluator> start_evaluators;
   
+  /**
+   * The data from {@link TextParser}.
+   */
   private TextParserData parser_data;
-  
-  
-  private static HashSet<Character> leftMarks;
-  private static HashSet<Character> rightMarks;
+   
+  /**
+   * Logger object.
+   */
+  private static final Logger logger;
   
   static {
     allowable_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
@@ -102,19 +111,14 @@ public class Sentence {
   }
   
   /**
-   * Private constructor.
+   * Constructor, initializes the <code>Sentence</code> object.
+   * 
+   * @param parserData  Data from {@link TextParser}.
    */
   public Sentence(TextParserData parserData) { 
     parser_data = parserData;
   }
-  
-  /**
-   * Reloads the local copy of allowable ends.
-   */
-  public static void reload() {
-    allowable_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
-  }
-  
+   
   /**
    * Initializes the <code>Evaluator</code>'s that are used for determining
    * the likelihood of sentence starts.
@@ -272,6 +276,16 @@ public class Sentence {
     return(op);
   }
   
+  /**
+   * Processes the colon during an <code>isEnd</code> operation.
+   * 
+   * @param buf   Text buffer.
+   * @param idx   Position in the buffer where a sentence end exists.
+   * 
+   * @return      <code>true</code> if the position specified by <code>idx</code>
+   *              in the <code>buf</code> is a likely sentence end, 
+   *              <code>false</code> otherwise.
+   */
   protected EndOp processColon(final char[] buf, int idx ) {
     String debugStr;
     EndOp op;
@@ -324,6 +338,16 @@ public class Sentence {
     return(false);
   }
   
+  /**
+   * Determines if the colon at position <code>idx</code> in the buffer
+   * <code>buf</code> is part of a continuation e.g. "some text - some other text"
+   * 
+   * @param buf   Text buffer.
+   * @param idx   Position in the buffer where a colon exists.
+   * 
+   * @return    <code>true</code> if the colon constitutes a continuation, 
+   *            <code>false</code> otherwise.
+   */
   protected static boolean isColonAContinuation(final char[] buf, int idx ) {
     if ( buf[idx] != ':' ) {
       return(false);
@@ -339,6 +363,16 @@ public class Sentence {
     return(false);
   }
   
+  /**
+   * Determines if the colon at position <code>idx</code> in the buffer
+   * <code>buf</code> is part inside left/right punctuation marks.
+   * 
+   * @param buf   Text buffer.
+   * @param idx   Position in the buffer where a colon exists.
+   * 
+   * @return    <code>true</code> if the colon is inside left/right punctuation 
+   *            marks, <code>false</code> otherwise.
+   */
   protected boolean isColonInsideMarks(final char[] buf, int idx) {
     if ( buf[idx] != ':' ) {
       return(false);
@@ -711,7 +745,7 @@ public class Sentence {
   
   /**
    * An inner class used to return the results of 
-   * {@link Sentence#isStart(char[], int)}.
+   * {@link Sentence#isStart(char[], int, boolean)}.
    */
   static class StartOp {
     /**

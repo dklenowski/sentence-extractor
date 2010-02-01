@@ -29,16 +29,26 @@ public class Name extends Evaluator {
   private static HashSet<String> names;
   
   /**
-   * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
+   * Constructor, initializes this <code>Evaluator</code>.
+   * 
+   * @param parserData  Data generating during <code>TextParser</code> parsing.
+   * @param type    The type of <code>Evaluator</code>.
    */
   public Name(TextParserData parserData, EvaluatorType type) {
     super("Name", type);
   }
 
+  /**
+   * Return's <code>true</code> as this <code>Evaluator</code> is only 
+   * used a a start <code>Evaluator</code>.
+   */
   public boolean recordAsUnlikely() {
     return(true);
   }
   
+  /**
+   * Return's <code>false</code>.
+   */
   public boolean recordAsPause() {
     return(false);
   }
@@ -47,12 +57,6 @@ public class Name extends Evaluator {
    * Determines if the previous word from <code>idx</code>
    * in the buffer <code>buf</code> is a common name and therefore not a
    * likely sentence start.
-   * 
-   * @param buf   Text buffer.
-   * @param idx   Position in <code>buf</code> where evaluation begins.
-   * 
-   * @return    <code>true</code> if the word is a common name and not
-   *            a likely sentence start, <code>false</code> otherwise.
    */
   public boolean evaluate(final char[] buf, int idx) throws FileNotFoundException {
     if ( idx != 0 ) {

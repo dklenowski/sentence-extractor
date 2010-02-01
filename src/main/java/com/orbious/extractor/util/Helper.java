@@ -52,7 +52,6 @@ public class Helper {
    * @return    A <code>String</code> containing text extracted from 
    *            <code>buf</code>.
    */
-
   public static String getDebugStringFromCharBuf(char[] buf, int idx, int size) {
     StringBuilder str;
     StringBuilder id;

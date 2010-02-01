@@ -32,18 +32,29 @@ import com.orbious.extractor.util.Helper;
  */
 
 public class AbbreviatedName extends Evaluator {
-  
+
   /**
-   * Constructor, set's the <code>name</code> of this <code>Evaluator</code>.
+   * Constructor, initializes this <code>Evaluator</code>.
+   * 
+   * @param parserData  Data generating during <code>TextParser</code> parsing.
+   * @param type    The type of <code>Evaluator</code>.
    */
   public AbbreviatedName(TextParserData parserData, EvaluatorType type) {
     super("AbbreviatedName", type);
   }  
-  
+
+  /**
+   * Return's <code>true</code> as the abbreviated name could be at either
+   * the start or end of a sentence.
+   */
   public boolean recordAsUnlikely() {
     return(true);
   }
   
+  /**
+   * Return's <code>false</code> as an abbreviated name does not represent
+   * a pause between sentences.
+   */
   public boolean recordAsPause() {
     return(false);
   }
@@ -51,13 +62,6 @@ public class AbbreviatedName extends Evaluator {
   /**
    * Determines if the current characters are part of an Abbreviated Name
    * and therefore not a likely sentence start/end.
-   * 
-   * @param buf   Text buffer.
-   * @param idx   Position in <code>buf</code> where evaluation begins.
-   * 
-   * @return    <code>true</code> if the text is part of an abbreviated name,
-   *            and therefore not a likely sentence start/end, 
-   *            <code>false</code> otherwise.
    */
   public boolean evaluate(final char[] buf, int idx) {
     boolean b;

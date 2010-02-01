@@ -59,12 +59,12 @@ public class TextParser {
   /**
    * List of left punctuation marks (see {@link Config#LEFT_PUNCTUATION_MARKS}).
    */
-  private HashSet<Character> left_punctuation_marks;
+  private HashSet<Character> left_marks;
   
   /**
    * List of right punctuation marks (see {@link Config#RIGHT_PUNCTUATION_MARKS}).
    */
-  private HashSet<Character> right_punctuation_marks;  
+  private HashSet<Character> right_marks;
   
   /**
    * A buffer that contains entries for likely/unlikely sentence start's/end's.
@@ -96,7 +96,8 @@ public class TextParser {
   private Vector< Vector<String> > sentences;
   
   /**
-   * 
+   * The data extracted during {@link TextParser#parse()} and 
+   * {@link TextParser#genSentenceMap()}.
    */
   private TextParserData parser_data;
   
@@ -141,8 +142,8 @@ public class TextParser {
     inner_punctuation = Helper.cvtStringToHashSet(Config.INNER_PUNCTUATION.asStr());
     preserved_punctuation = Helper.cvtStringToHashSet(Config.PRESERVED_PUNCTUATION.asStr());
     
-    left_punctuation_marks = Helper.cvtStringToHashSet(Config.LEFT_PUNCTUATION_MARKS.asStr());
-    right_punctuation_marks = Helper.cvtStringToHashSet(Config.RIGHT_PUNCTUATION_MARKS.asStr());
+    left_marks = Helper.cvtStringToHashSet(Config.LEFT_PUNCTUATION_MARKS.asStr());
+    right_marks = Helper.cvtStringToHashSet(Config.RIGHT_PUNCTUATION_MARKS.asStr());
   }
 
   // SHOULD REALLY ONLY BE USED IN TESTING
@@ -731,7 +732,7 @@ public class TextParser {
        while ( (adjustedStartIdx > 0) &&
            !extraction_map[adjustedStartIdx] &&
            (Character.isWhitespace(buffer[adjustedStartIdx]) ||
-               left_punctuation_marks.contains(buffer[adjustedStartIdx]) ||
+               left_marks.contains(buffer[adjustedStartIdx]) ||
                buffer[adjustedStartIdx] == '\"') ) {
           adjustedStartIdx--;
       }
@@ -754,9 +755,9 @@ public class TextParser {
     }
     
     for ( int i = startIdx; i < endIdx; i++ ) {
-      if ( left_punctuation_marks.contains(buffer[i]) ) {
+      if ( left_marks.contains(buffer[i]) ) {
         ct++;
-      } else if ( right_punctuation_marks.contains(buffer[i]) ) {
+      } else if ( right_marks.contains(buffer[i]) ) {
         ct--;
       }
     }
@@ -777,7 +778,7 @@ public class TextParser {
           (   sentence_ends.contains(buffer[adjustedEndIdx]) ||
               (adjustedLeft &&
               (Character.isWhitespace(buffer[adjustedEndIdx]) ||
-                  right_punctuation_marks.contains(buffer[adjustedEndIdx]) ||
+                  right_marks.contains(buffer[adjustedEndIdx]) ||
                   buffer[adjustedEndIdx] == '\"'))   ) ) {
         adjustedEndIdx++;
       }
@@ -806,19 +807,32 @@ public class TextParser {
   public static class TextParserData {
     
     /**
-     * Copy of {@link TextParser#line_starts}
+     * Copy of {@link TextParser#line_starts}.
      */
     protected HashSet<Integer> line_starts;
 
+    /**
+     * Copy of {@link TextParser#parser_map}.
+     */
     protected SentenceMapEntry[] sentence_map;
     
+    /**
+     * The average number of characters on each line.
+     */
     protected int avg_line_char_ct = -1;
     
     /**
-     * Private constructor.
+     * Constructor, initializes an empty <code>TextParserData</code>.
      */
     public TextParserData() { }
 
+    /**
+     * Updates all instance variables.
+     * 
+     * @param lineStarts    Copy of {@link TextParser#line_starts}.
+     * @param sentenceMap   Copy of {@link TextParser#sentence_map}.
+     * @param avgLineCharCt  The average number of characters on each line.
+     */
     public void setTextParserData(HashSet<Integer> lineStarts,
         SentenceMapEntry[] sentenceMap, int avgLineCharCt) {
       line_starts = lineStarts;
@@ -826,19 +840,40 @@ public class TextParser {
       avg_line_char_ct = avgLineCharCt;
     }
     
+    /**
+     * Determines if the index <code>idx</code> in the <code>TextParser</code>
+     * character buffer is a line start.
+     * 
+     * @param idx   The index in the {@link TextParser#buffer}.
+     * 
+     * @return    <code>true</code> if <code>idx</code> is a line start,
+     *            <code>false</code> otherwise.
+     */
     public boolean containsLineStart(int idx) {
       if ( line_starts == null ) {
-        throw new NullPointerException("TextParserData (line_starts) not initialized correctly");
+        throw new NullPointerException(
+            "TextParserData (line_starts) not initialized correctly");
       }
       
       return( line_starts.contains(idx) );
     }
     
+    /**
+     * Determines if the index <code>idx</code> in the <code>TextParser</code>
+     * character buffer lines on a line containing a heading.
+     * 
+     * @param idx   The index in the {@link TextParser#buffer}.
+     * 
+     * @return    <code>true</code> if <code>idx</code> is on the same line 
+     *            as a heading, <code>false</code> otherwise.
+     */
     public boolean containsHeading(int idx) {
       if ( sentence_map == null ) {
-        throw new NullPointerException("TextParserData (sentence_map) not initialized correctly");
+        throw new NullPointerException(
+            "TextParserData (sentence_map) not initialized correctly");
       } else if ( line_starts == null ) {
-        throw new NullPointerException("TextParserData (line_starts) not initialized correctly");
+        throw new NullPointerException(
+            "TextParserData (line_starts) not initialized correctly");
       }
       
       int i = idx-1;
@@ -875,9 +910,19 @@ public class TextParser {
       return(false);
     }
     
+    /**
+     * Returns the previous <code>PAUSE</code> ({@link SentenceEntryType})
+     * from <code>idx</code> in the <code>TextParser</code> character buffer.
+     * 
+     * @param idx   The index in {@link TextParser#buffer}.
+     * 
+     * @return  The index of the previous <code>PAUSE</code> or <code>-1</code>
+     *          if no <code>PAUSE</code> was found.
+     */
     public int findPreviousPause(int idx) {
       if ( sentence_map == null ) {
-        throw new NullPointerException("TextParserData (sentence_map) not initialized correctly");
+        throw new NullPointerException(
+            "TextParserData (sentence_map) not initialized correctly");
       }
 
       int i = idx-1;
@@ -907,9 +952,22 @@ public class TextParser {
       return(endIdx);
     }
     
+    /**
+     * Returns the previous <code>LIKELY</code> ({@link Likelihood})
+     * <code>END</code> ({@link SentenceEntryType}) from <code>idx</code> 
+     * in the <code>TextParser</code> 
+     * character buffer.
+     * 
+     * @param idx   The index in {@link TextParser#buffer}.
+     * 
+     * @return  The index of the previous <code>LIKELY</code> <code>END</code> 
+     *          or <code>-1</code> if no <code>LIKELY</code> <code>END</code> 
+     *          was found.
+     */
     public int findPreviousLikelyEnd(int idx) {
       if ( sentence_map == null ) {
-        throw new NullPointerException("TextParserData (sentence_map) not initialized correctly");
+        throw new NullPointerException(
+            "TextParserData (sentence_map) not initialized correctly");
       }
 
       int i = idx-1;
@@ -938,9 +996,22 @@ public class TextParser {
       return(endIdx);
     }
     
+    /**
+     * Returns the previous <code>UNLIKELY</code> ({@link Likelihood})
+     * <code>END</code> ({@link SentenceEntryType}) from <code>idx</code> 
+     * in the <code>TextParser</code> 
+     * character buffer.
+     * 
+     * @param idx   The index in {@link TextParser#buffer}.
+     * 
+     * @return  The index of the previous <code>UNLIKELY</code> <code>END</code> 
+     *          or <code>-1</code> if no <code>UNLIKELY</code> <code>END</code> 
+     *          was found.
+     */
     public int findPreviousUnlikelyEnd(int idx) {
       if ( sentence_map == null ) {
-        throw new NullPointerException("TextParserData (sentence_map) not initialized correctly");
+        throw new NullPointerException(
+            "TextParserData (sentence_map) not initialized correctly");
       }
 
       int i = idx-1;

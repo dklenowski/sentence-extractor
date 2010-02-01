@@ -24,8 +24,7 @@ public class WhitespaceRemover {
    * Private constructor.
    */
   private WhitespaceRemover() { }
-  
-  
+
   /**
    * Removes excessive whitespace characters from position <code>idx</code>
    * in the <code>Vector</code> <code>text</code>. If the <code>String</code>

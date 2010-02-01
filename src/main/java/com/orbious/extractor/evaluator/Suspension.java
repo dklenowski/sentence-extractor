@@ -32,16 +32,29 @@ public class Suspension extends Evaluator {
   private static HashSet<String> suspensions;
   
   /**
-   * Constructor, initializes the <code>Suspension</code> class.
+   * Constructor, initializes this <code>Evaluator</code>.
+   * 
+   * @param parserData  Data generating during <code>TextParser</code> parsing.
+   * @param type    The type of <code>Evaluator</code>.
    */
   public Suspension(TextParserData parserData, EvaluatorType type) {
     super("Suspension", type);
   }
   
+  /**
+   * Returns <code>true</code> if run as a start <code>Evaluator</code>,
+   * <code>false</code> otherwise.
+   */
   public boolean recordAsUnlikely() {
+    if ( type == EvaluatorType.START ) {
+      return(true);
+    }
     return(true);
   }
   
+  /**
+   * Return's <code>false</code>.
+   */
   public boolean recordAsPause() {
     return(false);
   }
@@ -50,13 +63,6 @@ public class Suspension extends Evaluator {
    * Determines if the previous word from <code>idx</code>
    * in the buffer <code>buf</code> is a suspension and therefore 
    * not a likely sentence start/end.
-   * 
-   * @param buf   Text buffer.
-   * @param idx   Position in buffer where evaluation begins.
-   * 
-   * @return    <code>true</code> if the previous word is a suspension and 
-   *            therefore not a likely sentence start/end, 
-   *            <code>false</code> otherwise.
    */
   public boolean evaluate(final char[] buf, int idx) throws FileNotFoundException {
     WordOp op;

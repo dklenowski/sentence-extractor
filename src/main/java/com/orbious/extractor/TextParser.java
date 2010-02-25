@@ -34,41 +34,14 @@ public class TextParser {
    */
   private String filename;
 
-  /**
-   * In memory representation of the text file with whitespace removed.
-   * Protected because it is used by {@link SentenceSplitter}.
-   */
-  protected char[] buffer;
+
+ // protected char[] buffer;
   
   /**
    * List of allowable sentence ends (see {@link Config#SENTENCE_ENDS}).
    */
   private HashSet<Character> sentence_ends;
 
-  /**
-   * A buffer that contains entries for likely/unlikely sentence start's/end's.
-   */
-  private SentenceMapEntry[] sentence_map;
-  
-  /**
-   * A buffer that contains a record of all the characters that have
-   * been extracted and is used for index adjustments of the start/end indexes
-   * (i.e. {@link TextParser#adjustIndexes(int, int)}).
-   */
-  protected boolean[] extraction_map;
-  
-  /**
-   * A buffer that contains where the line starts, which is used by some
-   * by the {@link com.orbious.extractor.evaluator.NumberedHeading} <code>Evaluator</code>.
-   */
-  private HashSet< Integer > line_starts;
-  
-  /**
-   * A <code>Vector</code> of <code>TextParserOp</code> containing sentence
-   * start/ends. Protected because it is used by {@link SentenceSplitter}.
-   */
-  protected Vector< TextParserOp > parser_map;
-  
   /**
    * Contains a list of sentences extracted from <code>filename</code>.
    */
@@ -119,15 +92,10 @@ public class TextParser {
   public TextParser(String filename) {
     this.filename = filename;
     parser_data = new TextParserData();
-    splitter = new SentenceSplitter(this);
+    splitter = new SentenceSplitter(parser_data);
 
     sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
     logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
-  }
-
-  // SHOULD REALLY ONLY BE USED IN TESTING
-  public char[] _buffer() {
-    return(buffer);
   }
   
   /**
@@ -203,7 +171,7 @@ public class TextParser {
     
     logger.info("Found " + raw.size() + " lines in " + filename);
 
-    line_starts = new HashSet<Integer>();
+    parser_data.line_starts = new HashSet<Integer>();
     clean = new Vector<String>();
     len = 0;
     lineCt = 0;
@@ -212,28 +180,28 @@ public class TextParser {
       str = WhitespaceRemover.remove(raw, i);
       if ( str != null ) {
         clean.add(str);
-        line_starts.add(len);
+        parser_data.line_starts.add(len);
         len += str.length();
         lineCt++;
       }
     }
     
     pos = 0;
-    buffer = new char[len];
+    parser_data.buffer = new char[len];
     for ( int i = 0; i < clean.size(); i++ ) {
       buf = clean.get(i).toCharArray();
-      System.arraycopy(buf, 0, buffer, pos, buf.length);
+      System.arraycopy(buf, 0, parser_data.buffer, pos, buf.length);
       pos += buf.length;
     }
     
-    sentence_map = new SentenceMapEntry[buffer.length];
-    parser_data.setTextParserData(line_starts, sentence_map, (len/lineCt));
+    parser_data.sentence_map = new SentenceMapEntry[parser_data.buffer.length];
+    parser_data.avg_line_char_ct = (len/lineCt);
     
     if ( logger.isInfoEnabled() ) {
       logger.info("Statistics for " + filename +
           " Raw: LineCt=" + raw.size() + 
-          " Cleansed: LineStarts=" + line_starts.size() +
-          " CharCt=" + buffer.length +
+          " Cleansed: LineStarts=" + parser_data.line_starts.size() +
+          " CharCt=" + parser_data.buffer.length +
           " AvgLineCharCt=" + parser_data.avg_line_char_ct);
     }
   }
@@ -252,20 +220,20 @@ public class TextParser {
 
     if ( sentences != null ) {
       sentences.clear();
-      parser_map.clear();
+      parser_data.parser_map.clear();
     } else {
       sentences = new Vector< Vector<String> >();
-      parser_map = new Vector<TextParserOp>();
+      parser_data.parser_map = new Vector<TextParserOp>();
     }
-    extraction_map = new boolean[buffer.length];
+    parser_data.extraction_map = new boolean[parser_data.buffer.length];
    
     sent_start_idx = -1;
     sent_unlikely_start_idx = -1;
     sent_end_idx = -1;
     sent_unlikely_end_idx = -1;
     
-    for ( int i = 0; i < sentence_map.length; i++ ) {      
-      entry = sentence_map[i];
+    for ( int i = 0; i < parser_data.sentence_map.length; i++ ) {      
+      entry = parser_data.sentence_map[i];
       if ( entry == null ) {
         continue;
       }
@@ -303,17 +271,20 @@ public class TextParser {
     
     if ( logger.isDebugEnabled() ) {
       logger.debug("Buffer:\n" + 
-          Helper.getDebugStringFromCharBuf(buffer, 0, buffer.length, 100) +
+          Helper.getDebugStringFromCharBuf(parser_data.buffer, 0, 
+              parser_data.buffer.length, 100) +
           "SentenceMap:\n" + 
-          Helper.getDebugStringFromSentenceMap(buffer, sentence_map, 0, 
-              sentence_map.length, 100) +
+          Helper.getDebugStringFromSentenceMap(parser_data.buffer, 
+              parser_data.sentence_map, 0, 
+              parser_data.sentence_map.length, 100) +
           "ExtractionMap:\n" +
-          Helper.getDebugStringFromBoolBuf(buffer, extraction_map, 0, 
-              extraction_map.length, 100));
+          Helper.getDebugStringFromBoolBuf(parser_data.buffer, 
+              parser_data.extraction_map, 0, 
+              parser_data.extraction_map.length, 100));
     }
 
-    for ( int i = 0; i < parser_map.size(); i++ ) {
-      op = splitter.split(parser_map.get(i));
+    for ( int i = 0; i < parser_data.parser_map.size(); i++ ) {
+      op = splitter.split(parser_data.parser_map.get(i));
       if ( op.wordCt() >= Config.MIN_SENTENCE_LENGTH.asInt() ) {
         sentences.add(op.words());
       }
@@ -396,9 +367,9 @@ public class TextParser {
    * @param end   The end of the sentence.
    */
   private void recordSentence(int start, int end) {
-    parser_map.add(new TextParserOp(start, end));
+    parser_data.parser_map.add(new TextParserOp(start, end));
     for ( int i = start; i <= end; i++ ) {
-      extraction_map[i] = true;
+      parser_data.extraction_map[i] = true;
     }
     
     if ( logger.isDebugEnabled() ) {
@@ -422,11 +393,11 @@ public class TextParser {
     inHeading = false;
     sentence = new Sentence(parser_data);
     
-    for ( int i = 0; i < buffer.length; i++ ) {
-      ch = buffer[i];
+    for ( int i = 0; i < parser_data.buffer.length; i++ ) {
+      ch = parser_data.buffer[i];
       
       if ( sentence_ends.contains(ch) ) {
-        endOp = sentence.isEnd(buffer, i);
+        endOp = sentence.isEnd(parser_data.buffer, i);
         if ( endOp != null ) {
           if ( !endOp.isEnd() ) {
             evaluator = endOp.failedEvaluator();
@@ -456,14 +427,14 @@ public class TextParser {
         // run a quick check to reduce the workload
         if ( !Character.isUpperCase(ch) ) {
           continue;
-        } else if ( (i > 0) && !Character.isWhitespace(buffer[i-1]) &&
-            !sentence_ends.contains(buffer[i-1]) ) {
+        } else if ( (i > 0) && !Character.isWhitespace(parser_data.buffer[i-1]) &&
+            !sentence_ends.contains(parser_data.buffer[i-1]) ) {
           // the setence_ends conditional is included for the case
           // ...: "As ...
           continue;
         }
 
-        startOp = sentence.isStart(buffer, i, inHeading);
+        startOp = sentence.isStart(parser_data.buffer, i, inHeading);
         if ( startOp != null ) {
           if ( !startOp.isStart() ) {
             evaluator = startOp.failedEvaluator();
@@ -509,7 +480,7 @@ public class TextParser {
     SentenceMapEntry entry;
     boolean replace;
     
-    old = sentence_map[idx];
+    old = parser_data.sentence_map[idx];
     replace = false;
     if ( old == null ) {
       replace = true;
@@ -521,7 +492,7 @@ public class TextParser {
         (type == SentenceEntryType.PAUSE) || 
         (type == SentenceEntryType.HEADING) ) {
       entry = new SentenceMapEntry(likelihood, type, subtype);
-      sentence_map[idx] = entry;
+      parser_data.sentence_map[idx] = entry;
     }
   }
 
@@ -536,15 +507,35 @@ public class TextParser {
   public static class TextParserData {
     
     /**
-     * Copy of {@link TextParser#line_starts}.
+     * In memory representation of the text file with whitespace removed.
+     * Protected because it is used by {@link SentenceSplitter}.
+     */
+    protected char[] buffer;
+    
+    /**
+     * A buffer that contains where the line starts, which is used by some
+     * by the {@link com.orbious.extractor.evaluator.NumberedHeading} <code>Evaluator</code>.
      */
     protected HashSet<Integer> line_starts;
 
     /**
-     * Copy of {@link TextParser#parser_map}.
+     * A buffer that contains entries for likely/unlikely sentence start's/end's.
      */
     protected SentenceMapEntry[] sentence_map;
     
+    /**
+     * A <code>Vector</code> of <code>TextParserOp</code> containing sentence
+     * start/ends. Protected because it is used by {@link SentenceSplitter}.
+     */
+    protected Vector< TextParserOp > parser_map;
+    
+    /**
+     * A buffer that contains a record of all the characters that have
+     * been extracted and is used for index adjustments of the start/end indexes
+     * (i.e. {@link TextParser#adjustIndexes(int, int)}).
+     */
+    protected boolean[] extraction_map;
+
     /**
      * The average number of characters on each line.
      */
@@ -554,18 +545,19 @@ public class TextParser {
      * Constructor, initializes an empty <code>TextParserData</code>.
      */
     public TextParserData() { }
-
+    
     /**
-     * Updates all instance variables.
-     * 
-     * @param lineStarts    Copy of {@link TextParser#line_starts}.
-     * @param sentenceMap   Copy of {@link TextParser#sentence_map}.
-     * @param avgLineCharCt  The average number of characters on each line.
+     * Should only be used for testing.
      */
-    public void setTextParserData(HashSet<Integer> lineStarts,
-        SentenceMapEntry[] sentenceMap, int avgLineCharCt) {
+    public void _setTextParserData(char[] buffer,
+        HashSet<Integer> lineStarts,
+        SentenceMapEntry[] sentenceMap, 
+        Vector<TextParserOp> parserMap, 
+        int avgLineCharCt) {
+      this.buffer = buffer;
       line_starts = lineStarts;
       sentence_map = sentenceMap;
+      parser_map = parserMap;
       avg_line_char_ct = avgLineCharCt;
     }
     

@@ -4,16 +4,19 @@ import java.util.HashSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+
+import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.evaluator.UrlText;
 import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
 import com.orbious.extractor.util.Helper;
 
 public class SentenceSplitter {
 
+
   /**
-   * The {@link TextParser} that is using this <code>SentenceSplitter</code>.
+   * Text Parser data that is used during Sentence Splitting.
    */
-  private TextParser parser;
+  private TextParserData parser_data;
   
   /**
    * List of inner punctuation. (see {@link Config#INNER_PUNCTUATION}).
@@ -45,8 +48,8 @@ public class SentenceSplitter {
    */
   private Logger logger;
   
-  public SentenceSplitter(TextParser parser) {
-    this.parser = parser;
+  public SentenceSplitter(TextParserData parserData) {
+    this.parser_data = parserData;
     
     inner_punctuation = Helper.cvtStringToHashSet(Config.INNER_PUNCTUATION.asStr());
     preserved_punctuation = Helper.cvtStringToHashSet(Config.PRESERVED_PUNCTUATION.asStr());
@@ -97,7 +100,7 @@ public class SentenceSplitter {
     }
 
     for ( int i = indexAdjustment.adjustedStartIdx(); i <= indexAdjustment.adjustedEndIdx(); i++ ) {
-      ch = parser.buffer[i];
+      ch = parser_data.buffer[i];
 
       if ( Character.isLetterOrDigit(ch) ) {
         wd += ch;
@@ -122,7 +125,7 @@ public class SentenceSplitter {
         // punctuation
         doAsNewWord = false;
         
-        if ( hasAlpha || Helper.isPreviousLetter(parser.buffer, i) ) {
+        if ( hasAlpha || Helper.isPreviousLetter(parser_data.buffer, i) ) {
           if ( (i < startIdx) || (i >= endIdx) ) {
             doAsNewWord = true;
           } else {
@@ -130,12 +133,12 @@ public class SentenceSplitter {
               // punctuation attached to the word.
               wd += ch;
             } else if ( (ch == '.') && 
-                new UrlText(parser.parser_data, EvaluatorType.END).evaluate(parser.buffer, i) ) {
+                new UrlText(parser_data, EvaluatorType.END).evaluate(parser_data.buffer, i) ) {
               
               // web address 
               wd += ch;
-            } else if ( (ch == ',') && Helper.isPreviousNumber(parser.buffer, i) &&
-                Helper.isNextNumber(parser.buffer, i) ) {
+            } else if ( (ch == ',') && Helper.isPreviousNumber(parser_data.buffer, i) &&
+                Helper.isNextNumber(parser_data.buffer, i) ) {
               // thousands separator
               wd += ch;
             } else if ( preserved_punctuation.contains(ch) ) {
@@ -245,10 +248,10 @@ public class SentenceSplitter {
       adjustedStartIdx = nxtIdx;
   
        while ( (adjustedStartIdx > 0) &&
-           !parser.extraction_map[adjustedStartIdx] &&
-           (Character.isWhitespace(parser.buffer[adjustedStartIdx]) ||
-               left_marks.contains(parser.buffer[adjustedStartIdx]) ||
-               parser.buffer[adjustedStartIdx] == '\"') ) {
+           !parser_data.extraction_map[adjustedStartIdx] &&
+           (Character.isWhitespace(parser_data.buffer[adjustedStartIdx]) ||
+               left_marks.contains(parser_data.buffer[adjustedStartIdx]) ||
+               parser_data.buffer[adjustedStartIdx] == '\"') ) {
           adjustedStartIdx--;
       }
         
@@ -259,7 +262,7 @@ public class SentenceSplitter {
         adjustedStartIdx++;
         adjustment.adjustedStartIdx(adjustedStartIdx);
         for ( int i = adjustedStartIdx; i < startIdx; i++ ) {
-          parser.extraction_map[i] = true;
+          parser_data.extraction_map[i] = true;
         }
       }
     }
@@ -270,9 +273,9 @@ public class SentenceSplitter {
     }
     
     for ( int i = startIdx; i < endIdx; i++ ) {
-      if ( left_marks.contains(parser.buffer[i]) ) {
+      if ( left_marks.contains(parser_data.buffer[i]) ) {
         ct++;
-      } else if ( right_marks.contains(parser.buffer[i]) ) {
+      } else if ( right_marks.contains(parser_data.buffer[i]) ) {
         ct--;
       }
     }
@@ -282,19 +285,19 @@ public class SentenceSplitter {
     }
     // now check the end
     //
-    if ( endIdx == parser.buffer.length-1 ) {
+    if ( endIdx == parser_data.buffer.length-1 ) {
       adjustment.adjustedEndIdx(endIdx);
     } else {
       nxtIdx = endIdx+1;
       adjustedEndIdx = nxtIdx;
 
-      while ( (adjustedEndIdx < parser.buffer.length) &&
-          !parser.extraction_map[adjustedEndIdx] &&
-          (   sentence_ends.contains(parser.buffer[adjustedEndIdx]) ||
+      while ( (adjustedEndIdx < parser_data.buffer.length) &&
+          !parser_data.extraction_map[adjustedEndIdx] &&
+          (   sentence_ends.contains(parser_data.buffer[adjustedEndIdx]) ||
               (adjustedLeft &&
-              (Character.isWhitespace(parser.buffer[adjustedEndIdx]) ||
-                  right_marks.contains(parser.buffer[adjustedEndIdx]) ||
-                  parser.buffer[adjustedEndIdx] == '\"'))   ) ) {
+              (Character.isWhitespace(parser_data.buffer[adjustedEndIdx]) ||
+                  right_marks.contains(parser_data.buffer[adjustedEndIdx]) ||
+                  parser_data.buffer[adjustedEndIdx] == '\"'))   ) ) {
         adjustedEndIdx++;
       }
       
@@ -304,7 +307,7 @@ public class SentenceSplitter {
         adjustedEndIdx--;
         adjustment.adjustedEndIdx(adjustedEndIdx);
         for ( int i = endIdx+1; i <= adjustedEndIdx; i++ ) {
-          parser.extraction_map[i] = true;
+          parser_data.extraction_map[i] = true;
         }
       }
     }

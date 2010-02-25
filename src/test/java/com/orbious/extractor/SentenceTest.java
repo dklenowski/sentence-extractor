@@ -205,8 +205,8 @@ public class SentenceTest extends TestCase {
     map = new SentenceMapEntry[buf.length];
     map[6] = new SentenceMapEntry(Likelihood.LIKELY, SentenceEntryType.END);
 
-    TextParserData parserData = new TextParserData();
-    parserData.setTextParserData(new HashSet<Integer>(), map, -1);
+    TextParserData parserData = AllExtractorTests.initTextParserData(
+        new HashSet<Integer>(), map, -1);
 
     sentence = new Sentence(parserData);
     assertTrue(sentence.isStart(buf, 8, false).isStart());    
@@ -224,9 +224,8 @@ public class SentenceTest extends TestCase {
     map = new SentenceMapEntry[buf.length];
     map[2] = new SentenceMapEntry(Likelihood.UNLIKELY, SentenceEntryType.END);
 
-    TextParserData parserData = new TextParserData();
-    parserData.setTextParserData(new HashSet<Integer>(), map, -1);
-    
+    TextParserData parserData = AllExtractorTests.initTextParserData(
+        new HashSet<Integer>(), map, -1);
     sentence = new Sentence(parserData);
 
     StartOp op = sentence.isStart(buf, 4, false);

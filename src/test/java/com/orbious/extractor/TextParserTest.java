@@ -53,7 +53,7 @@ public class TextParserTest extends TestCase {
       fail("IOException thrown");
     }
     
-    char[] buffer = parser._buffer();
+    char[] buffer = parser.parser_data.buffer;
     String str = String.copyValueOf(buffer);
     
     String expected = "The Project Gutenberg EBook of Punch, or the London Charivari, Volume 1, " +

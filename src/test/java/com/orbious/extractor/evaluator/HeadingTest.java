@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Vector;
 import com.orbious.AllExtractorTests;
 import com.orbious.extractor.SentenceMapEntry;
+import com.orbious.extractor.TextParserOp;
 import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
 
@@ -70,10 +71,10 @@ public class HeadingTest extends TestCase {
       System.arraycopy(buf, 0, buffer, pos, buf.length);
       pos += buf.length;
     }
-
-    parserData.setTextParserData(lineStarts, new SentenceMapEntry[buffer.length], 
-        (charCt/data.size()));
-
+    
+    parserData._setTextParserData(buffer, lineStarts, 
+        new SentenceMapEntry[buffer.length], 
+        new Vector<TextParserOp>(), (charCt/data.size()));
     return(buffer);
   }
 

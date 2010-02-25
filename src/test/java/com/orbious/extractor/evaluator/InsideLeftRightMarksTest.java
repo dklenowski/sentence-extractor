@@ -119,8 +119,8 @@ public class InsideLeftRightMarksTest extends TestCase {
         new SentenceMapEntry(Likelihood.LIKELY, SentenceEntryType.END);
     }
     
-    TextParserData parserData = new TextParserData();
-    parserData.setTextParserData(new HashSet<Integer>(), map, -1);
+    TextParserData parserData = AllExtractorTests.initTextParserData(
+        new HashSet<Integer>(), map, -1);
     return(parserData);
   }
 }

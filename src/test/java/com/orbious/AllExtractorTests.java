@@ -24,6 +24,7 @@ import com.orbious.extractor.evaluator.AcronymTest;
 import com.orbious.extractor.evaluator.UrlTextTest;
 import com.orbious.extractor.Config;
 import com.orbious.extractor.SentenceMapEntry;
+import com.orbious.extractor.TextParser;
 import com.orbious.extractor.TextParserOp;
 import com.orbious.extractor.TextParserTest;
 import com.orbious.extractor.WhitespaceRemoverTest;
@@ -76,6 +77,64 @@ public class AllExtractorTests {
       }
     }   
   }
+    
+  public static TextParserData initTextParserData(char[] buffer,
+      HashSet<Integer> lineStarts, 
+      SentenceMapEntry[] sentenceMap,
+      Vector<TextParserOp> parserMap,
+      boolean[] extractionMap,
+      int avgLineCharCt) {
+    
+    TextParserData parserData = new TextParserData();
+    parserData._setTextParserData(buffer, lineStarts, sentenceMap, 
+        parserMap, extractionMap, avgLineCharCt);
+    
+    return(parserData);
+  }
+  
+  public static TextParserData initEmptyTextParserData() {
+    return( initTextParserData(
+        new char[5000], 
+        new HashSet<Integer>(), 
+        new SentenceMapEntry[5000], 
+        new Vector<TextParserOp>(),
+        new boolean[5000], 
+        80) );
+  }
+  
+  public static TextParserData initTextParserData(SentenceMapEntry[] sentenceMap) { 
+    return( initTextParserData(
+        new char[sentenceMap.length], 
+        new HashSet<Integer>(),
+        sentenceMap,
+        new Vector<TextParserOp>(),
+        new boolean[sentenceMap.length],
+        80) );
+  }
+  
+  public static TextParserData initTextParserData(HashSet<Integer> lineStarts) {
+    return( initTextParserData(
+        new char[5000], 
+        lineStarts,
+        new SentenceMapEntry[5000], 
+        new Vector<TextParserOp>(),
+        new boolean[5000], 
+        80) );
+  }
+  
+  public static HashSet<Integer> cvtToSet(List<Integer> list) {
+    HashSet<Integer> hs = new HashSet<Integer>();
+    for ( int i = 0; i < list.size(); i++ ) {
+      hs.add(list.get(i));
+    }
+    
+    return(hs);
+  }
+  
+  
+  
+  
+  /*
 
   public static TextParserData initTextParserData(List<Integer> list,
       SentenceMapEntry[] sentenceMap, int avgLineCharCt) {
@@ -97,10 +156,14 @@ public class AllExtractorTests {
     return(parserData);
   }
  
-  public static TextParserData initEmptyTextParserData() {
+  public static TextParserData initTextParserData(char[] buffer, 
+      HashSet<Integer> lineStarts,
+      SentenceMapEntry[] sentenceMap, int avgLineCharCt) {
     TextParserData parserData = new TextParserData();
-    parserData._setTextParserData(new char[5000], 
-        new HashSet<Integer>(), new SentenceMapEntry[5000], new Vector<TextParserOp>(), 80);
+    parserData._setTextParserData(buffer, 
+        lineStarts, sentenceMap, new Vector<TextParserOp>(), 80);
     return(parserData);
-  }
+  }*/
+  
+
 }

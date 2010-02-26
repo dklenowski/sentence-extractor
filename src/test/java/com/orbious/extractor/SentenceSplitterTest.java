@@ -2,7 +2,13 @@ package com.orbious.extractor;
 
 // $Id$
 
+import java.util.List;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Vector;
+
 import com.orbious.AllExtractorTests;
+import com.orbious.extractor.TextParser.TextParserData;
 
 import junit.framework.TestCase;
 
@@ -18,13 +24,9 @@ public class SentenceSplitterTest extends TestCase {
     super(name);
     AllExtractorTests.initLogger();
   }
-  
-  ////////////////////////
-  //  TODO:
-  // 
-  
+ 
   /*
-  You have fed me,
+  "You have fed me,
   you have protected me, you have carried me in your arms. I live to-day
   by you, a stranger."
 
@@ -32,6 +34,32 @@ public class SentenceSplitterTest extends TestCase {
   service, he said, pointing to his two ambassadors: "These are great men;
   Umbate is my right hand.
   */
+  public void test_Stranger() {
+    SentenceSplitter splitter;
+    TextParserData parserData;
+    String str;
+    Vector<String> wds;
+    
+    str = 
+      "\"You have fed me,\n" +
+      "you have protected me, you have carried me in your arms. I live to-day\n" +
+      "by you, a stranger.\"\n" + 
+      "\n" +
+      "Upon Moffat replying that he was unaware of having rendered him any such\n" +
+      "service, he said, pointing to his two ambassadors: \"These are great men;\n" +
+      "Umbate is my right hand.\n";
+
+    parserData = genParserData(str);
+    
+    splitter = new SentenceSplitter(parserData);
+    SplitterOp op = splitter.split(new TextParserOp(75, 108));
+    
+    wds = op.words();
+    for ( int i = 0; i < wds.size(); i++ ) {
+      System.out.println(i + "=" + wds.get(i));
+    }
+    
+  }
   
   
   
@@ -98,5 +126,64 @@ public class SentenceSplitterTest extends TestCase {
   saw how subdued he was--how chastened he looked--her heart went out to
   him.
   */
+  
+  private TextParserData genParserData(String str) { 
+    TextParserData parserData;
+    Vector<String> dirty;
+    Vector<String> clean;
+    HashSet<Integer> lineStarts;
+    char[] buffer;
+    char[] buf;
+    String tmpstr;
+    int len;
+    int pos;
+    
+    dirty = cvtTextToVector(str);
+    clean = new Vector<String>();
+    
+    lineStarts = new HashSet<Integer>();
+    len = 0;
+    for ( int i = 0; i < dirty.size(); i++ ) {
+      tmpstr = WhitespaceRemover.remove(dirty, i);
+      if ( tmpstr != null ) {
+        clean.add(tmpstr);
+        lineStarts.add(len);
+        len += tmpstr.length();
+      }
+    }
+    
+    buffer = new char[len];
+    pos = 0;
+    for ( int i = 0; i < clean.size(); i++ ) {
+      buf = clean.get(i).toCharArray();
+      System.arraycopy(buf, 0, buffer, pos, buf.length);
+      pos += buf.length;
+    }
+    
+    for ( int i = 0; i < buffer.length; i++ ) {
+      System.out.println(i + "=" + buffer[i]);
+    }
+    
+    parserData = AllExtractorTests.initTextParserData(buffer, lineStarts, 
+        new SentenceMapEntry[buffer.length],
+        new Vector<TextParserOp>(),
+        new boolean[buffer.length],
+        80);
+    return(parserData);
+  }
+  
+  private Vector<String> cvtTextToVector(String str) {
+    Vector<String> v;
+    String a[];
+    
+    v = new Vector<String>();
+    a = str.split("\n");
+    
+    for ( int i = 0; i < a.length; i++ ) {
+      v.add(a[i]);
+    }
+    
+    return(v);
+  }
 
 }

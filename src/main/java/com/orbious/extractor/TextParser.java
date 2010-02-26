@@ -553,11 +553,14 @@ public class TextParser {
         HashSet<Integer> lineStarts,
         SentenceMapEntry[] sentenceMap, 
         Vector<TextParserOp> parserMap, 
+        boolean[] extractionMap,
         int avgLineCharCt) {
+      
       this.buffer = buffer;
       line_starts = lineStarts;
       sentence_map = sentenceMap;
       parser_map = parserMap;
+      extraction_map = extractionMap;
       avg_line_char_ct = avgLineCharCt;
     }
     

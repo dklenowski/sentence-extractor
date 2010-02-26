@@ -10,6 +10,17 @@ import com.orbious.extractor.evaluator.UrlText;
 import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
 import com.orbious.extractor.util.Helper;
 
+/**
+ * 
+ * Uses the following data from <code>TextParserData</code>.
+ * <li>TextParserData - Used by URLText (only buffer used in evaluate()).
+ * <li>buffer - Read only.
+ * <li>extraction_map - Read/Write.
+ * 
+ * @author dklenowski
+ * @version 2.0
+ * @since 2.0
+ */
 public class SentenceSplitter {
 
 

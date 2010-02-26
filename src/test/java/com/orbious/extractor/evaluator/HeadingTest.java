@@ -74,7 +74,9 @@ public class HeadingTest extends TestCase {
     
     parserData._setTextParserData(buffer, lineStarts, 
         new SentenceMapEntry[buffer.length], 
-        new Vector<TextParserOp>(), (charCt/data.size()));
+        new Vector<TextParserOp>(), 
+        new boolean[buffer.length], (charCt/data.size()) );
+
     return(buffer);
   }
 

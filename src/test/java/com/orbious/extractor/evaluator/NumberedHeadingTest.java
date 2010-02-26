@@ -27,7 +27,8 @@ public class NumberedHeadingTest extends TestCase {
     NumberedHeading head;
     TextParserData parserData;
     
-    parserData = AllExtractorTests.initTextParserData(Arrays.asList(0), null, -1);
+    parserData = AllExtractorTests.initTextParserData(
+        AllExtractorTests.cvtToSet(Arrays.asList(0)));
 
     head = new NumberedHeading(parserData, EvaluatorType.START);
     assertEquals(true, head.evaluate("I.".toCharArray(), 1));
@@ -38,7 +39,8 @@ public class NumberedHeadingTest extends TestCase {
     NumberedHeading head;
     TextParserData parserData;
     
-    parserData = AllExtractorTests.initTextParserData(Arrays.asList(0), null, -1);
+    parserData = AllExtractorTests.initTextParserData(
+        AllExtractorTests.cvtToSet(Arrays.asList(0)));
 
     head = new NumberedHeading(parserData, EvaluatorType.START);
     assertEquals(false, head.evaluate("typhoonIIM".toCharArray(), 7));
@@ -50,7 +52,8 @@ public class NumberedHeadingTest extends TestCase {
     String str;
     TextParserData parserData;
     
-    parserData = AllExtractorTests.initTextParserData(Arrays.asList(0, 2), null, -1);
+    parserData = AllExtractorTests.initTextParserData(
+        AllExtractorTests.cvtToSet(Arrays.asList(0, 2)));
 
     head = new NumberedHeading(parserData, EvaluatorType.START);
 
@@ -66,7 +69,8 @@ public class NumberedHeadingTest extends TestCase {
     String str;
     TextParserData parserData;
     
-    parserData = AllExtractorTests.initTextParserData(Arrays.asList(0), null, -1);
+    parserData = AllExtractorTests.initTextParserData(
+        AllExtractorTests.cvtToSet(Arrays.asList(0)));
 
     head = new NumberedHeading(parserData, EvaluatorType.START);
 

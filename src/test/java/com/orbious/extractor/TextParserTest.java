@@ -5,11 +5,10 @@ package com.orbious.extractor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Vector;
-import name.fraser.neil.plaintext.diff_match_patch;
-import name.fraser.neil.plaintext.diff_match_patch.Diff;
 import com.orbious.AllExtractorTests;
+import com.orbious.extractor.util.TextDiff;
+
 import junit.framework.TestCase;
 
 /**
@@ -54,7 +53,7 @@ public class TextParserTest extends TestCase {
     }
     
     char[] buffer = parser.parser_data.buffer;
-    String str = String.copyValueOf(buffer);
+    String actual = String.copyValueOf(buffer);
     
     String expected = "The Project Gutenberg EBook of Punch, or the London Charivari, Volume 1, " +
     "Complete, by Various. This eBook is for the use of anyone anywhere at no " +
@@ -66,13 +65,8 @@ public class TextParserTest extends TestCase {
     "2005 [EBook #17216] Language: English Character set encoding: " +
     "ASCII *** START OF THIS PROJECT GUTENBERG EBOOK PUNCH, VOLUME 1 *** ";
 
-    if ( !expected.equals(str) ) {
-      diff_match_patch dmp = new diff_match_patch();
-      LinkedList<Diff> d = dmp.diff_main(expected, str);
-
-      System.out.println("Expected=|" + expected + "|\n" +
-                         "Actual  =|" + str + "|\n" + 
-                         "Diff    =" + d);
+    if ( !expected.equals(actual) ) {
+      System.out.println(TextDiff.compare(expected, actual));
       fail();
     }
   }
@@ -106,12 +100,7 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());   
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        diff_match_patch dmp = new diff_match_patch();
-        LinkedList<Diff> d = dmp.diff_main(expected.get(i), sentences.get(i));
-
-        System.out.println("Expected=|" + expected.get(i) + "|\n" +
-                           "Actual  =|" + sentences.get(i) + "|\n" + 
-                           "Diff    =" + d);
+        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
@@ -150,12 +139,7 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        diff_match_patch dmp = new diff_match_patch();
-        LinkedList<Diff> d = dmp.diff_main(expected.get(i), sentences.get(i));
-
-        System.out.println("Expected=|" + expected.get(i) + "|\n" +
-                           "Actual  =|" + sentences.get(i) + "|\n" + 
-                           "Diff    =" + d);
+        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
@@ -170,7 +154,7 @@ public class TextParserTest extends TestCase {
         Arrays.asList(
             "Early in the month of July , 1841 , a small handbill was freely distributed by the newsmen of London , and created considerable amusement and inquiry .",
             "That handbill now stands as the INTRODUCTION to this , the first Volume of Punch , and was employed to announce the advent of a publication which has sustained for nearly twenty years a popularity unsurpassed in the history of periodical literature .",
-            "Punch and the Elections were the only matters which occupied the public mind on July 17, 1842 .",
+            "Punch and the Elections were the only matters which occupied the public mind on July 17 , 1842 .",
             "The Whigs had been defeated in many places where hitherto they had been the popular party , and it was quite evident that the Meeting of Parliament would terminate their lease of Office .",
             //"[ STREET POLITICS . ]",
             "The House met on the 19th of August , and unanimously elected MR. SHAW LEFEVRE to be Speaker .",
@@ -199,13 +183,8 @@ public class TextParserTest extends TestCase {
     
     assertEquals(expected.size(), sentences.size());    
     for ( int i = 0; i < sentences.size(); i++ ) {
-     if ( !expected.get(i).equals(sentences.get(i)) ) {
-        diff_match_patch dmp = new diff_match_patch();
-        LinkedList<Diff> d = dmp.diff_main(expected.get(i), sentences.get(i));
-
-        System.out.println("Expected=|" + expected.get(i) + "|\n" +
-                           "Actual  =|" + sentences.get(i) + "|\n" + 
-                           "Diff    =" + d);
+      if ( !expected.get(i).equals(sentences.get(i)) ) {
+        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
@@ -237,12 +216,7 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        diff_match_patch dmp = new diff_match_patch();
-        LinkedList<Diff> d = dmp.diff_main(expected.get(i), sentences.get(i));
-
-        System.out.println("Expected=|" + expected.get(i) + "|\n" +
-                           "Actual  =|" + sentences.get(i) + "|\n" + 
-                           "Diff    =" + d);
+        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
@@ -266,7 +240,7 @@ public class TextParserTest extends TestCase {
             "At length out steps P. Petronius , an old chum of his , a finished scholar in the Claudian tongue and claims a remand .",
             "Pedo Pompeius prosecutes with loud outcry .",
             "The counsel for the defence tries to reply ; but Aeacus , who is the soul of justice , will not have it .",
-            "Aeacus hears the case against Claudius , refuses to hear the other side and passes sentence against him , quoting the line : \" As he did , so be he done by , this is justice undefiled. \"",
+            "Aeacus hears the case against Claudius , refuses to hear the other side and passes sentence against him , quoting the line : \" As he did , so be he done by , this is justice undefiled . \"",
             "[ Footnote : A proverbial line . ]"));
     try {
       parser.parse();
@@ -284,12 +258,7 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        diff_match_patch dmp = new diff_match_patch();
-        LinkedList<Diff> d = dmp.diff_main(expected.get(i), sentences.get(i));
-
-        System.out.println("Expected=|" + expected.get(i) + "|\n" +
-                           "Actual  =|" + sentences.get(i) + "|\n" + 
-                           "Diff    =" + d);
+        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(i + "=" + sentences.get(i));
@@ -323,12 +292,7 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        diff_match_patch dmp = new diff_match_patch();
-        LinkedList<Diff> d = dmp.diff_main(expected.get(i), sentences.get(i));
-
-        System.out.println("Expected=|" + expected.get(i) + "|\n" +
-                           "Actual  =|" + sentences.get(i) + "|\n" + 
-                           "Diff    =" + d);
+        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
@@ -347,7 +311,7 @@ public class TextParserTest extends TestCase {
             "Extract all text from document , removing excessive whitespace ( e.g. multiple spaces between words ) into a character buffer .",
             "For each word in the character buffer :",
             "If the first character of a word ( has a whitespace previously ) is uppercase begin the Start Evaluation Process .",
-            "If the character is a sentence end ( e.g. ' .',' !' etc ) run the End Evaluation Process .",
+            "If the character is a sentence end ( e.g. ' . ',' ! ' etc ) run the End Evaluation Process .",
             "Once the evaluation process is complete and a map of startsends is generated , begin sentence extraction .",
             "Record \" likely \" starts and \" unlikely \" starts until a \" likely \" end or \" unlikely \" end is reached .",
             "When the end is reached use either the \" likely \" start or \" unlikely \" start detected earlier as the sentence start .",
@@ -381,12 +345,7 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        diff_match_patch dmp = new diff_match_patch();
-        LinkedList<Diff> d = dmp.diff_main(expected.get(i), sentences.get(i));
-
-        System.out.println("Expected=|" + expected.get(i) + "|\n" +
-                           "Actual  =|" + sentences.get(i) + "|\n" + 
-                           "Diff    =" + d);
+        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));

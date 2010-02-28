@@ -411,6 +411,77 @@ public class Helper {
   }
   
   /**
+   * Extract a <code>String</code> from a character buffer.
+   * 
+   * @param buffer     <code>Character</code> buffer.
+   *        start      Start index in <code>buffer</code> to begin extraction.
+   *        end        End index in <code>buffer</code> to stop extraction.
+   * 
+   * @return    A <code>String</code> extracted from <code>buffer</code>.
+   */
+  
+  public static String cvtCharArrayToString(final char[] buffer, int start, int end) {
+    StringBuilder sb;
+
+    sb = new StringBuilder();
+    if ( start < 0 ) {
+      start = 0;
+    }
+    
+    if ( end > buffer.length ) {
+      end = buffer.length;
+    }
+    
+    for ( int i = start; i < end; i++ ) {
+      sb.append(buffer[i]);
+    }
+
+    return(sb.toString());
+  }
+  
+  /**
+   * Determines if the previous non-whitespace character in <code>buf</code> 
+   * from <code>idx</code> is a alpha numeric character.
+   * 
+   * @param buf   Text buffer.
+   * @param idx   Position in <code>buf</code>.
+   * 
+   * @return    <code>true</code> if the first previous non-whitespace
+   *            character is a alpha numeric character, <code>false</code> otherwise.
+   */
+  public static boolean isPreviousAlpha(final char[] buf, int idx) { 
+    int i;
+
+    i = moveToNonWhitespace(ParseDirn.LEFT, buf, idx);
+    if ( i == idx ) {
+      return(false);
+    }
+    
+    return( Character.isLetterOrDigit(buf[i]) );
+  }
+  
+  /**
+   * Determines if the next non-whitespace character in <code>buf</code> 
+   * from <code>idx</code> is a letter.
+   * 
+   * @param buf   Text buffer.
+   * @param idx   Position in <code>buf</code>.
+   * 
+   * @return    <code>true</code> if the first next non-whitespace
+   *            character is a letter, <code>false</code> otherwise.
+   */
+  public static boolean isNextAlpha(final char[] buf, int idx) {
+    int i;
+    
+    i = moveToNonWhitespace(ParseDirn.RIGHT, buf, idx);
+    if ( i == idx ) {
+      return(false);
+    }
+    
+    return( Character.isLetterOrDigit(buf[i]) );
+  }
+  
+  /**
    * Determines if the previous non-whitespace character in <code>buf</code> 
    * from <code>idx</code> is a letter.
    * 

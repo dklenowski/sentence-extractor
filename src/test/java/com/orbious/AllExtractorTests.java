@@ -7,7 +7,6 @@ import java.util.Vector;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
-
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -24,7 +23,7 @@ import com.orbious.extractor.evaluator.AcronymTest;
 import com.orbious.extractor.evaluator.UrlTextTest;
 import com.orbious.extractor.Config;
 import com.orbious.extractor.SentenceMapEntry;
-import com.orbious.extractor.TextParser;
+import com.orbious.extractor.SentenceSplitterTest;
 import com.orbious.extractor.TextParserOp;
 import com.orbious.extractor.TextParserTest;
 import com.orbious.extractor.WhitespaceRemoverTest;
@@ -57,6 +56,7 @@ public class AllExtractorTests {
     ts.addTestSuite(InsideLeftRightMarksTest.class);
     
     ts.addTestSuite(WhitespaceRemoverTest.class);
+    ts.addTestSuite(SentenceSplitterTest.class);
     ts.addTestSuite(WordTest.class);
     ts.addTestSuite(SentenceTest.class);
     ts.addTestSuite(TextParserTest.class);

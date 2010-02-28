@@ -2,7 +2,6 @@ package com.orbious.extractor;
 
 // $Id: SentenceTest.java 14 2009-12-06 10:03:53Z app $
 
-import java.util.HashSet;
 import com.orbious.AllExtractorTests;
 import com.orbious.extractor.Sentence.StartOp;
 import com.orbious.extractor.SentenceMapEntry.Likelihood;

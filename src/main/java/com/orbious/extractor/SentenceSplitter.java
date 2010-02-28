@@ -2,12 +2,8 @@ package com.orbious.extractor;
 
 import java.util.HashSet;
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
-
 import com.orbious.extractor.TextParser.TextParserData;
-import com.orbious.extractor.evaluator.UrlText;
-import com.orbious.extractor.evaluator.Evaluator.EvaluatorType;
 import com.orbious.extractor.util.Helper;
 
 /**
@@ -84,19 +80,36 @@ public class SentenceSplitter {
    */
   protected SplitterOp split(TextParserOp op) {
     Vector<String> words;
-    int startIdx;
-    int endIdx;
+    int adStartIdx, adEndIdx;
+    int postEndIdx;
     int wordCt;
     String wd;
     char ch;
+    //Suspension suspension;
     IndexAdjustment indexAdjustment;
-    boolean hasAlpha;
-    boolean hasLetter;
+    boolean hasAlpha, hasLetter;
     boolean doAsNewWord;
 
-    startIdx = op.start();
-    endIdx = op.end();
-    indexAdjustment = adjustIndexes(startIdx, endIdx);
+    //suspension = new Suspension(parser_data, EvaluatorType.END);
+    indexAdjustment = adjustIndexes(op.start(), op.end());
+    
+    adStartIdx = indexAdjustment.adjustedStartIdx();
+    adEndIdx = indexAdjustment.adjustedEndIdx();
+
+    postEndIdx = 0;
+    
+    for ( int i = adStartIdx; i < adEndIdx; i++ ) {
+      if ( Character.isLetterOrDigit(parser_data.buffer[i]) ) {
+        postEndIdx = 0;
+      } else if ( postEndIdx == 0 ) {
+          postEndIdx = i;
+      }
+    }
+    
+    if ( postEndIdx == 0 ) {
+      postEndIdx = adEndIdx;
+    }
+   
     words = new Vector<String>();
     wd = "";
     hasAlpha = false;
@@ -104,13 +117,15 @@ public class SentenceSplitter {
     wordCt = 0;
     
     if ( logger.isDebugEnabled() ) {
-      logger.debug("Beginning extract startIdx=" + startIdx + 
-          " adjustedStartIdx=" + indexAdjustment.adjustedStartIdx() +
-          " endIdx=" + endIdx +
-          " adjustedEndIdx=" + indexAdjustment.adjustedEndIdx());
+      logger.debug("Beginning extract start=" + op.start() + 
+          " adjustedStartIdx=" + adStartIdx +
+          " end=" + op.end() +
+          " adjustedEndIdx=" + adEndIdx +
+          " postEndIdx=" + postEndIdx + "\n" + 
+          Helper.cvtCharArrayToString(parser_data.buffer, adStartIdx, adEndIdx) + "\n");
     }
 
-    for ( int i = indexAdjustment.adjustedStartIdx(); i <= indexAdjustment.adjustedEndIdx(); i++ ) {
+    for ( int i = adStartIdx; i <= adEndIdx; i++ ) {
       ch = parser_data.buffer[i];
 
       if ( Character.isLetterOrDigit(ch) ) {
@@ -123,7 +138,6 @@ public class SentenceSplitter {
         if ( wd.length() == 0 ) {
           continue;
         }
-        
         words.add(wd);
         wd = "";
         if ( hasLetter ) {
@@ -134,31 +148,27 @@ public class SentenceSplitter {
         
       } else {
         // punctuation
+        //
+        System.out.println("CH=" + ch);
         doAsNewWord = false;
-        
-        if ( hasAlpha || Helper.isPreviousLetter(parser_data.buffer, i) ) {
-          if ( (i < startIdx) || (i >= endIdx) ) {
-            doAsNewWord = true;
-          } else {
-            if ( inner_punctuation.contains(ch) ) {
-              // punctuation attached to the word.
+        if ( (i < op.start()) || (i >= postEndIdx) ) {
+          // we are at the ends, so consider the punctuation as a new word
+          doAsNewWord = true;
+          
+        } else {
+          if ( hasAlpha && inner_punctuation.contains(ch) ) {
+            if ( (ch == '.') || 
+                ((i+1 < parser_data.buffer.length) && 
+                    Character.isLetterOrDigit(parser_data.buffer[i+1])) ) {
+              // there are 2 cases, suspension which need to be combined
+              // and text where the next letter is text
               wd += ch;
-            } else if ( (ch == '.') && 
-                new UrlText(parser_data, EvaluatorType.END).evaluate(parser_data.buffer, i) ) {
-              
-              // web address 
-              wd += ch;
-            } else if ( (ch == ',') && Helper.isPreviousNumber(parser_data.buffer, i) &&
-                Helper.isNextNumber(parser_data.buffer, i) ) {
-              // thousands separator
-              wd += ch;
-            } else if ( preserved_punctuation.contains(ch) ) {
-              // we preserve this punctuation
+            } else {
               doAsNewWord = true;
             }
+          } else if ( preserved_punctuation.contains(ch) ) {
+            doAsNewWord = true;
           }
-        } else if ( preserved_punctuation.contains(ch) ) {
-          doAsNewWord = true;
         }
           
         if ( doAsNewWord ) {
@@ -184,46 +194,76 @@ public class SentenceSplitter {
       }
     }
     
-    // we need to run a final check and join punctuation
-    Vector<String> cleanwords = new Vector<String>();
+    // we need to run a final check and certain punctuation
+    //
+    Vector<String> clean = new Vector<String>();
     int p = 0;
-    boolean skipMunge;
-    StringBuilder tmpwd;
+
+    StringBuilder tmpwd = null;
     
     while ( p < words.size() ) {
       wd = words.get(p);
       p++;
-      skipMunge = false;
-      
-      if ( (wd.length() != 1) ||
-          !preserved_punctuation.contains(wd.charAt(0)) ||
-          (p+1 >= words.size()) ) {
-        skipMunge = true;
-      }
-      
-      if ( skipMunge ) {
-        cleanwords.add(wd);
-      } else {
-        tmpwd = new StringBuilder(wd);
-        while ( p < words.size() ) {
-          wd = words.get(p);
-          if ( (wd.length() != 1) || sentence_ends.contains(wd.charAt(0)) || 
-              !preserved_punctuation.contains(wd.charAt(0)) ) {
-            break;
-          } else {
-            tmpwd.append(wd);
-            p++;
-          }
+     
+      if ( wd.matches(".*[a-zA-Z0-9].*") ) {
+        // 
+        // special case, for words with a fullstop at the end of the 
+        // of the word (which can occur when TextParser#hasLaterPunctuation
+        // is true
+        if ( tmpwd != null ) {
+          clean.add(tmpwd.toString());
+          tmpwd = null;
         }
-        cleanwords.add(tmpwd.toString());
+
+        /*if ( wd.charAt(wd.length()-1) == '.' ) {
+          // run a suspension evaluation and check not a suspension
+          int pos = wd.length()-1;
+          try {
+            if ( suspension.evaluate(wd.toCharArray(), pos) ) {
+              clean.add(wd);
+            } else {
+              clean.add(wd.substring(0, pos));
+              clean.add(".");
+            }
+          } catch ( Exception e ) {
+            logger.fatal("Error initializing suspensions?");
+            return(null);
+          }
+        } else {*/
+          clean.add(wd);
+        //}
+        continue;
       }
+      
+      if ( tmpwd == null ) {
+        tmpwd = new StringBuilder(wd);
+        continue;
+      }
+      
+      // if we get to here we allready have a tmpwd
+      if ( wd.length() == 1 ) {
+        ch = wd.charAt(0);
+        if ( sentence_ends.contains(ch) || 
+            left_marks.contains(ch) || right_marks.contains(ch) ) {
+          clean.add(tmpwd.toString());
+          tmpwd = null;
+          clean.add(wd);    
+        } else {
+          tmpwd.append(wd);
+        }
+      }
+    }
+    
+    if ( tmpwd != null ) {
+      clean.add(tmpwd.toString());
     }
     
     if ( logger.isDebugEnabled() ) {
-      logger.debug("Extracted = " + Helper.cvtVectorToString(cleanwords));
+      logger.debug("PreClean =" + Helper.cvtVectorToString(words));
+      logger.debug("Clean    =" + Helper.cvtVectorToString(clean));
     }
     
-    return( new SplitterOp(cleanwords, wordCt) );
+    return( new SplitterOp(clean, wordCt) );
   }
   
   /**

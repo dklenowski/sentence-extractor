@@ -1,7 +1,6 @@
 package com.orbious.extractor.evaluator;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import com.orbious.AllExtractorTests;
 import com.orbious.extractor.SentenceMapEntry;

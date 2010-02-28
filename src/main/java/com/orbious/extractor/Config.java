@@ -40,7 +40,7 @@ public enum Config {
    * All punctuation that is considered part of a sentence
    * e.g. '-', '.'
    */
-  INNER_PUNCTUATION(".-'`"),
+  INNER_PUNCTUATION(".-'`:,"),
 
   /**
    * Characters that should be preserved during the cleansing process.

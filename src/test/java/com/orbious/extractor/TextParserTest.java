@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Vector;
 import com.orbious.AllExtractorTests;
-import com.orbious.extractor.util.TextDiff;
 
 import junit.framework.TestCase;
 
@@ -66,7 +65,7 @@ public class TextParserTest extends TestCase {
     "ASCII *** START OF THIS PROJECT GUTENBERG EBOOK PUNCH, VOLUME 1 *** ";
 
     if ( !expected.equals(actual) ) {
-      System.out.println(TextDiff.compare(expected, actual));
+      System.out.println(AllExtractorTests.compare(expected, actual));
       fail();
     }
   }
@@ -100,7 +99,7 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());   
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
+        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
@@ -139,7 +138,7 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
+        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
@@ -184,7 +183,7 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());    
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
+        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
@@ -216,7 +215,7 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
+        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
@@ -258,7 +257,7 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
+        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(i + "=" + sentences.get(i));
@@ -292,7 +291,7 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
+        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
@@ -345,7 +344,7 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(TextDiff.compare(expected.get(i), sentences.get(i)));
+        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));

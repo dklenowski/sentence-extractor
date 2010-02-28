@@ -2,11 +2,16 @@ package com.orbious;
 
 // $Id: AllTests.java 14 2009-12-06 10:03:53Z app $
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
+
+import name.fraser.neil.plaintext.diff_match_patch;
+import name.fraser.neil.plaintext.diff_match_patch.Diff;
+
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -77,6 +82,16 @@ public class AllExtractorTests {
       }
     }   
   }
+  
+  public static String compare(String expected, String actual) { 
+    diff_match_patch dmp = new diff_match_patch();
+    LinkedList<Diff> d = dmp.diff_main(expected, actual);
+    
+    String str = "Expected=|" + expected + "|\n" +
+                 "Actual  =|" + actual + "\n" +
+                 "Diff    =" + d;
+    return(str);
+  }
     
   public static TextParserData initTextParserData(char[] buffer,
       HashSet<Integer> lineStarts, 
@@ -130,40 +145,5 @@ public class AllExtractorTests {
     
     return(hs);
   }
-  
-  
-  
-  
-  /*
-
-  public static TextParserData initTextParserData(List<Integer> list,
-      SentenceMapEntry[] sentenceMap, int avgLineCharCt) {
-    HashSet<Integer> lineStarts;
-
-    lineStarts = new HashSet<Integer>();
-    for ( int i = 0; i < list.size(); i++ ) {
-      lineStarts.add(list.get(i));
-    }    
-
-    return( initTextParserData(lineStarts, sentenceMap, avgLineCharCt) );
-  }
-  
-  public static TextParserData initTextParserData(HashSet<Integer> lineStarts,
-      SentenceMapEntry[] sentenceMap, int avgLineCharCt) {
-    TextParserData parserData = new TextParserData();
-    parserData._setTextParserData(new char[5000], 
-        lineStarts, sentenceMap, new Vector<TextParserOp>(), 80);
-    return(parserData);
-  }
- 
-  public static TextParserData initTextParserData(char[] buffer, 
-      HashSet<Integer> lineStarts,
-      SentenceMapEntry[] sentenceMap, int avgLineCharCt) {
-    TextParserData parserData = new TextParserData();
-    parserData._setTextParserData(buffer, 
-        lineStarts, sentenceMap, new Vector<TextParserOp>(), 80);
-    return(parserData);
-  }*/
-  
 
 }

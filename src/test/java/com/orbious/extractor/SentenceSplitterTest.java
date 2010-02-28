@@ -7,7 +7,6 @@ import java.util.Vector;
 import com.orbious.AllExtractorTests;
 import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.util.Helper;
-import com.orbious.extractor.util.TextDiff;
 import junit.framework.TestCase;
 
 /**
@@ -57,7 +56,7 @@ public class SentenceSplitterTest extends TestCase {
     expected = "I live to-day by you , a stranger . \"";
     
     if ( !expected.equals(actual) ) {
-      System.out.println(TextDiff.compare(expected, actual));
+      System.out.println(AllExtractorTests.compare(expected, actual));
       fail();
     }
   }
@@ -98,7 +97,7 @@ public class SentenceSplitterTest extends TestCase {
     expected = "As Jimmy ambled away to look for some beetles , " +
                "he chuckled and chuckled and chuckled . \"";
     if ( !expected.equals(actual) ) {
-      System.out.println(TextDiff.compare(expected, actual));
+      System.out.println(AllExtractorTests.compare(expected, actual));
       fail();
     }
   }
@@ -137,7 +136,7 @@ public class SentenceSplitterTest extends TestCase {
                "you simply can't keep them away .";
     
     if ( !expected.equals(actual) ) {
-      System.out.println(TextDiff.compare(expected, actual));
+      System.out.println(AllExtractorTests.compare(expected, actual));
       fail();
     }
     
@@ -146,7 +145,7 @@ public class SentenceSplitterTest extends TestCase {
     expected = "It's bred in the bone . . . .";
     
     if ( !expected.equals(actual) ) {
-      System.out.println(TextDiff.compare(expected, actual));
+      System.out.println(AllExtractorTests.compare(expected, actual));
       fail();
     }
   }
@@ -188,7 +187,7 @@ public class SentenceSplitterTest extends TestCase {
     "iron , heard in the house while it was in building . \"";
 
     if ( !expected.equals(actual) ) {
-      System.out.println(TextDiff.compare(expected, actual));
+      System.out.println(AllExtractorTests.compare(expected, actual));
       fail();
     }
   }
@@ -228,7 +227,7 @@ public class SentenceSplitterTest extends TestCase {
     "own society than they are to that of every human association .";
 
     if ( !expected.equals(actual) ) {
-      System.out.println(TextDiff.compare(expected, actual));
+      System.out.println(AllExtractorTests.compare(expected, actual));
       fail();
     }
   }
@@ -264,7 +263,7 @@ public class SentenceSplitterTest extends TestCase {
     expected = "\" He calls her ' child ' . . . \" thought Mary .";
     
     if ( !expected.equals(actual) ) {
-      System.out.println(TextDiff.compare(expected, actual));
+      System.out.println(AllExtractorTests.compare(expected, actual));
       fail();
     }
     
@@ -275,7 +274,7 @@ public class SentenceSplitterTest extends TestCase {
     "her heart went out to him .";
     
     if ( !expected.equals(actual) ) {
-      System.out.println(TextDiff.compare(expected, actual));
+      System.out.println(AllExtractorTests.compare(expected, actual));
       fail();
     }
   }
@@ -301,7 +300,7 @@ public class SentenceSplitterTest extends TestCase {
     expected = "Illustration : FUNNY DOGS WITH COMIC TALES .";
 
     if ( !expected.equals(actual) ) {
-      System.out.println(TextDiff.compare(expected, actual));
+      System.out.println(AllExtractorTests.compare(expected, actual));
       fail();
     }
   }
@@ -330,7 +329,7 @@ public class SentenceSplitterTest extends TestCase {
     "SHAW LEFEVRE to be Speaker .";
 
     if ( !expected.equals(actual) ) {
-      System.out.println(TextDiff.compare(expected, actual));
+      System.out.println(AllExtractorTests.compare(expected, actual));
       fail();
     }
   }
@@ -373,7 +372,7 @@ public class SentenceSplitterTest extends TestCase {
     "wretched stipend of L8,000 a year !";
 
     if ( !expected.equals(actual) ) {
-      System.out.println(TextDiff.compare(expected, actual));
+      System.out.println(AllExtractorTests.compare(expected, actual));
       fail();
     }
   }

@@ -149,7 +149,6 @@ public class SentenceSplitter {
       } else {
         // punctuation
         //
-        System.out.println("CH=" + ch);
         doAsNewWord = false;
         if ( (i < op.start()) || (i >= postEndIdx) ) {
           // we are at the ends, so consider the punctuation as a new word

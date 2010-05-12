@@ -1,5 +1,6 @@
 
 
+
     * Version branches/1.1.
     * Used to extract sentences from text documents.
     * Has been used successfully on Project Gutenberg texts.

@@ -7,7 +7,7 @@
   <version>TRUNK</version>
   <name>sentence-extractor</name>
   <description>Sentence Extraction API.</description>
-  <url>http://code.google.com/p/sentence-extractor/</url>
+  <url>https://bitbucket.org/davek/sentence-extractor</url>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -40,13 +40,13 @@
     </dependency>
   </dependencies>
   <issueManagement>
-  	<system>google code</system>
-  	<url>http://code.google.com/p/sentence-extractor/issues/list</url>
+  	<system>bitbucket</system>
+  	<url>https://bitbucket.org/davek/sentence-extractor/wiki/Home</url>
   </issueManagement>
   <scm>
-  	<connection>https://sentence-extractor.googlecode.com/svn/trunk/</connection>
-  	<developerConnection>David Klenowski</developerConnection>
-  	<url>http://sentence-extractor.googlecode.com/svn/trunk/</url>
+  	<connection>https://bitbucket.org/davek/sentence-extractor</connection>
+  	<developerConnection>davek</developerConnection>
+  	<url>https://bitbucket.org/davek/sentence-extractor</url>
   </scm>
   <build>
     <plugins>

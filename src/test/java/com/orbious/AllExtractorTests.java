@@ -88,7 +88,7 @@ public class AllExtractorTests {
     LinkedList<Diff> d = dmp.diff_main(expected, actual);
     
     String str = "Expected=|" + expected + "|\n" +
-                 "Actual  =|" + actual + "\n" +
+                 "Actual  =|" + actual + "|\n" +
                  "Diff    =" + d;
     return(str);
   }

@@ -4,7 +4,7 @@
   <groupId>com.orbious.extractor</groupId>
   <artifactId>sentence-extractor</artifactId>
   <packaging>jar</packaging>
-  <version>TRUNK</version>
+  <version>4.0</version>
   <name>sentence-extractor</name>
   <description>Sentence Extraction API.</description>
   <url>https://bitbucket.org/davek/sentence-extractor</url>

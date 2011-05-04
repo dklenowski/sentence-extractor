@@ -1,6 +1,8 @@
 package com.orbious.extractor;
 
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * An class used to store data related to the extraction of words
@@ -23,6 +25,11 @@ public class SplitterOp {
    * <code>words</code> vector.
    */
   private int wordCt;
+  
+  /**
+   * A pattern for returning words without punctuation.
+   */
+  private static final Pattern alpha = Pattern.compile("[0-9a-zA-Z]");
   
   /**
    * Constructor, initialize the <code>ExtractionOp<code> object.
@@ -51,5 +58,26 @@ public class SplitterOp {
    */
   public int wordCt() {
     return(wordCt);
+  }
+  
+  /**
+   * Returns the words, but ignores words that are are punctuation.
+   * @return
+   */
+  public Vector<String> wordsWithoutPunct() {
+    Matcher m;
+    String str;
+    Vector<String> w;
+    
+    w = new Vector<String>(words.size());
+    for ( int i = 0; i < words.size(); i++ ) {
+      str = words.get(i);
+      m = alpha.matcher(str);
+      if ( m.find() ) {
+        w.add(str);
+      }
+    }
+    
+    return w;
   }
 }

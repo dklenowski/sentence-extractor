@@ -32,11 +32,8 @@ public class TextParser {
   /**
    * A plain text file.
    */
-  private String filename;
+  private final String filename;
 
-
- // protected char[] buffer;
-  
   /**
    * List of allowable sentence ends (see {@link Config#SENTENCE_ENDS}).
    */
@@ -45,7 +42,7 @@ public class TextParser {
   /**
    * Contains a list of sentences extracted from <code>filename</code>.
    */
-  private Vector< Vector<String> > sentences;
+  private Vector<SplitterOp> sentences;
   
   /**
    * The data extracted during {@link TextParser#parse()} and 
@@ -91,6 +88,7 @@ public class TextParser {
    */
   public TextParser(String filename) {
     this.filename = filename;
+
     parser_data = new TextParserData();
     splitter = new SentenceSplitter(parser_data);
 
@@ -103,11 +101,24 @@ public class TextParser {
    * {@link TextParser#filename}. Each sentence put into a <code>Vector</code>, 
    * where each entry contains a word.
    * 
+   * @param ignorePunct   Ignore words that contain only punctuation.
+   * 
    * @return    A list of sentences extracted from <code>filename</code>
    *            with each sentence returned as a <code>Vector</code> of words.
    */
-  public Vector< Vector<String> > sentences() {
-    return(sentences);
+  public Vector< Vector<String> > sentences(boolean ignorePunct) {
+    Vector< Vector<String> > s;
+    
+    s = new Vector<Vector<String>>(sentences.size());
+    for ( int i = 0; i < sentences.size(); i++ ) {
+      if ( ignorePunct ) {
+        s.add(sentences.get(i).wordsWithoutPunct());
+      } else {
+        s.add(sentences.get(i).words());
+      }
+    }
+    
+    return s;
   }
   
   /**
@@ -117,18 +128,27 @@ public class TextParser {
    * Accessor for {@link TextParser#sentences} with the words in the sentences
    * converted to <code>String</code>'s.
    * 
+   * @param ignorePunct   Ignore words that contain only punctuation.
+   * 
    * @return    A list of sentences extracted from <code>filename</code>
    *            with each sentence returned as a <code>String</code>.
    */
-  public Vector<String> sentencesAsStr() {
+  public Vector<String> sentencesAsStr(boolean ignorePunct) {
     Vector<String> sent = new Vector<String>();
+    SplitterOp op;
     Vector<String> words;
     StringBuilder sb;
     
     sb = new StringBuilder();
     
     for ( int i = 0; i < sentences.size(); i++ ) {
-      words = sentences.get(i);
+      op = sentences.get(i);
+      if ( ignorePunct ) {
+        words = op.wordsWithoutPunct();
+      } else {
+        words = op.words();
+      }
+      
       sb.setLength(0);
       for ( int j = 0; j < words.size(); j++ ) {
         sb.append(words.get(j));
@@ -222,7 +242,7 @@ public class TextParser {
       sentences.clear();
       parser_data.parser_map.clear();
     } else {
-      sentences = new Vector< Vector<String> >();
+      sentences = new Vector<SplitterOp>();
       parser_data.parser_map = new Vector<TextParserOp>();
     }
     parser_data.extraction_map = new boolean[parser_data.buffer.length];
@@ -286,7 +306,7 @@ public class TextParser {
     for ( int i = 0; i < parser_data.parser_map.size(); i++ ) {
       op = splitter.split(parser_data.parser_map.get(i));
       if ( op.wordCt() >= Config.MIN_SENTENCE_LENGTH.asInt() ) {
-        sentences.add(op.words());
+        sentences.add(op);
       }
     }
     

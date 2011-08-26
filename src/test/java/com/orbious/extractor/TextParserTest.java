@@ -1,13 +1,12 @@
 package com.orbious.extractor;
 
-// $Id: TextParserTest.java 12 2009-12-05 11:40:44Z app $
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Vector;
 import com.orbious.AllExtractorTests;
-
+import com.orbious.util.Strings;
 import junit.framework.TestCase;
 
 /**
@@ -20,16 +19,17 @@ public class TextParserTest extends TestCase {
 
   public TextParserTest(String name) {
     super(name);
-    AllExtractorTests.initLogger();
+    AllExtractorTests.init();
   }
 
   public void test_readWithException() {
     String fname = "asdfasdf";
     TextParser parser = new TextParser(fname);
-    
+
     try {
+      parser.invalidate();
       parser.parse();
-      fail("No FileNotFoundException thrown"); 
+      fail("No FileNotFoundException thrown");
     } catch ( FileNotFoundException fnfe ) {
       // we expect this to be thrown ..
     } catch (IOException ioe ) {
@@ -40,7 +40,7 @@ public class TextParserTest extends TestCase {
   public void test_Read() {
     String fname = "src/test/resources/17216_short.txt";
     TextParser parser = new TextParser(fname);
-    
+
     try {
       parser.parse();
     } catch ( FileNotFoundException fnfe ) {
@@ -50,10 +50,10 @@ public class TextParserTest extends TestCase {
       ioe.printStackTrace();
       fail("IOException thrown");
     }
-    
+
     char[] buffer = parser.parser_data.buffer;
     String actual = String.copyValueOf(buffer);
-    
+
     String expected = "The Project Gutenberg EBook of Punch, or the London Charivari, Volume 1, " +
     "Complete, by Various. This eBook is for the use of anyone anywhere at no " +
     "cost and with almost no restrictions whatsoever. You may copy it, give " +
@@ -65,24 +65,25 @@ public class TextParserTest extends TestCase {
     "ASCII *** START OF THIS PROJECT GUTENBERG EBOOK PUNCH, VOLUME 1 *** ";
 
     if ( !expected.equals(actual) ) {
-      System.out.println(AllExtractorTests.compare(expected, actual));
+      System.out.println(Strings.diff(expected, actual));
       fail();
     }
   }
 
-  public void test_GenSentences17216() {
+  public void test_GenSentences17216() throws ParserException {
     String fname = "src/test/resources/17216_short.txt";
     TextParser parser = new TextParser(fname);
+    parser.invalidate();
 
-    Vector<String> expected = new Vector<String>( 
+    Vector<String> expected = new Vector<String>(
         Arrays.asList(
-            "The Project Gutenberg EBook of Punch , or the London Charivari , Volume 1 , Complete , by Various ." , 
-            "This eBook is for the use of anyone anywhere at no cost and with almost no restrictions whatsoever .", 
+            "The Project Gutenberg EBook of Punch , or the London Charivari , Volume 1 , Complete , by Various ." ,
+            "This eBook is for the use of anyone anywhere at no cost and with almost no restrictions whatsoever .",
             "You may copy it , give it away or re-use it under the terms of the Project Gutenberg License included with this eBook or online at www.gutenberg.net .",
             "Punch , or the London Charivari , Volume 1 , Complete Author :",
             "English Character set encoding :"
         ));
-            
+
     try {
       parser.parse();
     } catch ( FileNotFoundException fnfe ) {
@@ -95,30 +96,31 @@ public class TextParserTest extends TestCase {
 
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(false);
-    
-    assertEquals(expected.size(), sentences.size());   
+
+    assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
+        System.out.println(Strings.diff(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
     }
   }
 
-  public void test_GenSentences17216_noPunct() {
+  public void test_GenSentences17216_noPunct() throws ParserException {
     String fname = "src/test/resources/17216_short.txt";
     TextParser parser = new TextParser(fname);
+    parser.invalidate();
 
-    Vector<String> expected = new Vector<String>( 
+    Vector<String> expected = new Vector<String>(
         Arrays.asList(
-            "The Project Gutenberg EBook of Punch or the London Charivari Volume 1 Complete by Various" , 
-            "This eBook is for the use of anyone anywhere at no cost and with almost no restrictions whatsoever", 
+            "The Project Gutenberg EBook of Punch or the London Charivari Volume 1 Complete by Various" ,
+            "This eBook is for the use of anyone anywhere at no cost and with almost no restrictions whatsoever",
             "You may copy it give it away or re-use it under the terms of the Project Gutenberg License included with this eBook or online at www.gutenberg.net",
             "Punch or the London Charivari Volume 1 Complete Author",
             "English Character set encoding"
         ));
-            
+
     try {
       parser.parse();
     } catch ( FileNotFoundException fnfe ) {
@@ -131,33 +133,34 @@ public class TextParserTest extends TestCase {
 
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(true);
-    
-    assertEquals(expected.size(), sentences.size());   
+
+    assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
+        System.out.println(Strings.diff(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
     }
   }
-  
-  public void test_GenSentences17216_2() {
+
+  public void test_GenSentences17216_2() throws ParserException {
     String fname = "src/test/resources/17216_short2.txt";
     TextParser parser = new TextParser(fname);
+    parser.invalidate();
 
-    Vector<String> expected = new Vector<String>( 
+    Vector<String> expected = new Vector<String>(
         Arrays.asList(
             "MUSIC AND THE DRAMA .",
-            "These are amongst the most prominent features of the work ." , 
-            "The Musical Notices are written by the gentleman who plays the mouth-organ , assisted by the professors of the drum and cymbals .", 
+            "These are amongst the most prominent features of the work ." ,
+            "The Musical Notices are written by the gentleman who plays the mouth-organ , assisted by the professors of the drum and cymbals .",
             "\" Punch \" himself does the Drama .",
             "A Prophet is engaged !",
             "He foretells not only the winners of each race , but also the \" VATES \" and colours of the riders .",
             "Are contributed by the members of the following learned bodies :",
             "Together with original , humorous , and satirical articles in verse and prose , from all the [ Illustration : FUNNY DOGS WITH COMIC TALES . ]"
         ));
-            
+
     try {
       parser.parse();
     } catch ( FileNotFoundException fnfe ) {
@@ -170,33 +173,34 @@ public class TextParserTest extends TestCase {
 
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(false);
-  
+
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
+        System.out.println(Strings.diff(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
-    }    
+    }
   }
 
-  public void test_GenSentences17216_2_noPunct() {
+  public void test_GenSentences17216_2_noPunct() throws ParserException {
     String fname = "src/test/resources/17216_short2.txt";
     TextParser parser = new TextParser(fname);
+    parser.invalidate();
 
-    Vector<String> expected = new Vector<String>( 
+    Vector<String> expected = new Vector<String>(
         Arrays.asList(
             "MUSIC AND THE DRAMA",
-            "These are amongst the most prominent features of the work" , 
-            "The Musical Notices are written by the gentleman who plays the mouth-organ assisted by the professors of the drum and cymbals", 
+            "These are amongst the most prominent features of the work" ,
+            "The Musical Notices are written by the gentleman who plays the mouth-organ assisted by the professors of the drum and cymbals",
             "Punch himself does the Drama",
             "A Prophet is engaged",
             "He foretells not only the winners of each race but also the VATES and colours of the riders",
             "Are contributed by the members of the following learned bodies",
             "Together with original humorous and satirical articles in verse and prose from all the Illustration FUNNY DOGS WITH COMIC TALES"
         ));
-            
+
     try {
       parser.parse();
     } catch ( FileNotFoundException fnfe ) {
@@ -209,22 +213,23 @@ public class TextParserTest extends TestCase {
 
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(true);
-  
+
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
+        System.out.println(Strings.diff(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
-    }    
+    }
   }
-  
-  public void test_GenSentences17216_3() {
+
+  public void test_GenSentences17216_3()  throws ParserException {
     String fname = "src/test/resources/17216_short3.txt";
     TextParser parser = new TextParser(fname);
+    parser.invalidate();
 
-    Vector<String> expected = new Vector<String>( 
+    Vector<String> expected = new Vector<String>(
         Arrays.asList(
             "Early in the month of July , 1841 , a small handbill was freely distributed by the newsmen of London , and created considerable amusement and inquiry .",
             "That handbill now stands as the INTRODUCTION to this , the first Volume of Punch , and was employed to announce the advent of a publication which has sustained for nearly twenty years a popularity unsurpassed in the history of periodical literature .",
@@ -240,7 +245,7 @@ public class TextParserTest extends TestCase {
             "SIR ROBERT PEEL , in a speech of great eloquence , condemned the inactivity and feebleness of the existing Government , and promised that , should he displace it , and take office , it should be by walking in the open light , and in the direct paths of the constitution .",
             "He would only accept power upon his conception of public duty , and would resign the moment he was satisfied he was unsupported by the confidence of the people , and not continue to hold place when the voice of the country was against him .",
             "[ HERCULES TEARING THESEUS FROM THE ROCK TO WHICH HE HAD GROWN . ]",
-            "LORD JOHN defended the acts of the Ministry , and denied that they had been guilty of harshness to the poor by the New Poor Law , or enemies of the Church by reducing \" the ARCHBISHOP OF CANTERBURY to the miserable pittance of L15,000 a year , cutting down the BISHOP OF LONDON to no more than L10,000 a year , and the BISHOP OF DURHAM to the wretched stipend of L8,000 a year ! \""        
+            "LORD JOHN defended the acts of the Ministry , and denied that they had been guilty of harshness to the poor by the New Poor Law , or enemies of the Church by reducing \" the ARCHBISHOP OF CANTERBURY to the miserable pittance of L15,000 a year , cutting down the BISHOP OF LONDON to no more than L10,000 a year , and the BISHOP OF DURHAM to the wretched stipend of L8,000 a year ! \""
             ));
     try {
       parser.parse();
@@ -254,22 +259,23 @@ public class TextParserTest extends TestCase {
 
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(false);
-    
-    assertEquals(expected.size(), sentences.size());    
+
+    assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
+        System.out.println(Strings.diff(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
-    }    
+    }
   }
 
-  public void test_GenSentences10001() {
+  public void test_GenSentences10001() throws ParserException {
     String fname = "src/test/resources/10001_short.txt";
     TextParser parser = new TextParser(fname);
+    parser.invalidate();
 
-    Vector<String> expected = new Vector<String>( 
+    Vector<String> expected = new Vector<String>(
         Arrays.asList(
             "This piece is ascribed to Seneca by ancient tradition ; it is impossible to prove that it is his , and impossible to prove that it is not .",
             "The matter will probably continue to be decided by every one according to his view of Seneca's character and abilities : in the matters of style and of sentiment much may be said on both sides ."
@@ -286,22 +292,23 @@ public class TextParserTest extends TestCase {
 
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(false);
-   
+
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
+        System.out.println(Strings.diff(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
-    }    
+    }
   }
-  
-  public void test_GenSentences100012() {
+
+  public void test_GenSentences100012() throws ParserException {
     String fname = "src/test/resources/10001_short2.txt";
     TextParser parser = new TextParser(fname);
+    parser.invalidate();
 
-    Vector<String> expected = new Vector<String>( 
+    Vector<String> expected = new Vector<String>(
         Arrays.asList(
             "Pedo brings him before the judgement seat of 14 Aeacus , who was holding court under the Lex Cornelia to try cases of murder and assassination .",
             "Pedo requests the judge to take the prisoner's name , and produces a summons with this charge :",
@@ -328,22 +335,23 @@ public class TextParserTest extends TestCase {
 
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(false);
-    
+
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
+        System.out.println(Strings.diff(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(i + "=" + sentences.get(i));
-    }    
+    }
   }
-  
-  public void test_GenSentences11938() {
+
+  public void test_GenSentences11938() throws ParserException {
     String fname = "src/test/resources/11938_short.txt";
     TextParser parser = new TextParser(fname);
+    parser.invalidate();
 
-    Vector<String> expected = new Vector<String>( 
+    Vector<String> expected = new Vector<String>(
         Arrays.asList(
             "I have roughly classified the stories : in part 1 are stories of a general character ; part 2 , stories relating to animals ; in part 3 , stories which are scarcely folklore but are anecdotes relating to Santal life ; in Part 4 , stories relating to the dealings of bongas and men .",
             "In part 5 , are some legends and traditions , and a few notes relating to tribal customs .",
@@ -366,18 +374,19 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
+        System.out.println(Strings.diff(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
-    }    
+    }
   }
-  
-  public void test_GenSentences11938_noPunct() {
+
+  public void test_GenSentences11938_noPunct() throws ParserException {
     String fname = "src/test/resources/11938_short.txt";
     TextParser parser = new TextParser(fname);
+    parser.invalidate();
 
-    Vector<String> expected = new Vector<String>( 
+    Vector<String> expected = new Vector<String>(
         Arrays.asList(
             "I have roughly classified the stories in part 1 are stories of a general character part 2 stories relating to animals in part 3 stories which are scarcely folklore but are anecdotes relating to Santal life in Part 4 stories relating to the dealings of bongas and men",
             "In part 5 are some legends and traditions and a few notes relating to tribal customs",
@@ -400,18 +409,19 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
+        System.out.println(Strings.diff(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
-    }    
+    }
   }
-  
-  public void test_GenSentencesWiki() {
+
+  public void test_GenSentencesWiki() throws ParserException {
     String fname = "src/test/resources/wiki.txt";
     TextParser parser = new TextParser(fname);
+    parser.invalidate();
 
-    Vector<String> expected = new Vector<String>( 
+    Vector<String> expected = new Vector<String>(
         Arrays.asList(
             "Used to extract sentences from text documents .",
             "Has been used successfully on Project Gutenberg texts .",
@@ -436,7 +446,7 @@ public class TextParserTest extends TestCase {
             "It is advisable to examine texts before extraction to see if any pre processing can be done .",
             "This can increase accuracy significantly ."
         ));
-            
+
     try {
       parser.parse();
     } catch ( FileNotFoundException fnfe ) {
@@ -453,10 +463,10 @@ public class TextParserTest extends TestCase {
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( !expected.get(i).equals(sentences.get(i)) ) {
-        System.out.println(AllExtractorTests.compare(expected.get(i), sentences.get(i)));
+        System.out.println(Strings.diff(expected.get(i), sentences.get(i)));
         fail();
       }
       //System.out.println(sentences.get(i));
-    } 
+    }
   }
 }

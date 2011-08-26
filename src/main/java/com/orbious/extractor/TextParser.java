@@ -1,7 +1,5 @@
 package com.orbious.extractor;
 
-// $Id: TextParser.java 14 2009-12-06 10:03:53Z app $
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -15,20 +13,24 @@ import com.orbious.extractor.SentenceMapEntry.Likelihood;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntrySubType;
 import com.orbious.extractor.SentenceMapEntry.SentenceEntryType;
 import com.orbious.extractor.evaluator.Evaluator;
+import com.orbious.extractor.evaluator.EvaluatorException;
 import com.orbious.extractor.evaluator.Heading;
 import com.orbious.extractor.util.Helper;
+import com.orbious.util.HashSets;
+import com.orbious.util.Loggers;
+import com.orbious.util.config.Config;
 
 /**
  * Parser a text document into sentences. This class is the central class
  * for the <code>sentence-extractor</code> package.
- * 
+ *
  * @author dave
  * @version 1.0
  * @since 1.0
  */
 
 public class TextParser {
-  
+
   /**
    * A plain text file.
    */
@@ -40,50 +42,55 @@ public class TextParser {
   private HashSet<Character> sentence_ends;
 
   /**
+   * Minimum sentence length (see {@link AppConfig#min_sentence_length}).
+   */
+  private int min_sentence_len;
+
+  /**
    * Contains a list of sentences extracted from <code>filename</code>.
    */
   private Vector<SplitterOp> sentences;
-  
+
   /**
-   * The data extracted during {@link TextParser#parse()} and 
+   * The data extracted during {@link TextParser#parse()} and
    * {@link TextParser#genSentenceMap()}. Protected because it is used by
    * {@link SentenceSplitter}.
    */
   protected TextParserData parser_data;
-  
+
   /**
    * Used to separate sentences.
    */
   private SentenceSplitter splitter;
-  
+
   /**
    * The most recent sentence start index found in <code>buffer</code>.
    */
   private int sent_start_idx;
-  
+
   /**
    * The most recent unlikely sentence start index found in <code>buffer</code>.
    */
   private int sent_unlikely_start_idx;
-  
+
   /**
    * The most recent sentence end index found in <code>buffer</code>.
    */
   private int sent_end_idx;
-  
+
   /**
    * The most recent unlikely sentence end index found in <code>buffer</code>.
    */
   private int sent_unlikely_end_idx;
-  
+
   /**
    * Logger object.
    */
-  private Logger logger;
-  
+  private Logger logger = Loggers.logger();
+
   /**
    * Intialize the <code>TextParser</code>.
-   * 
+   *
    * @param filename    The absolute path to a plain-text document.
    */
   public TextParser(String filename) {
@@ -91,24 +98,29 @@ public class TextParser {
 
     parser_data = new TextParserData();
     splitter = new SentenceSplitter(parser_data);
-
-    sentence_ends = Helper.cvtStringToHashSet(Config.SENTENCE_ENDS.asStr());
-    logger = Logger.getLogger(Config.LOGGER_REALM.asStr());
   }
-  
+
+  public void invalidate() {
+    sentence_ends = HashSets.cvtStringToHashSet(
+        Config.getString(AppConfig.sentence_ends));
+    min_sentence_len = Config.getInt(AppConfig.min_sentence_length);
+
+    splitter.invalidate();
+  }
+
   /**
-   * Returns a <code>Vector</code> of sentences extracted from 
-   * {@link TextParser#filename}. Each sentence put into a <code>Vector</code>, 
+   * Returns a <code>Vector</code> of sentences extracted from
+   * {@link TextParser#filename}. Each sentence put into a <code>Vector</code>,
    * where each entry contains a word.
-   * 
+   *
    * @param ignorePunct   Ignore words that contain only punctuation.
-   * 
+   *
    * @return    A list of sentences extracted from <code>filename</code>
    *            with each sentence returned as a <code>Vector</code> of words.
    */
   public Vector< Vector<String> > sentences(boolean ignorePunct) {
     Vector< Vector<String> > s;
-    
+
     s = new Vector<Vector<String>>(sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
       if ( ignorePunct ) {
@@ -117,19 +129,19 @@ public class TextParser {
         s.add(sentences.get(i).words());
       }
     }
-    
+
     return s;
   }
-  
+
   /**
    * Returns the same as @{link TextParser#sentences} with the <code>Vector</code>
-   * list's of words converted to <code>String</code>'s. 
-   * 
+   * list's of words converted to <code>String</code>'s.
+   *
    * Accessor for {@link TextParser#sentences} with the words in the sentences
    * converted to <code>String</code>'s.
-   * 
+   *
    * @param ignorePunct   Ignore words that contain only punctuation.
-   * 
+   *
    * @return    A list of sentences extracted from <code>filename</code>
    *            with each sentence returned as a <code>String</code>.
    */
@@ -138,9 +150,9 @@ public class TextParser {
     SplitterOp op;
     Vector<String> words;
     StringBuilder sb;
-    
+
     sb = new StringBuilder();
-    
+
     for ( int i = 0; i < sentences.size(); i++ ) {
       op = sentences.get(i);
       if ( ignorePunct ) {
@@ -148,7 +160,7 @@ public class TextParser {
       } else {
         words = op.words();
       }
-      
+
       sb.setLength(0);
       for ( int j = 0; j < words.size(); j++ ) {
         sb.append(words.get(j));
@@ -159,20 +171,20 @@ public class TextParser {
 
       sent.add(sb.toString());
     }
-    
+
     return(sent);
   }
-  
+
   /**
-   * Parses {@link TextParser#filename} into memory. This method also calls 
+   * Parses {@link TextParser#filename} into memory. This method also calls
    * {@link com.orbious.extractor.WhitespaceRemover#remove(Vector, int)} on each line
    * before adding to memory and updates {@link TextParser#line_starts}
    * with the start of each line (minus whitespace).
-   * 
+   *
    * @throws FileNotFoundException
    * @throws IOException
    */
-  public void parse() throws FileNotFoundException, IOException { 
+  public void parse() throws FileNotFoundException, IOException {
     BufferedReader br;
     Vector<String> raw;
     Vector<String> clean;
@@ -181,21 +193,21 @@ public class TextParser {
     int len;
     int pos;
     int lineCt;
-    
+
     br = new BufferedReader(new FileReader(filename));
     raw = new Vector<String>();
     while ( (str = br.readLine()) != null ) {
       raw.add(str);
     }
     br.close();
-    
+
     logger.info("Found " + raw.size() + " lines in " + filename);
 
     parser_data.line_starts = new HashSet<Integer>();
     clean = new Vector<String>();
     len = 0;
     lineCt = 0;
-  
+
     for ( int i = 0; i < raw.size(); i++ ) {
       str = WhitespaceRemover.remove(raw, i);
       if ( str != null ) {
@@ -205,7 +217,7 @@ public class TextParser {
         lineCt++;
       }
     }
-    
+
     pos = 0;
     parser_data.buffer = new char[len];
     for ( int i = 0; i < clean.size(); i++ ) {
@@ -213,30 +225,30 @@ public class TextParser {
       System.arraycopy(buf, 0, parser_data.buffer, pos, buf.length);
       pos += buf.length;
     }
-    
+
     parser_data.sentence_map = new SentenceMapEntry[parser_data.buffer.length];
     parser_data.avg_line_char_ct = (len/lineCt);
-    
+
     if ( logger.isInfoEnabled() ) {
       logger.info("Statistics for " + filename +
-          " Raw: LineCt=" + raw.size() + 
+          " Raw: LineCt=" + raw.size() +
           " Cleansed: LineStarts=" + parser_data.line_starts.size() +
           " CharCt=" + parser_data.buffer.length +
           " AvgLineCharCt=" + parser_data.avg_line_char_ct);
     }
   }
- 
+
   /**
    * Runs the sentence extraction algorithm to generate the sentences
    * for {@link TextParser#sentences}.
    */
-  public void genSentences() {
+  public void genSentences() throws ParserException {
     SentenceMapEntry entry;
     SentenceEntryType type;
     Likelihood likelihood;
     SplitterOp op;
-    
-    genSentenceMap();    
+
+    genSentenceMap();
 
     if ( sentences != null ) {
       sentences.clear();
@@ -246,21 +258,21 @@ public class TextParser {
       parser_data.parser_map = new Vector<TextParserOp>();
     }
     parser_data.extraction_map = new boolean[parser_data.buffer.length];
-   
+
     sent_start_idx = -1;
     sent_unlikely_start_idx = -1;
     sent_end_idx = -1;
     sent_unlikely_end_idx = -1;
-    
-    for ( int i = 0; i < parser_data.sentence_map.length; i++ ) {      
+
+    for ( int i = 0; i < parser_data.sentence_map.length; i++ ) {
       entry = parser_data.sentence_map[i];
       if ( entry == null ) {
         continue;
       }
-      
+
       type = entry.type();
       likelihood = entry.likelihood();
-      
+
       if ( type == SentenceEntryType.START ) {
         if ( likelihood == Likelihood.UNLIKELY ) {
           if ( sent_unlikely_start_idx == -1 ) {
@@ -288,33 +300,33 @@ public class TextParser {
     }
 
     checkIndexes();
-    
+
     if ( logger.isDebugEnabled() ) {
-      logger.debug("Buffer:\n" + 
-          Helper.getDebugStringFromCharBuf(parser_data.buffer, 0, 
+      logger.debug("Buffer:\n" +
+          Helper.getDebugStringFromCharBuf(parser_data.buffer, 0,
               parser_data.buffer.length, 100) +
-          "SentenceMap:\n" + 
-          Helper.getDebugStringFromSentenceMap(parser_data.buffer, 
-              parser_data.sentence_map, 0, 
+          "SentenceMap:\n" +
+          Helper.getDebugStringFromSentenceMap(parser_data.buffer,
+              parser_data.sentence_map, 0,
               parser_data.sentence_map.length, 100) +
           "ExtractionMap:\n" +
-          Helper.getDebugStringFromBoolBuf(parser_data.buffer, 
-              parser_data.extraction_map, 0, 
+          Helper.getDebugStringFromBoolBuf(parser_data.buffer,
+              parser_data.extraction_map, 0,
               parser_data.extraction_map.length, 100));
     }
 
     for ( int i = 0; i < parser_data.parser_map.size(); i++ ) {
       op = splitter.split(parser_data.parser_map.get(i));
-      if ( op.wordCt() >= Config.MIN_SENTENCE_LENGTH.asInt() ) {
+      if ( op.wordCt() >= min_sentence_len ) {
         sentences.add(op);
       }
     }
-    
+
     if ( logger.isInfoEnabled() ) {
       logger.info("Found " + sentences.size() + " sentences in " + filename);
     }
   }
-  
+
   /**
    * Runs a check of the current sentence start/end indexes we have to see
    * if a sentence can be generated.
@@ -324,20 +336,20 @@ public class TextParser {
     int tEndIdx;
     boolean fndStart;
     boolean fndEnd;
-    
+
     if ( (sent_end_idx != -1 || sent_unlikely_end_idx != -1) &&
          (sent_start_idx != -1 || sent_unlikely_start_idx != -1) ) {
-      
+
       if ( logger.isDebugEnabled() ) {
-        logger.debug(" sent_start_idx=" + sent_start_idx + 
-            " sent_unlikely_start_idx=" + sent_unlikely_start_idx + 
-            " sent_end_idx=" + sent_end_idx + " sent_unlikely_end_idx=" + 
+        logger.debug(" sent_start_idx=" + sent_start_idx +
+            " sent_unlikely_start_idx=" + sent_unlikely_start_idx +
+            " sent_end_idx=" + sent_end_idx + " sent_unlikely_end_idx=" +
             sent_unlikely_end_idx);
       }
-    
+
       fndStart = false;
       fndEnd = false;
-      
+
       tStartIdx = -1;
       if ( sent_start_idx != -1 ) {
         tStartIdx = sent_start_idx;
@@ -346,7 +358,7 @@ public class TextParser {
       } else if ( sent_unlikely_start_idx != -1 ) {
         tStartIdx = sent_unlikely_start_idx;
       }
-      
+
       tEndIdx = -1;
       if ( tStartIdx != -1 ) {
         if ( sent_end_idx != -1 ) {
@@ -356,7 +368,7 @@ public class TextParser {
         } else if ( sent_unlikely_end_idx != -1 ) {
           tEndIdx = sent_unlikely_end_idx;
         }
-        
+
         if ( (tEndIdx != -1) && (tStartIdx < tEndIdx) && (fndStart || fndEnd) ) {
           recordSentence(tStartIdx, tEndIdx);
           sent_unlikely_start_idx = -1;
@@ -368,7 +380,7 @@ public class TextParser {
           } else {
             sent_unlikely_start_idx = tStartIdx;
           }
-          
+
           if ( fndEnd ) {
             sent_end_idx = tEndIdx;
           } else {
@@ -382,7 +394,7 @@ public class TextParser {
   /**
    * Add's a new sentence begin/end to the <code>extraction_map</code>
    * and the <code>parser_map</code>.
-   * 
+   *
    * @param start   The start of the sentence.
    * @param end   The end of the sentence.
    */
@@ -391,7 +403,7 @@ public class TextParser {
     for ( int i = start; i <= end; i++ ) {
       parser_data.extraction_map[i] = true;
     }
-    
+
     if ( logger.isDebugEnabled() ) {
       logger.debug("Added sentence startIdx=" + start + " endIdx=" + end);
     }
@@ -399,25 +411,36 @@ public class TextParser {
 
   /**
    * Internal method to generate a sentence map that is used by
-   * {@link TextParser#genSentences()} to find the begin and start 
+   * {@link TextParser#genSentences()} to find the begin and start
    * indexes for sentences.
    */
-  protected void genSentenceMap() {
+  protected void genSentenceMap() throws ParserException {
     char ch;
     EndOp endOp;
     StartOp startOp;
     boolean inHeading;
     Evaluator evaluator;
     Sentence sentence;
-    
+
     inHeading = false;
     sentence = new Sentence(parser_data);
-    
+
+    try {
+      sentence.invalidate();
+    } catch ( EvaluatorException ee ) {
+      throw new ParserException("Failed to validate sentence", ee);
+    }
+
     for ( int i = 0; i < parser_data.buffer.length; i++ ) {
       ch = parser_data.buffer[i];
-      
+
       if ( sentence_ends.contains(ch) ) {
-        endOp = sentence.isEnd(parser_data.buffer, i);
+        try {
+          endOp = sentence.isEnd(parser_data.buffer, i);
+        } catch ( SentenceException se ) {
+          throw new ParserException("Error during evaluation of end", se);
+        }
+
         if ( endOp != null ) {
           if ( !endOp.isEnd() ) {
             evaluator = endOp.failedEvaluator();
@@ -431,13 +454,13 @@ public class TextParser {
             }
           } else {
             addToMap(i, Likelihood.LIKELY, SentenceEntryType.END, null);
-            
+
             if ( endOp.startIdx() >= 0 ) {
-              addToMap(endOp.startIdx(), Likelihood.LIKELY, 
+              addToMap(endOp.startIdx(), Likelihood.LIKELY,
                   SentenceEntryType.START, SentenceEntrySubType.START_FROM_END);
             }
           }
-          
+
           if ( inHeading ) {
             inHeading = false;
           }
@@ -454,12 +477,16 @@ public class TextParser {
           continue;
         }
 
-        startOp = sentence.isStart(parser_data.buffer, i, inHeading);
+        try {
+          startOp = sentence.isStart(parser_data.buffer, i, inHeading);
+        } catch ( SentenceException se ) {
+          throw new ParserException("Error during evaluation of start", se);
+        }
         if ( startOp != null ) {
           if ( !startOp.isStart() ) {
             evaluator = startOp.failedEvaluator();
-            
-            if ( evaluator != null ) { 
+
+            if ( evaluator != null ) {
               if ( evaluator instanceof Heading ) {
                 addToMap(i, Likelihood.LIKELY, SentenceEntryType.HEADING, null);
                 inHeading = true;
@@ -469,37 +496,37 @@ public class TextParser {
             }
           } else {
             addToMap(i, Likelihood.LIKELY, SentenceEntryType.START, null);
-          
+
             ////////////////////
-            // THIS seems to generate allot of false positives? 
+            // THIS seems to generate allot of false positives?
             //
             //if ( startOp.stopIdx() >= 0 ) {
-              //addToMap(startOp.stopIdx(), Likelihood.LIKELY, 
+              //addToMap(startOp.stopIdx(), Likelihood.LIKELY,
                //   SentenceEntryType.END, SentenceEntrySubType.END_FROM_START);
             //}
           }
         }
       }
-    }  
+    }
   }
 
   /**
-   * Adds a likely/unlikely sentence start/end to the 
+   * Adds a likely/unlikely sentence start/end to the
    * {@link TextParser#sentence_map}. If the entry specified at <code>idx</code>
-   * is not null, will only add if the new entry replaces a 
+   * is not null, will only add if the new entry replaces a
    * {@link SentenceMapEntry.Likelihood} of <code>LIKELY</code>.
-   * 
+   *
    * @param idx   The index in {@link TextParser#sentence_map}.
-   * @param likelihood    The likelihood of this <code>SentenceMapEntry</code>. 
+   * @param likelihood    The likelihood of this <code>SentenceMapEntry</code>.
    * @param type    The type of this <code>SentenceMapEntry</code>.
    * @param subtype   Optional, The subtype of this <code>SentenceMapEntry</code>.
    */
-  private void addToMap(int idx, Likelihood likelihood, SentenceEntryType type, 
+  private void addToMap(int idx, Likelihood likelihood, SentenceEntryType type,
       SentenceEntrySubType subtype) {
     SentenceMapEntry old;
     SentenceMapEntry entry;
     boolean replace;
-    
+
     old = parser_data.sentence_map[idx];
     replace = false;
     if ( old == null ) {
@@ -508,30 +535,30 @@ public class TextParser {
       replace = true;
     }
 
-    if ( replace || 
-        (type == SentenceEntryType.PAUSE) || 
+    if ( replace ||
+        (type == SentenceEntryType.PAUSE) ||
         (type == SentenceEntryType.HEADING) ) {
       entry = new SentenceMapEntry(likelihood, type, subtype);
       parser_data.sentence_map[idx] = entry;
     }
   }
 
-  
+
   /**
    * An inner class to share <code>TextParser</code> data.
-   * 
+   *
    * @author dave
    * @since 1.0
    * @version 1.0
    */
   public static class TextParserData {
-    
+
     /**
      * In memory representation of the text file with whitespace removed.
      * Protected because it is used by {@link SentenceSplitter}.
      */
     protected char[] buffer;
-    
+
     /**
      * A buffer that contains where the line starts, which is used by some
      * by the {@link com.orbious.extractor.evaluator.NumberedHeading} <code>Evaluator</code>.
@@ -542,13 +569,13 @@ public class TextParser {
      * A buffer that contains entries for likely/unlikely sentence start's/end's.
      */
     protected SentenceMapEntry[] sentence_map;
-    
+
     /**
      * A <code>Vector</code> of <code>TextParserOp</code> containing sentence
      * start/ends. Protected because it is used by {@link SentenceSplitter}.
      */
     protected Vector< TextParserOp > parser_map;
-    
+
     /**
      * A buffer that contains a record of all the characters that have
      * been extracted and is used for index adjustments of the start/end indexes
@@ -560,22 +587,22 @@ public class TextParser {
      * The average number of characters on each line.
      */
     protected int avg_line_char_ct = -1;
-    
+
     /**
      * Constructor, initializes an empty <code>TextParserData</code>.
      */
     public TextParserData() { }
-    
+
     /**
      * Should only be used for testing.
      */
     public void _setTextParserData(char[] buffer,
         HashSet<Integer> lineStarts,
-        SentenceMapEntry[] sentenceMap, 
-        Vector<TextParserOp> parserMap, 
+        SentenceMapEntry[] sentenceMap,
+        Vector<TextParserOp> parserMap,
         boolean[] extractionMap,
         int avgLineCharCt) {
-      
+
       this.buffer = buffer;
       line_starts = lineStarts;
       sentence_map = sentenceMap;
@@ -583,13 +610,13 @@ public class TextParser {
       extraction_map = extractionMap;
       avg_line_char_ct = avgLineCharCt;
     }
-    
+
     /**
      * Determines if the index <code>idx</code> in the <code>TextParser</code>
      * character buffer is a line start.
-     * 
+     *
      * @param idx   The index in the {@link TextParser#buffer}.
-     * 
+     *
      * @return    <code>true</code> if <code>idx</code> is a line start,
      *            <code>false</code> otherwise.
      */
@@ -598,17 +625,17 @@ public class TextParser {
         throw new NullPointerException(
             "TextParserData (line_starts) not initialized correctly");
       }
-      
+
       return( line_starts.contains(idx) );
     }
-    
+
     /**
      * Determines if the index <code>idx</code> in the <code>TextParser</code>
      * character buffer lines on a line containing a heading.
-     * 
+     *
      * @param idx   The index in the {@link TextParser#buffer}.
-     * 
-     * @return    <code>true</code> if <code>idx</code> is on the same line 
+     *
+     * @return    <code>true</code> if <code>idx</code> is on the same line
      *            as a heading, <code>false</code> otherwise.
      */
     public boolean containsHeading(int idx) {
@@ -619,12 +646,12 @@ public class TextParser {
         throw new NullPointerException(
             "TextParserData (line_starts) not initialized correctly");
       }
-      
+
       int i = idx-1;
       if ( i < 0 ) {
         return(false);
       }
-      
+
       SentenceMapEntry entry;
       SentenceEntryType type;
 
@@ -636,30 +663,30 @@ public class TextParser {
             return(true);
           }
           return(false);
-        } 
+        }
 
         if ( entry == null ) {
           i--;
           continue;
-        } 
-        
+        }
+
         type = entry.type();
         if ( type == SentenceEntryType.HEADING ) {
           return(true);
         }
-        
+
         return(false);
       }
-      
+
       return(false);
     }
-    
+
     /**
      * Returns the previous <code>PAUSE</code> ({@link SentenceEntryType})
      * from <code>idx</code> in the <code>TextParser</code> character buffer.
-     * 
+     *
      * @param idx   The index in {@link TextParser#buffer}.
-     * 
+     *
      * @return  The index of the previous <code>PAUSE</code> or <code>-1</code>
      *          if no <code>PAUSE</code> was found.
      */
@@ -673,17 +700,17 @@ public class TextParser {
       if ( i < 0 ) {
         return(-1);
       }
-      
+
       SentenceMapEntry entry;
       int endIdx = -1;
-      
+
       while ( i > 0 ) {
         entry = sentence_map[i];
         if ( entry == null ) {
           i--;
           continue;
         }
-        
+
         if ( entry.likelihood() == Likelihood.LIKELY &&
             ((entry.type() == SentenceEntryType.END) ||
              (entry.type() == SentenceEntryType.PAUSE)) ) {
@@ -692,20 +719,20 @@ public class TextParser {
         }
         i--;
       }
-      
+
       return(endIdx);
     }
-    
+
     /**
      * Returns the previous <code>LIKELY</code> ({@link Likelihood})
-     * <code>END</code> ({@link SentenceEntryType}) from <code>idx</code> 
-     * in the <code>TextParser</code> 
+     * <code>END</code> ({@link SentenceEntryType}) from <code>idx</code>
+     * in the <code>TextParser</code>
      * character buffer.
-     * 
+     *
      * @param idx   The index in {@link TextParser#buffer}.
-     * 
-     * @return  The index of the previous <code>LIKELY</code> <code>END</code> 
-     *          or <code>-1</code> if no <code>LIKELY</code> <code>END</code> 
+     *
+     * @return  The index of the previous <code>LIKELY</code> <code>END</code>
+     *          or <code>-1</code> if no <code>LIKELY</code> <code>END</code>
      *          was found.
      */
     public int findPreviousLikelyEnd(int idx) {
@@ -718,17 +745,17 @@ public class TextParser {
       if ( i < 0 ) {
         return(-1);
       }
-      
+
       SentenceMapEntry entry;
       int endIdx = -1;
-      
+
       while ( i > 0 ) {
         entry = sentence_map[i];
         if ( entry == null ) {
           i--;
           continue;
         }
-        
+
         if ( (entry.likelihood() == Likelihood.LIKELY) &&
              (entry.type() == SentenceEntryType.END) ) {
           endIdx = i;
@@ -736,20 +763,20 @@ public class TextParser {
         }
         i--;
       }
-      
+
       return(endIdx);
     }
-    
+
     /**
      * Returns the previous <code>UNLIKELY</code> ({@link Likelihood})
-     * <code>END</code> ({@link SentenceEntryType}) from <code>idx</code> 
-     * in the <code>TextParser</code> 
+     * <code>END</code> ({@link SentenceEntryType}) from <code>idx</code>
+     * in the <code>TextParser</code>
      * character buffer.
-     * 
+     *
      * @param idx   The index in {@link TextParser#buffer}.
-     * 
-     * @return  The index of the previous <code>UNLIKELY</code> <code>END</code> 
-     *          or <code>-1</code> if no <code>UNLIKELY</code> <code>END</code> 
+     *
+     * @return  The index of the previous <code>UNLIKELY</code> <code>END</code>
+     *          or <code>-1</code> if no <code>UNLIKELY</code> <code>END</code>
      *          was found.
      */
     public int findPreviousUnlikelyEnd(int idx) {
@@ -765,7 +792,7 @@ public class TextParser {
 
       SentenceMapEntry entry;
       int endIdx = -1;
-      
+
       while ( i > 0 ) {
         entry = sentence_map[i];
         if ( entry == null ) {

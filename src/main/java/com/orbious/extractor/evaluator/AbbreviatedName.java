@@ -6,9 +6,6 @@ import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.Word.WordOp;
 import com.orbious.extractor.util.Helper;
 
-// $Id$
-
-
 /**
  * AbbreviatedName is used an an sentence end <code>Evaluator</code> to identify
  * non sentence ends like:
@@ -17,15 +14,15 @@ import com.orbious.extractor.util.Helper;
  * M.A. Little<br>
  * B. Thomas<br>
  * <p>
- * or the reverse 
+ * or the reverse
  * <p>
  * Rouse W.H.D<br>
  * Little M.A.<br>
  * Thomas B.<br>
  * <p>
- * Note that some of these names may also be picked up by 
+ * Note that some of these names may also be picked up by
  * {@link Acronym}.
- * 
+ *
  * @author dave
  * @version 1.0
  * @since 1.0
@@ -35,13 +32,15 @@ public class AbbreviatedName extends Evaluator {
 
   /**
    * Constructor, initializes this <code>Evaluator</code>.
-   * 
+   *
    * @param parserData  Data generating during <code>TextParser</code> parsing.
    * @param type    The type of <code>Evaluator</code>.
    */
   public AbbreviatedName(TextParserData parserData, EvaluatorType type) {
     super("AbbreviatedName", type);
-  }  
+  }
+
+  public void invalidate() { }
 
   /**
    * Return's <code>true</code> as the abbreviated name could be at either
@@ -50,7 +49,7 @@ public class AbbreviatedName extends Evaluator {
   public boolean recordAsUnlikely() {
     return(true);
   }
-  
+
   /**
    * Return's <code>false</code> as an abbreviated name does not represent
    * a pause between sentences.
@@ -65,7 +64,7 @@ public class AbbreviatedName extends Evaluator {
    */
   public boolean evaluate(final char[] buf, int idx) {
     boolean b;
-    
+
     if ( (type == EvaluatorType.START) && !Character.isUpperCase(buf[idx]) ) {
       return(false);
     } else if ( (type == EvaluatorType.END) && buf[idx] != '.' ) {
@@ -76,30 +75,30 @@ public class AbbreviatedName extends Evaluator {
     b = evaluateLeftToRight(buf, idx);
     if ( b ) {
       if ( logger.isDebugEnabled() && (debug_str.length() != 0) ) {
-        logger.debug(debug_str + 
+        logger.debug(debug_str +
             " RESULT=" + String.valueOf(b).toUpperCase());
       }
       return(b);
     }
-    
+
     b = evaluateRightToLeft(buf, idx);
-    
+
     if ( logger.isDebugEnabled() && (debug_str.length() != 0) ) {
-      logger.debug(debug_str + 
+      logger.debug(debug_str +
           " RESULT=" + String.valueOf(b).toUpperCase());
     }
-    
+
     return(b);
   }
-  
+
   /**
    * Tries to find abbreviated names of the format.
    * <p>
-   * [INITIALS] [SURNAME] 
+   * [INITIALS] [SURNAME]
    * <p>
    * @param buf   Text buffer.
    * @param idx   Position in the <code>buf</code> to begin examination.
-   * 
+   *
    * @return    <code>true</code> if an abbreviated name was found,
    *            <code>false</code> otherwise.
    */
@@ -111,16 +110,16 @@ public class AbbreviatedName extends Evaluator {
     // 12 3
     //
     int i;
-    
+
     if ( logger.isDebugEnabled() ) {
       debug_str.append("LtoR: ");
     }
-    
+
     if ( Character.isUpperCase(buf[idx]) ) {
       if ( idx+1 >= buf.length ) {
         return(false);
       }
-      
+
       if ( buf[idx+1] == '.' ) {
         //
         // case 1
@@ -131,8 +130,8 @@ public class AbbreviatedName extends Evaluator {
             debug_str.append("Case 1-Failed Checkcase, ");
           }
           return(false);
-        } 
- 
+        }
+
         i = Helper.moveToNonWhitespace(ParseDirn.RIGHT, buf, i+1);
         if ( (i != -1) && Character.isUpperCase(buf[i]) ) {
           if ( logger.isDebugEnabled() ) {
@@ -145,40 +144,40 @@ public class AbbreviatedName extends Evaluator {
           debug_str.append("Case 1-Default FALSE, ");
         }
         return(false);
-        
+
       } else if ( Character.isLowerCase(buf[idx+1]) ) {
         //
         // case 3
-        // 
+        //
         i = Helper.moveToNonWhitespace(ParseDirn.LEFT, buf, idx-1);
         if ( i == -1 ) {
           if ( logger.isDebugEnabled() ) {
             debug_str.append("Case 3-Failed move left, ");
           }
           return(false);
-        } 
-        
+        }
+
         i = checkCase(buf, idx, ParseDirn.LEFT);
         if ( i == -1 ) {
           if ( logger.isDebugEnabled() ) {
             debug_str.append("Case 1-Failed Checkcase, ");
           }
           return(false);
-        } 
-        
+        }
+
         if ( logger.isDebugEnabled() ) {
           debug_str.append("Case 3-TRUE, ");
         }
         return(true);
-        
-        
+
+
       } else {
         if ( logger.isDebugEnabled() ) {
           debug_str.append("Case 1,3-Default FALSE, ");
         }
         return(false);
       }
-      
+
     } else if ( buf[idx] == '.' ) {
       //
       // case 2
@@ -189,8 +188,8 @@ public class AbbreviatedName extends Evaluator {
           debug_str.append("Case 2-Failed Checkcase, ");
         }
         return(false);
-      }  
-      
+      }
+
       i = Helper.moveToNonWhitespace(ParseDirn.RIGHT, buf, idx+1);
       if ( (i != -1) && Character.isUpperCase(buf[i]) ) {
         if ( logger.isDebugEnabled() ) {
@@ -204,26 +203,26 @@ public class AbbreviatedName extends Evaluator {
       }
       return(false);
     }
-    
+
     if ( logger.isDebugEnabled() ) {
       debug_str.append("Default FALSE, ");
     }
     return(false);
   }
-  
+
   /**
    * Tries to find abbreviated names of the format.
    * <p>
-   * [SURNAME] [INITIALS] 
+   * [SURNAME] [INITIALS]
    * <p>
    * @param buf   Text buffer.
    * @param idx   Position in the <code>buf</code> to begin examination.
-   * 
+   *
    * @return    <code>true</code> if an abbreviated name was found,
    *            <code>false</code> otherwise.
    */
   protected boolean evaluateRightToLeft(final char[] buf, int idx) {
-    
+
     //
     // 3 cases:
     // Petro P.
@@ -231,16 +230,16 @@ public class AbbreviatedName extends Evaluator {
     //
     int i;
     WordOp op;
-    
+
     if ( logger.isDebugEnabled() ) {
       debug_str.append("RtoL: ");
     }
-    
+
     if ( Character.isUpperCase(buf[idx]) ) {
       if ( idx+1 >= buf.length ) {
         return(false);
       }
-      
+
       if ( buf[idx+1] == '.' ) {
         //
         // case 2
@@ -252,9 +251,9 @@ public class AbbreviatedName extends Evaluator {
           }
           return(false);
         }
-    
+
         op = Word.getPreviousWord(buf, i-1, true);
-        
+
         if ( (op == null) || (op.word().length() == 0) ) {
           if ( logger.isDebugEnabled() ) {
             debug_str.append("Case 2-Failed Word, ");
@@ -268,7 +267,7 @@ public class AbbreviatedName extends Evaluator {
           }
           return(true);
         }
-        
+
       } else if ( Character.isLowerCase(buf[idx+1] ) ) {
         //
         // case 1
@@ -277,7 +276,7 @@ public class AbbreviatedName extends Evaluator {
         while ( (i < buf.length) && !Character.isWhitespace(buf[i]) ) {
           i++;
         }
-        
+
         i = Helper.moveToNonWhitespace(ParseDirn.RIGHT, buf, i);
         if ( i == -1 ) {
           if ( logger.isDebugEnabled() ) {
@@ -285,7 +284,7 @@ public class AbbreviatedName extends Evaluator {
           }
           return(false);
         }
-        
+
         i = checkCase(buf, i, ParseDirn.RIGHT);
         if ( i == -1 ) {
           if ( logger.isDebugEnabled() ) {
@@ -293,17 +292,17 @@ public class AbbreviatedName extends Evaluator {
           }
           return(false);
         }
-        
+
         if ( logger.isDebugEnabled() ) {
           debug_str.append("Case 1-TRUE, ");
         }
         return(true);
       }
-  
+
     } else if ( buf[idx] == '.' ) {
-      // 
+      //
       // case 3
-      // 
+      //
       i = checkCase(buf, idx, ParseDirn.LEFT);
       if ( i == -1 ) {
         if ( logger.isDebugEnabled() ) {
@@ -311,7 +310,7 @@ public class AbbreviatedName extends Evaluator {
         }
         return(false);
       }
-      
+
       op = Word.getPreviousWord(buf, idx-1, true);
 
       if ( (op == null) || (op.word().length() == 0) ) {
@@ -328,7 +327,7 @@ public class AbbreviatedName extends Evaluator {
         return(true);
       }
     }
-    
+
     if ( logger.isDebugEnabled() ) {
       debug_str.append("Default FALSE, ");
     }
@@ -336,12 +335,12 @@ public class AbbreviatedName extends Evaluator {
   }
 
   /**
-   * Checks the case for an abbreviated name. 
-   * 
+   * Checks the case for an abbreviated name.
+   *
    * @param buf   Text buffer.
    * @param idx   Position in the buffer to begin examination.
    * @param dirn  Direction of traversal.
-   * 
+   *
    * @return    <code>true</code> if the case is correct for an abbreviated name,
    *             <code>false</code> otherwise.
    */
@@ -364,18 +363,18 @@ public class AbbreviatedName extends Evaluator {
     } else {
       nxtUpperCase = false;
     }
-    
+
     if ( (i < 0) || (i >= buf.length) ) {
       return(-1);
     }
- 
+
     while ( Character.isWhitespace(buf[i]) ) {
       i += inc;
       if ( (i < 0) || (i >= buf.length) ) {
         return(-1);
       }
     }
-    
+
     match = false;
     while ( (i >= 0) && (i < buf.length) && !Character.isWhitespace(buf[i]) ) {
       ch = buf[i];
@@ -393,16 +392,16 @@ public class AbbreviatedName extends Evaluator {
         }
         nxtUpperCase = true;
       }
-      
+
       // if we get to here we have at least 1 match
       match = true;
       i += inc;
     }
-    
+
     if ( !match ) {
       return(-1);
     }
-    
+
     if ( dirn == ParseDirn.LEFT ) {
       i++;
     } else {

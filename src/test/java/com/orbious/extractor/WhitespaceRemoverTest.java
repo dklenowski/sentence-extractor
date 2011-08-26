@@ -1,11 +1,9 @@
 package com.orbious.extractor;
 
-// $Id$
 
 import java.util.Arrays;
 import java.util.Vector;
 import com.orbious.AllExtractorTests;
-
 import junit.framework.TestCase;
 
 /**
@@ -15,41 +13,41 @@ import junit.framework.TestCase;
  */
 
 public class WhitespaceRemoverTest extends TestCase {
-  
+
   public WhitespaceRemoverTest(String name) {
     super(name);
-    AllExtractorTests.initLogger();
+    AllExtractorTests.init();
   }
-  
+
   public void test_ExceptionThrow() {
     Vector<String> text = new Vector<String>( Arrays.asList("test") );
-    
+
     try {
       WhitespaceRemover.remove(text, -1);
     fail("No ArrayIndexOutOfBoundsException thrown");
     } catch ( ArrayIndexOutOfBoundsException aioobe ) { }
-    
+
     try {
       WhitespaceRemover.remove(text, 10);
     fail("No ArrayIndexOutOfBoundsException thrown");
     } catch ( ArrayIndexOutOfBoundsException aioobe ) { }
   }
-  
+
   public void test_RemoveWhitespaceBasic() {
     Vector<String> text = new Vector<String>(
         Arrays.asList(
             " The  style and  use varies in the english language.  \n"
         ));
-    
+
     String str = WhitespaceRemover.remove(text, 0);
     assertEquals("The style and use varies in the english language. ", str);
   }
-    
-  public void test_RemoveWhitespaceMultipleLines() { 
+
+  public void test_RemoveWhitespaceMultipleLines() {
     Vector<String> text = new Vector<String>(
         Arrays.asList(
-            " The  style and  use varies in the english language.  \n", 
-            "\n", 
+            " The  style and  use varies in the english language.  \n",
+            "\n",
             " \n",
             "Towards the end of his life Turing became interested in chemistry.",
             "He wrote a paper on the  chemical basis of  morphogenesis."
@@ -57,8 +55,8 @@ public class WhitespaceRemoverTest extends TestCase {
 
     Vector<String> expected = new Vector<String>(
         Arrays.asList(
-            "The style and use varies in the english language. ", 
-            null, 
+            "The style and use varies in the english language. ",
+            null,
             null,
             "Towards the end of his life Turing became interested in chemistry. ",
             "He wrote a paper on the chemical basis of morphogenesis. "
@@ -72,18 +70,18 @@ public class WhitespaceRemoverTest extends TestCase {
       } else {
         assertNull(str);
       }
-    } 
+    }
   }
-  
+
   public void test_RemoveWhitespaceWithHyphen() {
     Vector<String> text = new Vector<String>(
         Arrays.asList(
-            "\n", 
+            "\n",
             " \n",
             "In December  1940 , Turing solved the naval Enigma indicator system",
             "Turing was ranked twenty-  ",
             "first on the BBC nationwide poll of the 100 Greatest Britons."
-        ));   
+        ));
 
     Vector<String> expected = new Vector<String>(
         Arrays.asList(
@@ -102,7 +100,7 @@ public class WhitespaceRemoverTest extends TestCase {
       } else {
         assertNull(str);
       }
-    } 
+    }
   }
-    
+
 }

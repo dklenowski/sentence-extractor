@@ -7,5 +7,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="../thirdparty/junit-4.7.jar"/>
 	<classpathentry kind="lib" path="../thirdparty/log4j-1.2.15.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/javautil"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

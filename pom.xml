@@ -7,8 +7,39 @@
   <version>4.0</version>
   <name>sentence-extractor</name>
   <description>Sentence Extraction API.</description>
-  <url>https://bitbucket.org/davek/sentence-extractor</url>
+  <url>https://github.com/dklenowski/sentence-extractor</url>
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>javautil-snapshots</id>
+      <name>javautil snapshots</name>
+      <url>https://github.com/dklenowski/javautil/tree/master/snapshots</url>
+      <layout>default</layout>
+    </repository>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>javautil-releases</id>
+      <name>javautil releases</name>
+      <url>https://github.com/dklenowski/javautil/tree/master/releases</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
   <dependencies>
+    <dependency>
+      <groupId>com.orbious.util</groupId>
+      <artifactId>javautil</artifactId>
+      <version>1.0</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -40,13 +71,13 @@
     </dependency>
   </dependencies>
   <issueManagement>
-  	<system>bitbucket</system>
-  	<url>https://bitbucket.org/davek/sentence-extractor/wiki/Home</url>
+    <system>guthub</system>
+    <url>https://github.com/dklenowski/sentence-extractor/issues</url>
   </issueManagement>
   <scm>
-  	<connection>https://bitbucket.org/davek/sentence-extractor</connection>
-  	<developerConnection>davek</developerConnection>
-  	<url>https://bitbucket.org/davek/sentence-extractor</url>
+    <connection>https://github.com/dklenowski/sentence-extractor</connection>
+    <developerConnection>dklenowski</developerConnection>
+    <url>https://github.com/dklenowski/sentence-extractor</url>
   </scm>
   <build>
     <plugins>

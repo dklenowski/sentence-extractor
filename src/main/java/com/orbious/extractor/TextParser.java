@@ -103,8 +103,8 @@ public class TextParser {
   public void invalidate() {
     sentence_ends = HashSets.cvtStringToHashSet(
         Config.getString(AppConfig.sentence_ends));
-    min_sentence_len = Config.getInt(AppConfig.min_sentence_length);
 
+    min_sentence_len = Config.getInt(AppConfig.min_sentence_length);
     splitter.invalidate();
   }
 
@@ -118,16 +118,12 @@ public class TextParser {
    * @return    A list of sentences extracted from <code>filename</code>
    *            with each sentence returned as a <code>Vector</code> of words.
    */
-  public Vector< Vector<String> > sentences(boolean ignorePunct) {
+  public Vector< Vector<String> > sentences(boolean preserveCase, boolean preservePunct) {
     Vector< Vector<String> > s;
 
     s = new Vector<Vector<String>>(sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
-      if ( ignorePunct ) {
-        s.add(sentences.get(i).wordsWithoutPunct());
-      } else {
-        s.add(sentences.get(i).words());
-      }
+      s.add(wordsFromOp(sentences.get(i), preserveCase, preservePunct));
     }
 
     return s;
@@ -140,27 +136,19 @@ public class TextParser {
    * Accessor for {@link TextParser#sentences} with the words in the sentences
    * converted to <code>String</code>'s.
    *
-   * @param ignorePunct   Ignore words that contain only punctuation.
    *
    * @return    A list of sentences extracted from <code>filename</code>
    *            with each sentence returned as a <code>String</code>.
    */
-  public Vector<String> sentencesAsStr(boolean ignorePunct) {
+  public Vector<String> sentencesAsStr(boolean preserveCase, boolean preservePunct) {
     Vector<String> sent = new Vector<String>();
-    SplitterOp op;
     Vector<String> words;
     StringBuilder sb;
 
     sb = new StringBuilder();
 
     for ( int i = 0; i < sentences.size(); i++ ) {
-      op = sentences.get(i);
-      if ( ignorePunct ) {
-        words = op.wordsWithoutPunct();
-      } else {
-        words = op.words();
-      }
-
+      words = wordsFromOp(sentences.get(i), preserveCase, preservePunct);
       sb.setLength(0);
       for ( int j = 0; j < words.size(); j++ ) {
         sb.append(words.get(j));
@@ -173,6 +161,27 @@ public class TextParser {
     }
 
     return(sent);
+  }
+
+  /**
+   *
+   */
+  private Vector<String> wordsFromOp(SplitterOp op, boolean preserveCase, boolean preservePunct) {
+    if ( preservePunct ) {
+      if ( preserveCase ) {
+        return op.words();
+      } else {
+        return op.wordsWithoutCase();
+      }
+    } else {
+      // !preserve_punctuation
+      if ( preserveCase ) {
+        return op.wordsWithoutPunct();
+      } else {
+        // !preserve_punctuation && !preserve_case
+        return op.wordsWithoutPunctAndCase();
+      }
+    }
   }
 
   /**

@@ -1,0 +1,18 @@
+Remember before running mvn to include /usr/local/lib (for tokyo cabinet)
+in your LD_LIBRARY_PATH (Unix) / DYLD_LIBRARY_PATH (Mac).
+
+To build the project run:
+  mvn clean install
+
+To kill the apps send a SIGTERM to the process.
+
+Notes:
+- Debugging is turned on, to turn off edit main/resources/com/orbious/rtree/log4j.xml
+
+To build the classpath:
+  mvn dependency:build-classpath
+
+To run apps:
+  export CLASSPATH=`cat .maven_classpath`
+  java -server com.orbious.extractor.app.Sentences -h
+

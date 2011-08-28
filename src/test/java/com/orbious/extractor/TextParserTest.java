@@ -95,7 +95,7 @@ public class TextParserTest extends TestCase {
     }
 
     parser.genSentences();
-    Vector<String> sentences = parser.sentencesAsStr(false);
+    Vector<String> sentences = parser.sentencesAsStr(true, true);
 
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
@@ -132,7 +132,44 @@ public class TextParserTest extends TestCase {
     }
 
     parser.genSentences();
-    Vector<String> sentences = parser.sentencesAsStr(true);
+    Vector<String> sentences = parser.sentencesAsStr(true, false);
+
+    assertEquals(expected.size(), sentences.size());
+    for ( int i = 0; i < sentences.size(); i++ ) {
+      if ( !expected.get(i).equals(sentences.get(i)) ) {
+        System.out.println(Strings.diff(expected.get(i), sentences.get(i)));
+        fail();
+      }
+      //System.out.println(sentences.get(i));
+    }
+  }
+
+  public void test_GenSentences17216_noPunctNoCase() throws ParserException {
+    String fname = "src/test/resources/17216_short.txt";
+    TextParser parser = new TextParser(fname);
+    parser.invalidate();
+
+    Vector<String> expected = new Vector<String>(
+        Arrays.asList(
+            "the project gutenberg ebook of punch or the london charivari volume 1 complete by various" ,
+            "this ebook is for the use of anyone anywhere at no cost and with almost no restrictions whatsoever",
+            "you may copy it give it away or re-use it under the terms of the project gutenberg license included with this ebook or online at www.gutenberg.net",
+            "punch or the london charivari volume 1 complete author",
+            "english character set encoding"
+        ));
+
+    try {
+      parser.parse();
+    } catch ( FileNotFoundException fnfe ) {
+      fnfe.printStackTrace();
+      fail("FileNotFoundException thrown");
+    } catch ( IOException ioe ) {
+      ioe.printStackTrace();
+      fail("IOException thrown");
+    }
+
+    parser.genSentences();
+    Vector<String> sentences = parser.sentencesAsStr(false, false);
 
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
@@ -172,7 +209,7 @@ public class TextParserTest extends TestCase {
     }
 
     parser.genSentences();
-    Vector<String> sentences = parser.sentencesAsStr(false);
+    Vector<String> sentences = parser.sentencesAsStr(true, true);
 
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
@@ -212,7 +249,7 @@ public class TextParserTest extends TestCase {
     }
 
     parser.genSentences();
-    Vector<String> sentences = parser.sentencesAsStr(true);
+    Vector<String> sentences = parser.sentencesAsStr(true, false);
 
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
@@ -258,7 +295,7 @@ public class TextParserTest extends TestCase {
     }
 
     parser.genSentences();
-    Vector<String> sentences = parser.sentencesAsStr(false);
+    Vector<String> sentences = parser.sentencesAsStr(true, true);
 
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
@@ -291,7 +328,7 @@ public class TextParserTest extends TestCase {
     }
 
     parser.genSentences();
-    Vector<String> sentences = parser.sentencesAsStr(false);
+    Vector<String> sentences = parser.sentencesAsStr(true, true);
 
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
@@ -334,7 +371,7 @@ public class TextParserTest extends TestCase {
     }
 
     parser.genSentences();
-    Vector<String> sentences = parser.sentencesAsStr(false);
+    Vector<String> sentences = parser.sentencesAsStr(true, true);
 
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
@@ -369,7 +406,7 @@ public class TextParserTest extends TestCase {
     }
 
     parser.genSentences();
-    Vector<String> sentences = parser.sentencesAsStr(false);
+    Vector<String> sentences = parser.sentencesAsStr(true, true);
 
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
@@ -404,7 +441,7 @@ public class TextParserTest extends TestCase {
     }
 
     parser.genSentences();
-    Vector<String> sentences = parser.sentencesAsStr(true);
+    Vector<String> sentences = parser.sentencesAsStr(true, false);
 
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {
@@ -458,7 +495,7 @@ public class TextParserTest extends TestCase {
     }
 
     parser.genSentences();
-    Vector<String> sentences = parser.sentencesAsStr(false);
+    Vector<String> sentences = parser.sentencesAsStr(true, true);
 
     assertEquals(expected.size(), sentences.size());
     for ( int i = 0; i < sentences.size(); i++ ) {

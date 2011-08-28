@@ -8,5 +8,7 @@
 	<classpathentry kind="lib" path="../thirdparty/junit-4.7.jar"/>
 	<classpathentry kind="lib" path="../thirdparty/log4j-1.2.15.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/javautil"/>
+	<classpathentry kind="lib" path="/myroot/workspace-java/thirdparty/getopt-1.0.13.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/tokyoutil"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

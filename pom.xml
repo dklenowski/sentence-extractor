@@ -9,35 +9,33 @@
   <description>Sentence Extraction API.</description>
   <url>https://github.com/dklenowski/sentence-extractor</url>
   <repositories>
+    <!-- for gnu-getopt -->
     <repository>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>javautil-snapshots</id>
-      <name>javautil snapshots</name>
-      <url>https://github.com/dklenowski/javautil/tree/master/snapshots</url>
-      <layout>default</layout>
+      <id>Java</id>
+      <name>Java Repository</name>
+      <url>http://download.java.net/maven/2</url>
+    </repository>
+    <!-- davek repos -->
+    <repository>
+      <id>davek-javautil</id>
+      <name>davek javautil Repository</name>
+      <url>https://raw.github.com/dklenowski/javautil/master/</url>
     </repository>
     <repository>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>javautil-releases</id>
-      <name>javautil releases</name>
-      <url>https://github.com/dklenowski/javautil/tree/master/releases</url>
-      <layout>default</layout>
+      <id>davek-tokyoutil</id>
+      <name>davek tokyoutil Repository</name>
+      <url>https://raw.github.com/dklenowski/tokyoutil/master/</url>
     </repository>
   </repositories>
   <dependencies>
     <dependency>
       <groupId>com.orbious.util</groupId>
       <artifactId>javautil</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.orbious.util.tokyo</groupId>
+      <artifactId>tokyoutil</artifactId>
       <version>1.0</version>
     </dependency>
     <dependency>
@@ -88,6 +86,14 @@
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.0</version>
+        <configuration>
+          <outputFile>.maven_classpath</outputFile>
         </configuration>
       </plugin>
     </plugins>

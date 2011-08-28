@@ -1,7 +1,5 @@
 package com.orbious.extractor.util;
 
-// $Id: Helper.java 11 2009-12-04 14:07:11Z app $
-
 import com.orbious.extractor.ParseDirn;
 import com.orbious.extractor.SentenceMapEntry;
 import com.orbious.extractor.SentenceMapEntry.Likelihood;

@@ -95,17 +95,7 @@ public enum AppConfig implements IConfig {
   /**
    * Minimum sentence length (in alphanumeric words).
    */
-  min_sentence_length(4),
-
-  /**
-   * Whether or not output sentences contain case.
-   */
-  preserve_case(false),
-
-  /**
-   * Whether or not output sentences contain inner punctuation.
-   */
-  preserve_punctuation(false);
+  min_sentence_length(4);
 
   // implementation
 

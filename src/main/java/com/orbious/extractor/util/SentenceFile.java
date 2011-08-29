@@ -110,19 +110,27 @@ public class SentenceFile {
     }
   }
 
-  // do not convert to strings, can use a bit of memory ..
-  public Vector<byte[]> names() throws SentenceFileException {
-    if ( hdbw == null ) {
-      return null;
-    }
-
-    try {
-      return hdbw.keys();
-    } catch ( WrapperException we ) {
-      throw new SentenceFileException("Error retreiving keys from sentence file " +
-          sentencefile, we);
-    }
+  public void iterinit() {
+    hdbw.iterinit();
   }
+
+  public byte[] iternext() {
+    return hdbw.iternext();
+  }
+
+  // do not convert to strings, can use a bit of memory ..
+//  public Vector<byte[]> names() throws SentenceFileException {
+//    if ( hdbw == null ) {
+//      return null;
+//    }
+//
+//    try {
+//      return hdbw.keys();
+//    } catch ( WrapperException we ) {
+//      throw new SentenceFileException("Error retreiving keys from sentence file " +
+//          sentencefile, we);
+//    }
+//  }
 
 
 }

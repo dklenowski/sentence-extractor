@@ -160,16 +160,10 @@ public class Sentences {
         System.out.println(Strings.cvtVectorToString(sentences.get(i)));
       }
     } else {
-      Vector<byte[]> keys = null;
-      try {
-        keys = sentencefile.names();
-      } catch ( SentenceFileException sfe ) {
-        logger.fatal("Error extracting keys from " + sentencepath, sfe);
-      }
-      if ( keys != null ) {
-        for ( int i = 0; i < keys.size(); i++ ) {
-          System.out.println(Bytes.bytesToStr(keys.get(i)));
-        }
+      byte[] bytes;
+      sentencefile.iterinit();
+      while ( (bytes = sentencefile.iternext()) != null ) {
+        System.out.println(Bytes.bytesToStr(bytes));
       }
     }
 

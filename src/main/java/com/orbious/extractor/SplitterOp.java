@@ -60,52 +60,81 @@ public class SplitterOp {
     return(wordCt);
   }
 
-  /**
-   * Returns the words, but ignores words that are are punctuation.
-   * @return
-   */
   public Vector<String> wordsWithoutPunct() {
-    Matcher m;
-    String str;
-    Vector<String> w;
-
-    w = new Vector<String>(words.size());
-    for ( int i = 0; i < words.size(); i++ ) {
-      str = words.get(i);
-      m = alpha.matcher(str);
-      if ( m.find() ) {
-        w.add(str);
-      }
-    }
-
-    return w;
+    return Utils.wordsWithoutPunct(words);
   }
 
   public Vector<String> wordsWithoutCase() {
-    Vector<String> w;
-
-    w = new Vector<String>(words.size());
-    for ( int i = 0; i < words.size(); i++ ) {
-      w.add(words.get(i).toLowerCase());
-    }
-
-    return w;
+    return Utils.wordsWithoutCase(words);
   }
 
   public Vector<String> wordsWithoutPunctAndCase() {
-    Matcher m;
-    String str;
-    Vector<String> w;
+    return Utils.wordsWithoutPunctAndCase(words);
+  }
 
-    w = new Vector<String>(words.size());
-    for ( int i = 0; i < words.size(); i++ ) {
-      str = words.get(i);
-      m = alpha.matcher(str);
-      if ( m.find() ) {
-        w.add(str.toLowerCase());
+  /**
+   * Helper methods.
+   *
+   * @author dave
+   */
+  public static class Utils {
+
+    /**
+     *
+     * @param wds
+     * @return
+     */
+    public static Vector<String> wordsWithoutPunct(Vector<String> wds) {
+      Matcher m;
+      String str;
+      Vector<String> w;
+
+      w = new Vector<String>(wds.size());
+      for ( int i = 0; i < wds.size(); i++ ) {
+        str = wds.get(i);
+        m = alpha.matcher(str);
+        if ( m.find() ) {
+          w.add(str);
+        }
       }
+
+      return w;
     }
 
-    return w;
+    /**
+     *
+     * @return
+     */
+    public static Vector<String> wordsWithoutCase(Vector<String> wds) {
+      Vector<String> w;
+
+      w = new Vector<String>(wds.size());
+      for ( int i = 0; i < wds.size(); i++ ) {
+        w.add(wds.get(i).toLowerCase());
+      }
+
+      return w;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static Vector<String> wordsWithoutPunctAndCase(Vector<String> wds) {
+      Matcher m;
+      String str;
+      Vector<String> w;
+
+      w = new Vector<String>(wds.size());
+      for ( int i = 0; i < wds.size(); i++ ) {
+        str = wds.get(i);
+        m = alpha.matcher(str);
+        if ( m.find() ) {
+          w.add(str.toLowerCase());
+        }
+      }
+
+      return w;
+    }
   }
 }

@@ -20,6 +20,7 @@ import com.orbious.util.Strings;
 import com.orbious.util.config.Config;
 import com.orbious.util.config.ConfigException;
 import com.orbious.util.tokyo.Bytes;
+import com.orbious.util.tokyo.HDBFileException;
 
 public class Sentences {
   private static File txtpath = null;
@@ -125,7 +126,7 @@ public class Sentences {
 
     try {
       sentencefile.init(true);
-    } catch ( SentenceFileException sfe ) {
+    } catch ( HDBFileException sfe ) {
       logger.fatal("Error opening sentence file " + sentencepath, sfe);
       return;
     }
@@ -135,7 +136,7 @@ public class Sentences {
 
     try {
       sentencefile.close();
-    } catch ( SentenceFileException ignored ) { }
+    } catch ( HDBFileException ignored ) { }
   }
 
   private static void dumpKeys(String key) {
@@ -149,7 +150,7 @@ public class Sentences {
 
     try {
       sentencefile.init(true);
-    } catch ( SentenceFileException sfe ) {
+    } catch ( HDBFileException sfe ) {
       logger.fatal("Error opening sentence file " + sentencepath, sfe);
       return;
     }
@@ -169,7 +170,7 @@ public class Sentences {
 
     try {
       sentencefile.close();
-    } catch ( SentenceFileException ignore ) { }
+    } catch ( HDBFileException ignore ) { }
   }
 
   private static void process(boolean preserveCase, boolean preservePunct) {
@@ -192,7 +193,7 @@ public class Sentences {
     sentencefile = new SentenceFile(sentencepath);
     try {
       sentencefile.init(false);
-    } catch ( SentenceFileException sfe ) {
+    } catch ( HDBFileException sfe ) {
       logger.fatal("Error opening sentence file " + sentencepath, sfe);
       return;
     }
@@ -234,7 +235,7 @@ public class Sentences {
 
     try {
       sentencefile.close();
-    } catch ( SentenceFileException sfe ) {
+    } catch ( HDBFileException sfe ) {
       logger.fatal("Failed to close sentence file " + sentencepath +
           " cleanly?", sfe);
     }

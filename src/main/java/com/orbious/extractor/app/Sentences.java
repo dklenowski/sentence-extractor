@@ -19,13 +19,14 @@ import com.orbious.util.Loggers;
 import com.orbious.util.Strings;
 import com.orbious.util.config.Config;
 import com.orbious.util.config.ConfigException;
-import com.orbious.util.tokyo.Bytes;
-import com.orbious.util.tokyo.HDBFileException;
+import com.orbious.util.tokyo.StorageException;
+import com.orbious.util.Bytes;
 
 public class Sentences {
   private static File txtpath = null;
   private static File sentencepath = null;
   private static Logger logger = null;
+  private static int tokyoSize = 10000;
 
   private static void usage() {
     System.out.println(
@@ -118,16 +119,16 @@ public class Sentences {
   private static void dumpConfig() {
     SentenceFile sentencefile;
 
-    sentencefile = new SentenceFile(sentencepath);
+    sentencefile = new SentenceFile(sentencepath, tokyoSize, true);
     if ( !sentencefile.exists() ) {
       logger.fatal("Sentence file " + sentencepath + "  does not exist?");
       return;
     }
 
     try {
-      sentencefile.init(true);
-    } catch ( HDBFileException sfe ) {
-      logger.fatal("Error opening sentence file " + sentencepath, sfe);
+      sentencefile.open();
+    } catch ( StorageException se ) {
+      logger.fatal("Error opening sentence file " + sentencepath, se);
       return;
     }
 
@@ -136,22 +137,22 @@ public class Sentences {
 
     try {
       sentencefile.close();
-    } catch ( HDBFileException ignored ) { }
+    } catch ( StorageException ignored ) { }
   }
 
   private static void dumpKeys(String key) {
     SentenceFile sentencefile;
 
-    sentencefile = new SentenceFile(sentencepath);
+    sentencefile = new SentenceFile(sentencepath, tokyoSize, true);
     if ( !sentencefile.exists() ) {
       logger.fatal("Sentence file " + sentencepath + "  does not exist?");
       return;
     }
 
     try {
-      sentencefile.init(true);
-    } catch ( HDBFileException sfe ) {
-      logger.fatal("Error opening sentence file " + sentencepath, sfe);
+      sentencefile.open();
+    } catch ( StorageException se ) {
+      logger.fatal("Error opening sentence file " + sentencepath, se);
       return;
     }
 
@@ -161,16 +162,20 @@ public class Sentences {
         System.out.println(Strings.cvtVectorToString(sentences.get(i)));
       }
     } else {
-      byte[] bytes;
-      sentencefile.iterinit();
-      while ( (bytes = sentencefile.iternext()) != null ) {
-        System.out.println(Bytes.bytesToStr(bytes));
+      try {
+        sentencefile.iterinit();
+        byte[] bytes;
+        while ( (bytes = sentencefile.iternext()) != null ) {
+          System.out.println(Bytes.bytesToStr(bytes));
+        }
+      } catch ( StorageException se ) {
+        logger.fatal("Failed to initialize iterator for " + sentencepath, se);
       }
     }
 
     try {
       sentencefile.close();
-    } catch ( HDBFileException ignore ) { }
+    } catch ( StorageException ignored ) { }
   }
 
   private static void process(boolean preserveCase, boolean preservePunct) {
@@ -190,11 +195,11 @@ public class Sentences {
     cmd = Command.instance();
     cmd.canExit(false);
 
-    sentencefile = new SentenceFile(sentencepath);
+    sentencefile = new SentenceFile(sentencepath, tokyoSize, false);
     try {
-      sentencefile.init(false);
-    } catch ( HDBFileException sfe ) {
-      logger.fatal("Error opening sentence file " + sentencepath, sfe);
+      sentencefile.open();
+    } catch ( StorageException se ) {
+      logger.fatal("Error opening sentence file " + sentencepath, se);
       return;
     }
 
@@ -235,9 +240,9 @@ public class Sentences {
 
     try {
       sentencefile.close();
-    } catch ( HDBFileException sfe ) {
+    } catch ( StorageException se ) {
       logger.fatal("Failed to close sentence file " + sentencepath +
-          " cleanly?", sfe);
+          " cleanly?", se);
     }
 
     end = System.currentTimeMillis();

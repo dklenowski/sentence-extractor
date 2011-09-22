@@ -6,9 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
-
 import com.orbious.extractor.AppConfig;
 import com.orbious.extractor.ParserException;
 import com.orbious.extractor.TextParser;
@@ -19,6 +17,7 @@ import com.orbious.util.Loggers;
 import com.orbious.util.Strings;
 import com.orbious.util.config.Config;
 import com.orbious.util.config.ConfigException;
+import com.orbious.util.tokyo.HDBFile;
 import com.orbious.util.tokyo.StorageException;
 import com.orbious.util.Bytes;
 
@@ -30,13 +29,15 @@ public class Sentences {
 
   private static void usage() {
     System.out.println(
-        "Usage: Generator: [-h] [-pa] [-c|-k|-d <key>|-t <txtpath>] -s <sentence.hdb>\n" +
+        "Usage: Generator: [-h] [-pa] [-c|-k|-d <key>|-e <key>|-t <txtpath>]\n" +
+        "                  -s <sentence.hdb>\n\n" +
         "    -h                Print this help message and exit.\n" +
         "    -p                Dont preserve punctuation.\n" +
         "    -a                Dont preserve case.\n" +
         "    -c                Dump configuration for sentence file.\n" +
         "    -k                Dump keys in <sentence.hdb>\n" +
         "    -d <key>          Dump sentences for key <key>.\n" +
+        "    -e <key>          Extract sentences for key <key> (in tokyodb format).\n" +
         "    -h                Print this help message and exit.\n" +
         "    -t <txtpath>      Path (file/directory) contain txt files to process.\n" +
         "    -s <sentence.hdb> A tokyo cabinet file.\n");
@@ -52,6 +53,7 @@ public class Sentences {
     boolean preserveCase = true;
     boolean preservePunct = true;
     String key = null;
+    boolean ashdb = false;
 
     try {
       Config.setDefaults(AppConfig.class);
@@ -62,7 +64,7 @@ public class Sentences {
     }
 
     logger = Loggers.logger();
-    opts = new Getopt("Sentences", args, "hpackd:t:s:");
+    opts = new Getopt("Sentences", args, "hpackd:e:t:s:");
 
     while ( (c = opts.getopt()) != -1 ) {
       switch ( c ) {
@@ -82,6 +84,9 @@ public class Sentences {
         case 'd':
           key = opts.getOptarg();
           break;
+        case 'e':
+          key = opts.getOptarg();
+          ashdb = true;
         case 't':
           txtpath = new File(opts.getOptarg());
           break;
@@ -105,8 +110,10 @@ public class Sentences {
 
     if ( cfg ) {
       dumpConfig();
-    } else if ( keys || (key != null) ) {
-      dumpKeys(key);
+    } else if ( keys ) {
+      dumpKeys();
+    } else if ( key != null ) {
+      extract(key, ashdb);
     } else if ( txtpath != null ) {
       process(preserveCase, preservePunct);
     } else {
@@ -140,7 +147,76 @@ public class Sentences {
     } catch ( StorageException ignored ) { }
   }
 
-  private static void dumpKeys(String key) {
+  private static void extract(String key, boolean ashdb) {
+    SentenceFile sentencefile;
+
+    if ( (key == null) || (key == "") ) {
+      logger.fatal("Invalid key (" + key + ") specified, cannot continue?");
+      return;
+    }
+
+    sentencefile = new SentenceFile(sentencepath, tokyoSize, true);
+    if ( !sentencefile.exists() ) {
+      logger.fatal("Sentence file " + sentencepath + "  does not exist?");
+      return;
+    }
+
+    try {
+      sentencefile.open();
+    } catch ( StorageException se ) {
+      logger.fatal("Error opening sentence file " + sentencepath, se);
+      return;
+    }
+
+    logger.info("Extracting key " + key + " from " + sentencefile.filename());
+
+    Vector<Vector<String>> sentences;
+    sentences = sentencefile.get(key);
+
+    if ( sentences == null ) {
+      logger.fatal("Failed to extract key " + key + " from " + sentencefile.filename());
+    } else {
+      if ( !ashdb ) {
+        for ( int i = 0; i < sentences.size(); i++ ) {
+          System.out.println(Strings.cvtVectorToString(sentences.get(i)));
+        }
+      } else {
+        File outfile;
+        HDBFile outhdb;
+
+        outfile = new File(sentencefile.filename() + "_" + key + ".hdb");
+        outhdb = new HDBFile(outfile, 1, false);
+
+        logger.info("Writing key " + key + " to " + outfile.toString());
+
+        try {
+          outhdb.open();
+        } catch ( StorageException se ) {
+          logger.fatal("Failed to open " + outfile + " for writing?", se);
+        }
+
+        if ( outhdb.isopen() ) {
+          try {
+            outhdb.write(key, sentences);
+            } catch ( StorageException se ) {
+              logger.fatal("Failed to write key " + key + " to " + outfile.toString(), se);
+            }
+
+          try {
+            outhdb.close();
+          } catch ( StorageException se ) {
+            logger.fatal("Failed to close hdb file " + outfile.toString() + " cleanly", se);
+          }
+        }
+      }
+    }
+
+    try {
+      sentencefile.close();
+    } catch ( StorageException ignored ) { }
+  }
+
+  private static void dumpKeys() {
     SentenceFile sentencefile;
 
     sentencefile = new SentenceFile(sentencepath, tokyoSize, true);
@@ -156,21 +232,16 @@ public class Sentences {
       return;
     }
 
-    if ( key != null ) {
-      Vector<Vector<String>> sentences = sentencefile.get(key);
-      for ( int i = 0; i < sentences.size(); i++ ) {
-        System.out.println(Strings.cvtVectorToString(sentences.get(i)));
+    logger.info("Dumping keys for " + sentencefile.filename());
+
+    try {
+      sentencefile.iterinit();
+      byte[] bytes;
+      while ( (bytes = sentencefile.iternext()) != null ) {
+        System.out.println(Bytes.bytesToStr(bytes));
       }
-    } else {
-      try {
-        sentencefile.iterinit();
-        byte[] bytes;
-        while ( (bytes = sentencefile.iternext()) != null ) {
-          System.out.println(Bytes.bytesToStr(bytes));
-        }
-      } catch ( StorageException se ) {
-        logger.fatal("Failed to initialize iterator for " + sentencepath, se);
-      }
+    } catch ( StorageException se ) {
+      logger.fatal("Failed to initialize iterator for " + sentencepath, se);
     }
 
     try {

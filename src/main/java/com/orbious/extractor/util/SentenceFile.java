@@ -2,6 +2,8 @@ package com.orbious.extractor.util;
 
 import java.io.File;
 import java.util.Vector;
+
+import com.orbious.util.config.Config;
 import com.orbious.util.tokyo.HDBFile;
 import com.orbious.util.tokyo.StorageException;
 
@@ -28,6 +30,12 @@ public class SentenceFile extends HDBFile {
   @SuppressWarnings("unchecked")
   public Vector<Vector<String>> get(String name) {
     Object obj;
+    logger.info("Retreiving sentences for " + name);
+
+    if ( name.equals(Config.config_hdb_key) ) {
+      logger.info("Skipping configuration key " + Config.config_hdb_key);
+      return null;
+    }
 
     obj = readObject(name);
     if ( obj == null ) {

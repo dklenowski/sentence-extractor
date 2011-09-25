@@ -4,39 +4,43 @@
   <groupId>com.orbious.extractor</groupId>
   <artifactId>sentence-extractor</artifactId>
   <packaging>jar</packaging>
-  <version>4.0</version>
+  <version>4.3</version>
   <name>sentence-extractor</name>
   <description>Sentence Extraction API.</description>
   <url>https://github.com/dklenowski/sentence-extractor</url>
   <repositories>
-    <!-- for gnu-getopt -->
-    <repository>
-      <id>Java</id>
-      <name>Java Repository</name>
-      <url>http://download.java.net/maven/2</url>
-    </repository>
     <!-- davek repos -->
     <repository>
-      <id>davek-javautil</id>
-      <name>davek javautil Repository</name>
-      <url>https://raw.github.com/dklenowski/javautil/master/</url>
+      <id>davek-javautil-snapshots</id>
+      <name>davek javautil snapshot repo</name>
+      <url>https://github.com/dklenowski/javautil/raw/master/snapshots</url>
     </repository>
     <repository>
-      <id>davek-tokyoutil</id>
-      <name>davek tokyoutil Repository</name>
-      <url>https://raw.github.com/dklenowski/tokyoutil/master/</url>
+      <id>davek-javautil-releases</id>
+      <name>davek javautil releases repo</name>
+      <url>https://github.com/dklenowski/javautil/raw/master/releases</url>
+    </repository>
+    <repository>
+      <id>davek-tokyoutil-snapshots</id>
+      <name>davek tokyoutil snapshot repo</name>
+      <url>https://github.com/dklenowski/tokyoutil/raw/master/snapshots</url>
+    </repository>
+    <repository>
+      <id>davek-tokyoutil-releases</id>
+      <name>davek tokyoutil releases repo</name>
+      <url>https://github.com/dklenowski/tokyoutil/raw/master/releases</url>
     </repository>
   </repositories>
   <dependencies>
     <dependency>
       <groupId>com.orbious.util</groupId>
       <artifactId>javautil</artifactId>
-      <version>1.0</version>
+      <version>2.1</version>
     </dependency>
     <dependency>
       <groupId>com.orbious.util.tokyo</groupId>
       <artifactId>tokyoutil</artifactId>
-      <version>1.0</version>
+      <version>2.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

@@ -52,7 +52,7 @@ public class SentenceSplitterTest extends TestCase {
 
     SplitterOp op = splitter.split(new TextParserOp(75, 108));
 
-    actual = Strings.cvtVectorToString(op.words());
+    actual = Strings.cvtVector(op.words());
     expected = "I live to-day by you , a stranger . \"";
 
     if ( !expected.equals(actual) ) {
@@ -95,7 +95,7 @@ public class SentenceSplitterTest extends TestCase {
 
     SplitterOp op = splitter.split(new TextParserOp(226, 310));
 
-    actual = Strings.cvtVectorToString(op.words());
+    actual = Strings.cvtVector(op.words());
     expected = "As Jimmy ambled away to look for some beetles , " +
                "he chuckled and chuckled and chuckled . \"";
     if ( !expected.equals(actual) ) {
@@ -135,7 +135,7 @@ public class SentenceSplitterTest extends TestCase {
     SplitterOp op;
 
     op = splitter.split(new TextParserOp(0, 83));
-    actual = Strings.cvtVectorToString(op.words());
+    actual = Strings.cvtVector(op.words());
     expected = "\" After seven generations , \" was his cryptic remark , \" " +
                "you simply can't keep them away .";
 
@@ -145,7 +145,7 @@ public class SentenceSplitterTest extends TestCase {
     }
 
     op = splitter.split(new TextParserOp(85, 109));
-    actual = Strings.cvtVectorToString(op.words());
+    actual = Strings.cvtVector(op.words());
     expected = "It's bred in the bone . . . .";
 
     if ( !expected.equals(actual) ) {
@@ -185,7 +185,7 @@ public class SentenceSplitterTest extends TestCase {
     SplitterOp op;
 
     op = splitter.split(new TextParserOp(0, 291));
-    actual = Strings.cvtVectorToString(op.words());
+    actual = Strings.cvtVector(op.words());
     expected = "We learn from the account of the temple , contained " +
     "in the First Book of Kings , that \" The house , when it was in " +
     "building , was built of stone , made ready before it was brought " +
@@ -227,7 +227,7 @@ public class SentenceSplitterTest extends TestCase {
     SplitterOp op;
 
     op = splitter.split(new TextParserOp(0, 326));
-    actual = Strings.cvtVectorToString(op.words());
+    actual = Strings.cvtVector(op.words());
     expected = "Now , this mode of construction , undoubtedly adopted to avoid " +
     "confusion and discord among so many thousand workmen , [ 58 ] has been " +
     "selected as an elementary symbol of concord and harmony -- virtues " +
@@ -269,7 +269,7 @@ public class SentenceSplitterTest extends TestCase {
     SplitterOp op;
 
     op = splitter.split(new TextParserOp(0, 38));
-    actual = Strings.cvtVectorToString(op.words());
+    actual = Strings.cvtVector(op.words());
     expected = "\" He calls her ' child ' . . . \" thought Mary .";
 
     if ( !expected.equals(actual) ) {
@@ -278,7 +278,7 @@ public class SentenceSplitterTest extends TestCase {
     }
 
     op = splitter.split(new TextParserOp(40, 190));
-    actual = Strings.cvtVectorToString(op.words());
+    actual = Strings.cvtVector(op.words());
     expected = "That night Wally was a visitor at the house on the hill :- " +
     "and when Mary saw how subdued he was :-- how chastened he looked -- " +
     "her heart went out to him .";
@@ -308,7 +308,7 @@ public class SentenceSplitterTest extends TestCase {
     SplitterOp op;
 
     op = splitter.split(new TextParserOp(0, 42));
-    actual = Strings.cvtVectorToString(op.words());
+    actual = Strings.cvtVector(op.words());
     expected = "Illustration : FUNNY DOGS WITH COMIC TALES .";
 
     if ( !expected.equals(actual) ) {
@@ -338,7 +338,7 @@ public class SentenceSplitterTest extends TestCase {
     SplitterOp op;
 
     op = splitter.split(new TextParserOp(0, str.length()-1));
-    actual = Strings.cvtVectorToString(op.words());
+    actual = Strings.cvtVector(op.words());
     expected = "The House met on the 19th of August , and unanimously elected MR. " +
     "SHAW LEFEVRE to be Speaker .";
 
@@ -379,7 +379,7 @@ public class SentenceSplitterTest extends TestCase {
     SplitterOp op;
 
     op = splitter.split(new TextParserOp(0, str.length()-1));
-    actual = Strings.cvtVectorToString(op.words());
+    actual = Strings.cvtVector(op.words());
     expected = "LORD JOHN defended the acts of the Ministry , and denied that " +
     "they had been guilty of harshness to the poor by the New Poor Law , or " +
     "enemies of the Church by reducing the ARCHBISHOP OF CANTERBURY to the " +

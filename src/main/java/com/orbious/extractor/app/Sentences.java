@@ -168,23 +168,23 @@ public class Sentences {
       return;
     }
 
-    logger.info("Extracting key " + key + " from " + sentencefile.filename());
+    logger.info("Extracting key " + key + " from " + sentencefile.path());
 
     Vector<Vector<String>> sentences;
     sentences = sentencefile.get(key);
 
     if ( sentences == null ) {
-      logger.fatal("Failed to extract key " + key + " from " + sentencefile.filename());
+      logger.fatal("Failed to extract key " + key + " from " + sentencefile.path());
     } else {
       if ( !ashdb ) {
         for ( int i = 0; i < sentences.size(); i++ ) {
-          System.out.println(Strings.cvtVectorToString(sentences.get(i)));
+          System.out.println(Strings.cvtVector(sentences.get(i)));
         }
       } else {
         File outfile;
         HDBFile outhdb;
 
-        outfile = new File(sentencefile.filename() + "_" + key + ".hdb");
+        outfile = new File(sentencefile.path() + "_" + key + ".hdb");
         outhdb = new HDBFile(outfile, 1, false);
 
         logger.info("Writing key " + key + " to " + outfile.toString());
@@ -232,7 +232,7 @@ public class Sentences {
       return;
     }
 
-    logger.info("Dumping keys for " + sentencefile.filename());
+    logger.info("Dumping keys for " + sentencefile.path());
 
     try {
       sentencefile.iterinit();

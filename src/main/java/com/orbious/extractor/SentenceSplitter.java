@@ -128,7 +128,7 @@ public class SentenceSplitter {
           " end=" + op.end() +
           " adjustedEndIdx=" + adEndIdx +
           " postEndIdx=" + postEndIdx + "\n" +
-          Strings.cvtCharArrayToString(parser_data.buffer, adStartIdx, adEndIdx) + "\n");
+          Strings.cvtCharArray(parser_data.buffer, adStartIdx, adEndIdx) + "\n");
     }
 
     for ( int i = adStartIdx; i <= adEndIdx; i++ ) {
@@ -264,8 +264,8 @@ public class SentenceSplitter {
     }
 
     if ( logger.isDebugEnabled() ) {
-      logger.debug("PreClean =" + Strings.cvtVectorToString(words));
-      logger.debug("Clean    =" + Strings.cvtVectorToString(clean));
+      logger.debug("PreClean =" + Strings.cvtVector(words));
+      logger.debug("Clean    =" + Strings.cvtVector(clean));
     }
 
     return( new SplitterOp(clean, wordCt) );

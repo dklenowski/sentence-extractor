@@ -38,7 +38,6 @@ public class Sentences {
         "    -k                Dump keys in <sentence.hdb>\n" +
         "    -d <key>          Dump sentences for key <key>.\n" +
         "    -e <key>          Extract sentences for key <key> (in tokyodb format).\n" +
-        "    -h                Print this help message and exit.\n" +
         "    -t <txtpath>      Path (file/directory) contain txt files to process.\n" +
         "    -s <sentence.hdb> A tokyo cabinet file.\n");
     Command.instance().canExit(true);

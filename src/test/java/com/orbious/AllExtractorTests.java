@@ -4,6 +4,7 @@ import java.util.Vector;
 import java.util.HashSet;
 import com.orbious.extractor.util.HelperTest;
 import com.orbious.extractor.TextParser.TextParserData;
+import com.orbious.extractor.app.SentenceStatsTest;
 import com.orbious.extractor.evaluator.AbbreviatedNameTest;
 import com.orbious.extractor.evaluator.HeadingTest;
 import com.orbious.extractor.evaluator.InsideLeftRightMarksTest;
@@ -57,6 +58,8 @@ public class AllExtractorTests {
     ts.addTestSuite(WordTest.class);
     ts.addTestSuite(SentenceTest.class);
     ts.addTestSuite(TextParserTest.class);
+
+    ts.addTestSuite(SentenceStatsTest.class);
 
     return(ts);
   }

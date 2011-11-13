@@ -110,6 +110,11 @@ public enum AppConfig implements IConfig {
   private int ivalue = -1;
 
   /**
+   * The <code>float</code> value for this enum.
+   */
+  private float fvalue = Float.NaN;
+
+  /**
    * The <code>double</code> value for this enum.
    */
   private double dvalue = Double.NaN;
@@ -171,6 +176,14 @@ public enum AppConfig implements IConfig {
 
   public int asInt() {
     return ivalue;
+  }
+
+  public boolean isFloat() {
+    return (fvalue != Float.NaN) ? true : false;
+  }
+
+  public float asFloat() {
+    return fvalue;
   }
 
   public boolean isDouble() {

@@ -13,7 +13,7 @@ To build the classpath:
   mvn dependency:build-classpath
 
 To run apps:
-  export CLASSPATH=`cat .maven_classpath`:target/sentence-extractor-4.5.jar
+  export CLASSPATH=`cat .maven_classpath`:target/sentence-extractor-4.6.jar
   java -server com.orbious.extractor.app.Sentences -h
   java -server com.orbious.extractor.app.SentenceStats -h
 

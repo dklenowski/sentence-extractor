@@ -120,6 +120,11 @@ public enum AppConfig implements IConfig {
   private double dvalue = Double.NaN;
 
   /**
+   * The <code>long</code> value for this enum.
+   */
+  private long lvalue = -1;
+
+  /**
    * The <code>boolean</code> value for this enum.
    */
   private boolean bvalue = false;
@@ -150,6 +155,16 @@ public enum AppConfig implements IConfig {
   private AppConfig(double value) {
     this.dvalue = value;
   }
+
+  /**
+   * Constructor, set's the enum constant.
+   *
+   * @param value    The <code>long</code> value to set the enum constant to.
+   */
+  private AppConfig(long value) {
+    this.lvalue = value;
+  }
+
 
   /**
    * Constructor, set's the enum constant.
@@ -192,6 +207,14 @@ public enum AppConfig implements IConfig {
 
   public double asDouble() {
     return dvalue;
+  }
+
+  public boolean isLong() {
+    return (lvalue != -1) ? true : false;
+  }
+
+  public long asLong() {
+    return lvalue;
   }
 
   public boolean isBool() {

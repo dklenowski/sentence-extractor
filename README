@@ -16,4 +16,3 @@ To run apps:
   export CLASSPATH=`cat .maven_classpath`:target/sentence-extractor-4.6.jar
   java -server com.orbious.extractor.app.Sentences -h
   java -server com.orbious.extractor.app.SentenceStats -h
-

@@ -44,11 +44,11 @@ public class InsideLeftRightMarks extends Evaluator {
   }
 
   public void invalidate() {
-    leftMarks = HashSets.cvtStringToHashSet(
+    leftMarks = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.left_punctuation_marks));
-    rightMarks = HashSets.cvtStringToHashSet(
+    rightMarks = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.right_punctuation_marks));
-    sentence_ends = HashSets.cvtStringToHashSet(
+    sentence_ends = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.sentence_ends));
   }
 

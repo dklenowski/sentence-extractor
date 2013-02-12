@@ -39,7 +39,7 @@ public class Word {
   private Word() { }
 
   public static void invalidate() {
-    inner_punctuation = HashSets.cvtStringToHashSet(
+    inner_punctuation = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.inner_punctuation));
   }
 

@@ -101,7 +101,7 @@ public class TextParser {
   }
 
   public void invalidate() {
-    sentence_ends = HashSets.cvtStringToHashSet(
+    sentence_ends = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.sentence_ends));
 
     min_sentence_len = Config.getInt(AppConfig.min_sentence_length);

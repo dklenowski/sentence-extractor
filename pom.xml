@@ -35,7 +35,7 @@
     <dependency>
       <groupId>com.orbious.util</groupId>
       <artifactId>javautil</artifactId>
-      <version>3.5</version>
+      <version>3.8</version>
     </dependency>
     <dependency>
       <groupId>com.orbious.util.tokyo</groupId>

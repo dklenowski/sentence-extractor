@@ -41,7 +41,7 @@ public class Heading extends Evaluator {
   }
 
   public void invalidate() {
-    sentence_ends = HashSets.cvtStringToHashSet(
+    sentence_ends = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.sentence_ends));
   }
 

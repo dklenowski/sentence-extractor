@@ -33,7 +33,7 @@ public class NumberedHeading extends Evaluator {
   }
 
   public void invalidate() {
-    roman_numerals = HashSets.cvtStringToHashSet(
+    roman_numerals = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.roman_numerals));
   }
 

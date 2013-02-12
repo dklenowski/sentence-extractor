@@ -116,13 +116,13 @@ public class Sentence {
    * Reload all configuration information.
    */
   public void invalidate() throws EvaluatorException {
-    allowable_ends = HashSets.cvtStringToHashSet(
+    allowable_ends = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.sentence_ends));
-    punctuation = HashSets.cvtStringToHashSet(
+    punctuation = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.punctuation));
-    leftMarks = HashSets.cvtStringToHashSet(
+    leftMarks = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.left_punctuation_marks));
-    rightMarks = HashSets.cvtStringToHashSet(
+    rightMarks = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.right_punctuation_marks));
 
     invalidateEvaluators();

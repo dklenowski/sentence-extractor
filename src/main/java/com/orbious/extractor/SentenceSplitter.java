@@ -63,15 +63,15 @@ public class SentenceSplitter {
   }
 
   public void invalidate() {
-    inner_punctuation = HashSets.cvtStringToHashSet(
+    inner_punctuation = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.inner_punctuation));
-    preserved_punctuation = HashSets.cvtStringToHashSet(
+    preserved_punctuation = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.preserved_punctuation));
-    left_marks = HashSets.cvtStringToHashSet(
+    left_marks = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.left_punctuation_marks));
-    right_marks = HashSets.cvtStringToHashSet(
+    right_marks = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.right_punctuation_marks));
-    sentence_ends = HashSets.cvtStringToHashSet(
+    sentence_ends = HashSets.cvtStringToCharHashSet(
         Config.getString(AppConfig.sentence_ends));
   }
 

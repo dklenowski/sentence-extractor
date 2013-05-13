@@ -34,8 +34,13 @@ public class TextParser {
   /**
    * A plain text file.
    */
-  private final String filename;
+  private String filename;
 
+  /**
+   * Alternatively, provide the raw text.
+   */
+  private Vector<String> raw;
+  
   /**
    * List of allowable sentence ends (see {@link Config#SENTENCE_ENDS}).
    */
@@ -96,6 +101,13 @@ public class TextParser {
   public TextParser(String filename) {
     this.filename = filename;
 
+    parser_data = new TextParserData();
+    splitter = new SentenceSplitter(parser_data);
+  }
+  
+  public TextParser(Vector<String> raw) {
+    this.raw = raw;
+    
     parser_data = new TextParserData();
     splitter = new SentenceSplitter(parser_data);
   }
@@ -166,7 +178,8 @@ public class TextParser {
   /**
    *
    */
-  private Vector<String> wordsFromOp(SplitterOp op, boolean preserveCase, boolean preservePunct) {
+  private Vector<String> wordsFromOp(SplitterOp op, boolean preserveCase, 
+      boolean preservePunct) {
     if ( preservePunct ) {
       if ( preserveCase ) {
         return op.words();
@@ -186,16 +199,14 @@ public class TextParser {
 
   /**
    * Parses {@link TextParser#filename} into memory. This method also calls
-   * {@link com.orbious.extractor.WhitespaceRemover#remove(Vector, int)} on each line
-   * before adding to memory and updates {@link TextParser#line_starts}
+   * {@link com.orbious.extractor.WhitespaceRemover#remove(Vector, int)} on each 
+   * line before adding to memory and updates {@link TextParser#line_starts}
    * with the start of each line (minus whitespace).
    *
    * @throws FileNotFoundException
    * @throws IOException
    */
   public void parse() throws FileNotFoundException, IOException {
-    BufferedReader br;
-    Vector<String> raw;
     Vector<String> clean;
     String str;
     char[] buf;
@@ -203,14 +214,11 @@ public class TextParser {
     int pos;
     int lineCt;
 
-    br = new BufferedReader(new FileReader(filename));
-    raw = new Vector<String>();
-    while ( (str = br.readLine()) != null ) {
-      raw.add(str);
+    if ( raw == null ) {
+      read();
     }
-    br.close();
 
-    logger.info("Found " + raw.size() + " lines in " + filename);
+    logger.info("Processing " + raw.size() + " lines in " + filename);
 
     parser_data.line_starts = new HashSet<Integer>();
     clean = new Vector<String>();
@@ -245,6 +253,21 @@ public class TextParser {
           " CharCt=" + parser_data.buffer.length +
           " AvgLineCharCt=" + parser_data.avg_line_char_ct);
     }
+  }
+  
+  /**
+   * Reads {filename} into a buffer called {raw}.
+   */
+  private void read() throws IOException {
+    raw = new Vector<String>();
+    
+    BufferedReader br = new BufferedReader(new FileReader(filename));    
+    String str;
+    while ( (str = br.readLine()) != null ) {
+      raw.add(str);
+    }
+    
+    br.close();
   }
 
   /**

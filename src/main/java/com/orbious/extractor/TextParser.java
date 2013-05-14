@@ -106,6 +106,7 @@ public class TextParser {
   }
   
   public TextParser(Vector<String> raw) {
+    this.filename = "buffer";
     this.raw = raw;
     
     parser_data = new TextParserData();
@@ -213,13 +214,13 @@ public class TextParser {
     int len;
     int pos;
     int lineCt;
-
+    
     if ( raw == null ) {
       read();
     }
 
-    logger.info("Processing " + raw.size() + " lines in " + filename);
-
+    logger.info("Processing " + raw.size() + " lines from " + filename);
+    
     parser_data.line_starts = new HashSet<Integer>();
     clean = new Vector<String>();
     len = 0;
@@ -267,6 +268,7 @@ public class TextParser {
       raw.add(str);
     }
     
+    logger.info("Processing " + raw.size() + " lines in " + filename);
     br.close();
   }
 

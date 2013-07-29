@@ -40,7 +40,6 @@ public class Sentences {
         "    -e <key>          Extract sentences for key <key> (in tokyodb format).\n" +
         "    -t <txtpath>      Path (file/directory) contain txt files to process.\n" +
         "    -s <sentence.hdb> A tokyo cabinet file.\n");
-    Command.instance().canExit(true);
     System.exit(1);
   }
 
@@ -95,18 +94,6 @@ public class Sentences {
       }
     }
 
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      public void run() {
-        logger.warn("Shutdown hook called");
-        Command.instance().shutdown(true);
-        while ( !Command.instance().canExit() ) {
-          try {
-            sleep(10000);
-          } catch ( InterruptedException ignored ) { }
-        }
-      }
-    });;
-
     if ( cfg ) {
       dumpConfig();
     } else if ( keys ) {
@@ -118,10 +105,8 @@ public class Sentences {
     } else {
       usage();
     }
-
-    Command.instance().canExit(true);
   }
-
+  
   private static void dumpConfig() {
     SentenceFile sentencefile;
 
@@ -247,6 +232,20 @@ public class Sentences {
       sentencefile.close();
     } catch ( StorageException ignored ) { }
   }
+  
+  private static void setuphook() {
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      public void run() {
+        logger.warn("Shutdown hook called");
+        Command.instance().shutdown(true);
+        while ( !Command.instance().canExit() ) {
+          try {
+            sleep(10000);
+          } catch ( InterruptedException ignored ) { }
+        }
+      }
+    });;
+  }
 
   private static void process(boolean preserveCase, boolean preservePunct) {
     SentenceFile sentencefile;
@@ -261,6 +260,8 @@ public class Sentences {
       logger.fatal("Text path " + txtpath + " does not exist?");
       return;
     }
+    
+    setuphook();
 
     cmd = Command.instance();
     cmd.canExit(false);

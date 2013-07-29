@@ -14,7 +14,8 @@ Note, debugging is turned on, to turn off edit main/resources/com/orbious/rtree/
 
 ### To run apps
 
-    export CLASSPATH=`cat .maven_classpath`:target/sentence-extractor-4.6.jar
+    export CLASSPATH=`cat .maven_classpath`:target/sentence-extractor-<version>.jar
+    java -server com.orbious.extractor.app.FileParser -h
     java -server com.orbious.extractor.app.Sentences -h
     java -server com.orbious.extractor.app.SentenceStats -h
 

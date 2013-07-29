@@ -103,6 +103,7 @@ public class TextParser {
 
     parser_data = new TextParserData();
     splitter = new SentenceSplitter(parser_data);
+    invalidate();
   }
   
   public TextParser(Vector<String> raw) {
@@ -111,6 +112,7 @@ public class TextParser {
     
     parser_data = new TextParserData();
     splitter = new SentenceSplitter(parser_data);
+    invalidate();
   }
 
   public void invalidate() {

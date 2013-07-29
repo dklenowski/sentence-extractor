@@ -129,7 +129,6 @@ public class SentenceStats {
     }
   }
 
-
   protected static String filestats(Vector<Vector<String>> sentences) {
     int min;
     int max;

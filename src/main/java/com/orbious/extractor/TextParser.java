@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Vector;
 import org.apache.log4j.Logger;
+import com.orbious.extractor.AppConfig;
 import com.orbious.extractor.Sentence.EndOp;
 import com.orbious.extractor.Sentence.StartOp;
 import com.orbious.extractor.SentenceMapEntry.Likelihood;
@@ -19,6 +20,7 @@ import com.orbious.extractor.util.Helper;
 import com.orbious.util.HashSets;
 import com.orbious.util.Loggers;
 import com.orbious.util.config.Config;
+import com.orbious.util.config.ConfigException;
 
 /**
  * Parser a text document into sentences. This class is the central class
@@ -103,6 +105,7 @@ public class TextParser {
 
     parser_data = new TextParserData();
     splitter = new SentenceSplitter(parser_data);
+    
     invalidate();
   }
   
@@ -121,6 +124,18 @@ public class TextParser {
 
     min_sentence_len = Config.getInt(AppConfig.min_sentence_length);
     splitter.invalidate();
+  }
+  
+  public void checkConfig() throws ParserException {
+    if ( Config.getInt(AppConfig.min_sentence_length) == -1 ||
+        Config.getInt(AppConfig.max_sentence_length) == -1 ) {
+      logger.warn("sentence configuration not set, trying to set defaults");
+      try {
+        Config.setDefaults(AppConfig.class);
+      } catch ( ConfigException ce ) {
+        throw new ParserException("no configuration loaded?", ce);
+      }
+    }
   }
 
   /**
@@ -209,7 +224,7 @@ public class TextParser {
    * @throws FileNotFoundException
    * @throws IOException
    */
-  public void parse() throws FileNotFoundException, IOException {
+  public void parse() throws FileNotFoundException, IOException, ParserException {
     Vector<String> clean;
     String str;
     char[] buf;
@@ -217,9 +232,9 @@ public class TextParser {
     int pos;
     int lineCt;
     
-    if ( raw == null ) {
-      read();
-    }
+    checkConfig();
+    
+    if ( raw == null ) read();
 
     logger.info("Processing " + raw.size() + " lines from " + filename);
     

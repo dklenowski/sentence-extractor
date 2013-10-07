@@ -5,9 +5,12 @@ import com.orbious.extractor.Word;
 import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.Word.WordOp;
 import com.orbious.util.HashSets;
+import com.orbious.util.Resources;
 import com.orbious.util.config.Config;
-import java.io.FileNotFoundException;
+
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 
 /**
@@ -38,16 +41,22 @@ public class Name extends Evaluator {
   }
 
   public void invalidate() throws EvaluatorException {
+    String filename = Config.getString(AppConfig.names_filename); 
+    logger.info("using names filename " + filename);
+    
+    InputStream in = Resources.getResourceStream(new File(filename));
+    if ( in == null ) 
+      throw new EvaluatorException("failed to find names file " + filename );      
+
     try {
-      names = HashSets.cvtFileToHashSet(
-          Config.getString(AppConfig.names_filename), false);
-    } catch ( FileNotFoundException fnfe ) {
-      throw new EvaluatorException("Failed to find names file " +
-          Config.getString(AppConfig.names_filename), fnfe);
+      names = HashSets.cvtStreamToHash(in, false);
     } catch ( IOException ioe ) {
       throw new EvaluatorException("Failed to load names file " +
-          Config.getString(AppConfig.names_filename), ioe);
+         filename, ioe);
     }
+    
+    if ( names.size() == 0 ) 
+      throw new EvaluatorException("failed to extract any names from " + filename);
   }
 
   /**

@@ -32,25 +32,18 @@ public class TextParserTest extends TestCase {
       fail("No FileNotFoundException thrown");
     } catch ( FileNotFoundException fnfe ) {
       // we expect this to be thrown ..
+    } catch ( ParserException pe ) {
+      fail("Wrong Exception (ParseException) thrown.");
     } catch (IOException ioe ) {
       fail("Wrong Exception (IOException) thrown.");
     }
   }
 
-  public void test_Read() {
+  public void test_Read() throws Exception {
     String fname = "src/test/resources/17216_short.txt";
     TextParser parser = new TextParser(fname);
 
-    try {
-      parser.parse();
-    } catch ( FileNotFoundException fnfe ) {
-      fnfe.printStackTrace();
-      fail("FileNotFoundException thrown");
-    } catch ( IOException ioe ) {
-      ioe.printStackTrace();
-      fail("IOException thrown");
-    }
-
+    parser.parse();
     char[] buffer = parser.parser_data.buffer;
     String actual = String.copyValueOf(buffer);
 
@@ -70,7 +63,7 @@ public class TextParserTest extends TestCase {
     }
   }
 
-  public void test_GenSentences17216() throws ParserException {
+  public void test_GenSentences17216() throws Exception {
     String fname = "src/test/resources/17216_short.txt";
     TextParser parser = new TextParser(fname);
     parser.invalidate();
@@ -84,16 +77,7 @@ public class TextParserTest extends TestCase {
             "English Character set encoding :"
         ));
 
-    try {
-      parser.parse();
-    } catch ( FileNotFoundException fnfe ) {
-      fnfe.printStackTrace();
-      fail("FileNotFoundException thrown");
-    } catch ( IOException ioe ) {
-      ioe.printStackTrace();
-      fail("IOException thrown");
-    }
-
+    parser.parse();
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(true, true);
 
@@ -107,7 +91,7 @@ public class TextParserTest extends TestCase {
     }
   }
 
-  public void test_GenSentences17216_noPunct() throws ParserException {
+  public void test_GenSentences17216_noPunct() throws Exception {
     String fname = "src/test/resources/17216_short.txt";
     TextParser parser = new TextParser(fname);
     parser.invalidate();
@@ -121,16 +105,7 @@ public class TextParserTest extends TestCase {
             "English Character set encoding"
         ));
 
-    try {
-      parser.parse();
-    } catch ( FileNotFoundException fnfe ) {
-      fnfe.printStackTrace();
-      fail("FileNotFoundException thrown");
-    } catch ( IOException ioe ) {
-      ioe.printStackTrace();
-      fail("IOException thrown");
-    }
-
+    parser.parse();
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(true, false);
 
@@ -144,7 +119,7 @@ public class TextParserTest extends TestCase {
     }
   }
 
-  public void test_GenSentences17216_noPunctNoCase() throws ParserException {
+  public void test_GenSentences17216_noPunctNoCase() throws Exception {
     String fname = "src/test/resources/17216_short.txt";
     TextParser parser = new TextParser(fname);
     parser.invalidate();
@@ -158,16 +133,7 @@ public class TextParserTest extends TestCase {
             "english character set encoding"
         ));
 
-    try {
-      parser.parse();
-    } catch ( FileNotFoundException fnfe ) {
-      fnfe.printStackTrace();
-      fail("FileNotFoundException thrown");
-    } catch ( IOException ioe ) {
-      ioe.printStackTrace();
-      fail("IOException thrown");
-    }
-
+    parser.parse();
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(false, false);
 
@@ -181,7 +147,7 @@ public class TextParserTest extends TestCase {
     }
   }
 
-  public void test_GenSentences17216_2() throws ParserException {
+  public void test_GenSentences17216_2() throws Exception {
     String fname = "src/test/resources/17216_short2.txt";
     TextParser parser = new TextParser(fname);
     parser.invalidate();
@@ -198,16 +164,7 @@ public class TextParserTest extends TestCase {
             "Together with original , humorous , and satirical articles in verse and prose , from all the [ Illustration : FUNNY DOGS WITH COMIC TALES . ]"
         ));
 
-    try {
-      parser.parse();
-    } catch ( FileNotFoundException fnfe ) {
-      fnfe.printStackTrace();
-      fail("FileNotFoundException thrown");
-    } catch ( IOException ioe ) {
-      ioe.printStackTrace();
-      fail("IOException thrown");
-    }
-
+    parser.parse();
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(true, true);
 
@@ -221,7 +178,7 @@ public class TextParserTest extends TestCase {
     }
   }
 
-  public void test_GenSentences17216_2_noPunct() throws ParserException {
+  public void test_GenSentences17216_2_noPunct() throws Exception {
     String fname = "src/test/resources/17216_short2.txt";
     TextParser parser = new TextParser(fname);
     parser.invalidate();
@@ -238,16 +195,7 @@ public class TextParserTest extends TestCase {
             "Together with original humorous and satirical articles in verse and prose from all the Illustration FUNNY DOGS WITH COMIC TALES"
         ));
 
-    try {
-      parser.parse();
-    } catch ( FileNotFoundException fnfe ) {
-      fnfe.printStackTrace();
-      fail("FileNotFoundException thrown");
-    } catch ( IOException ioe ) {
-      ioe.printStackTrace();
-      fail("IOException thrown");
-    }
-
+    parser.parse();
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(true, false);
 
@@ -261,7 +209,7 @@ public class TextParserTest extends TestCase {
     }
   }
 
-  public void test_GenSentences17216_3()  throws ParserException {
+  public void test_GenSentences17216_3()  throws Exception {
     String fname = "src/test/resources/17216_short3.txt";
     TextParser parser = new TextParser(fname);
     parser.invalidate();
@@ -284,16 +232,8 @@ public class TextParserTest extends TestCase {
             "[ HERCULES TEARING THESEUS FROM THE ROCK TO WHICH HE HAD GROWN . ]",
             "LORD JOHN defended the acts of the Ministry , and denied that they had been guilty of harshness to the poor by the New Poor Law , or enemies of the Church by reducing \" the ARCHBISHOP OF CANTERBURY to the miserable pittance of L15,000 a year , cutting down the BISHOP OF LONDON to no more than L10,000 a year , and the BISHOP OF DURHAM to the wretched stipend of L8,000 a year ! \""
             ));
-    try {
-      parser.parse();
-    } catch ( FileNotFoundException fnfe ) {
-      fnfe.printStackTrace();
-      fail("FileNotFoundException thrown");
-    } catch ( IOException ioe ) {
-      ioe.printStackTrace();
-      fail("IOException thrown");
-    }
 
+    parser.parse();
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(true, true);
 
@@ -307,7 +247,7 @@ public class TextParserTest extends TestCase {
     }
   }
 
-  public void test_GenSentences10001() throws ParserException {
+  public void test_GenSentences10001() throws Exception {
     String fname = "src/test/resources/10001_short.txt";
     TextParser parser = new TextParser(fname);
     parser.invalidate();
@@ -317,16 +257,8 @@ public class TextParserTest extends TestCase {
             "This piece is ascribed to Seneca by ancient tradition ; it is impossible to prove that it is his , and impossible to prove that it is not .",
             "The matter will probably continue to be decided by every one according to his view of Seneca's character and abilities : in the matters of style and of sentiment much may be said on both sides ."
         ));
-    try {
-      parser.parse();
-    } catch ( FileNotFoundException fnfe ) {
-      fnfe.printStackTrace();
-      fail("FileNotFoundException thrown");
-    } catch ( IOException ioe ) {
-      ioe.printStackTrace();
-      fail("IOException thrown");
-    }
 
+    parser.parse();
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(true, true);
 
@@ -340,7 +272,7 @@ public class TextParserTest extends TestCase {
     }
   }
 
-  public void test_GenSentences100012() throws ParserException {
+  public void test_GenSentences100012() throws Exception {
     String fname = "src/test/resources/10001_short2.txt";
     TextParser parser = new TextParser(fname);
     parser.invalidate();
@@ -360,16 +292,8 @@ public class TextParserTest extends TestCase {
             "The counsel for the defence tries to reply ; but Aeacus , who is the soul of justice , will not have it .",
             "Aeacus hears the case against Claudius , refuses to hear the other side and passes sentence against him , quoting the line : \" As he did , so be he done by , this is justice undefiled . \"",
             "[ Footnote : A proverbial line . ]"));
-    try {
-      parser.parse();
-    } catch ( FileNotFoundException fnfe ) {
-      fnfe.printStackTrace();
-      fail("FileNotFoundException thrown");
-    } catch ( IOException ioe ) {
-      ioe.printStackTrace();
-      fail("IOException thrown");
-    }
 
+    parser.parse();
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(true, true);
 
@@ -383,7 +307,7 @@ public class TextParserTest extends TestCase {
     }
   }
 
-  public void test_GenSentences11938() throws ParserException {
+  public void test_GenSentences11938() throws Exception {
     String fname = "src/test/resources/11938_short.txt";
     TextParser parser = new TextParser(fname);
     parser.invalidate();
@@ -395,16 +319,8 @@ public class TextParserTest extends TestCase {
             "Part 6 contains illustrations of the belief in witchcraft .",
             "I have had to omit a certain number of stories as unsuited for publication ."
             ));
-    try {
-      parser.parse();
-    } catch ( FileNotFoundException fnfe ) {
-      fnfe.printStackTrace();
-      fail("FileNotFoundException thrown");
-    } catch ( IOException ioe ) {
-      ioe.printStackTrace();
-      fail("IOException thrown");
-    }
-
+    
+    parser.parse();
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(true, true);
 
@@ -418,7 +334,7 @@ public class TextParserTest extends TestCase {
     }
   }
 
-  public void test_GenSentences11938_noPunct() throws ParserException {
+  public void test_GenSentences11938_noPunct() throws Exception {
     String fname = "src/test/resources/11938_short.txt";
     TextParser parser = new TextParser(fname);
     parser.invalidate();
@@ -430,16 +346,8 @@ public class TextParserTest extends TestCase {
             "Part 6 contains illustrations of the belief in witchcraft",
             "I have had to omit a certain number of stories as unsuited for publication"
             ));
-    try {
-      parser.parse();
-    } catch ( FileNotFoundException fnfe ) {
-      fnfe.printStackTrace();
-      fail("FileNotFoundException thrown");
-    } catch ( IOException ioe ) {
-      ioe.printStackTrace();
-      fail("IOException thrown");
-    }
-
+    
+    parser.parse();
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(true, false);
 
@@ -453,7 +361,7 @@ public class TextParserTest extends TestCase {
     }
   }
 
-  public void test_GenSentencesWiki() throws ParserException {
+  public void test_GenSentencesWiki() throws Exception {
     String fname = "src/test/resources/wiki.txt";
     TextParser parser = new TextParser(fname);
     parser.invalidate();
@@ -484,16 +392,7 @@ public class TextParserTest extends TestCase {
             "This can increase accuracy significantly ."
         ));
 
-    try {
-      parser.parse();
-    } catch ( FileNotFoundException fnfe ) {
-      fnfe.printStackTrace();
-      fail("FileNotFoundException thrown");
-    } catch ( IOException ioe ) {
-      ioe.printStackTrace();
-      fail("IOException thrown");
-    }
-
+    parser.parse();
     parser.genSentences();
     Vector<String> sentences = parser.sentencesAsStr(true, true);
 

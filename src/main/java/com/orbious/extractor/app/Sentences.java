@@ -324,13 +324,14 @@ public class Sentences {
 
   private static Vector<Vector<String>> parse(File f,
       boolean preserveCase, boolean preservePunct)  {
-    TextParser parser;
-
-    parser = new TextParser(f.toString());
+    TextParser parser = new TextParser(f.toString());   
     parser.invalidate();
 
     try {
       parser.parse();
+    } catch ( ParserException pe ) { 
+      logger.fatal("failed to load config for parser?", pe);
+      return null;
     } catch ( FileNotFoundException fnfe ) {
       logger.fatal("Failed to open text file " + f, fnfe);
       return null;

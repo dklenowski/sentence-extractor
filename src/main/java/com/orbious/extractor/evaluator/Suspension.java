@@ -1,13 +1,15 @@
 package com.orbious.extractor.evaluator;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import com.orbious.extractor.AppConfig;
 import com.orbious.extractor.Word;
 import com.orbious.extractor.TextParser.TextParserData;
 import com.orbious.extractor.Word.WordOp;
 import com.orbious.util.HashSets;
+import com.orbious.util.Resources;
 import com.orbious.util.config.Config;
 
 /**
@@ -42,16 +44,22 @@ public class Suspension extends Evaluator {
   }
 
   public void invalidate() throws EvaluatorException {
+    String filename = Config.getString(AppConfig.suspension_filename); 
+    logger.info("using suspension filename " + filename);
+    
+    InputStream in = Resources.getResourceStream(new File(filename));
+    
+    if ( in == null ) 
+      throw new EvaluatorException("failed to find suspension file " + filename );      
+    
     try {
-      suspensions = HashSets.cvtFileToHashSet(
-          Config.getString(AppConfig.suspension_filename), true);
-    } catch ( FileNotFoundException fnfe ) {
-      throw new EvaluatorException("Failed to find suspensions file " +
-          Config.getString(AppConfig.suspension_filename), fnfe);
+      suspensions = HashSets.cvtStreamToHash(in, true);
     } catch ( IOException ioe ) {
-      throw new EvaluatorException("Failed to suspensions names file " +
-          Config.getString(AppConfig.suspension_filename), ioe);
+      throw new EvaluatorException("Failed to suspensions file " +filename, ioe);
     }
+    
+    if ( suspensions.size() == 0 ) 
+      throw new EvaluatorException("failed to extract any suspensions from " + filename);
   }
 
   /**

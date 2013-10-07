@@ -77,10 +77,13 @@ public class FileParser {
   }
   
   private static Vector<String> parse(File file) {
-    TextParser parser = new TextParser(file.toString());    
-            
+    TextParser parser = new TextParser(file.toString());   
+    
     try {
       parser.parse();
+    } catch ( ParserException pe ) { 
+      logger.fatal("failed to load config for parser?", pe);
+      return null;
     } catch ( FileNotFoundException fnfe ) {
       logger.fatal("failed to parse " + file, fnfe);
       return null;

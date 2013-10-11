@@ -4,7 +4,7 @@
   <groupId>com.orbious.extractor</groupId>
   <artifactId>sentence-extractor</artifactId>
   <packaging>jar</packaging>
-  <version>4.17</version>
+  <version>4.18</version>
   <name>sentence-extractor</name>
   <description>Sentence Extraction API.</description>
   <url>https://github.com/dklenowski/sentence-extractor</url>
@@ -35,7 +35,7 @@
     <dependency>
       <groupId>com.orbious.util</groupId>
       <artifactId>javautil</artifactId>
-      <version>6.6</version>
+      <version>6.7</version>
     </dependency>
     <dependency>
       <groupId>com.orbious.util.tokyo</groupId>

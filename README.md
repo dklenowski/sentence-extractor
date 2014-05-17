@@ -1,6 +1,6 @@
 ### To build the project run
 
-  mvn clean install
+    mvn clean install
 
 ### To kill the apps send a SIGTERM to the process
 
@@ -32,11 +32,11 @@ There is a an eclipse project file along with a maven pom.xml file (for those no
 
 Building with maven:
 
-        # mvn install
+        mvn install
 
 Generating javadoc with maven:
 
-        # mvn javadoc:javadoc
+        mvn javadoc:javadoc
 
 
 ## Usage

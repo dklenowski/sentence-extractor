@@ -4,7 +4,7 @@
   <groupId>com.orbious.extractor</groupId>
   <artifactId>sentence-extractor</artifactId>
   <packaging>jar</packaging>
-  <version>5.1</version>
+  <version>6.0</version>
   <name>sentence-extractor</name>
   <description>Sentence Extraction API.</description>
   <url>https://github.com/dklenowski/sentence-extractor</url>
@@ -20,27 +20,12 @@
       <name>davek javautil releases repo</name>
       <url>https://github.com/dklenowski/javautil/raw/master/releases</url>
     </repository>
-    <repository>
-      <id>davek-tokyoutil-snapshots</id>
-      <name>davek tokyoutil snapshot repo</name>
-      <url>https://github.com/dklenowski/tokyoutil/raw/master/snapshots</url>
-    </repository>
-    <repository>
-      <id>davek-tokyoutil-releases</id>
-      <name>davek tokyoutil releases repo</name>
-      <url>https://github.com/dklenowski/tokyoutil/raw/master/releases</url>
-    </repository>
   </repositories>
   <dependencies>
     <dependency>
       <groupId>com.orbious.util</groupId>
       <artifactId>javautil</artifactId>
       <version>7.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.orbious.util.tokyo</groupId>
-      <artifactId>tokyoutil</artifactId>
-      <version>3.4</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

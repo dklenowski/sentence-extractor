@@ -20,14 +20,21 @@ public class FileParser {
   private static Logger logger = null;
 
   private static void usage() {
-    System.out.println("usage: FileParser -i <input-txt-file> -o <output-txt-file>\n");
+    System.out.println("usage: FileParser [-h] [-p] [-a] -i <input-txt-file> -o <output-txt-file>\n" +
+        "    -h                    Print this help message and exit.\n" + 
+        "    -p                    Dont preserve punctuation.\n" +
+        "    -a                    Dont preserve case.\n" + 
+        "    -i <input-txt-file>   The input file (plain text).\n" +
+        "    -o <output-txt-file>  The output text file containining one sentence per line.\n");
     System.exit(1);
   }
 
   public static void main(String[] args) {
     File inputfile = null;
     File outputfile = null;
-
+    boolean preserveCase = true;
+    boolean preservePunct = true;
+    
     try {
       Config.setDefaults(AppConfig.class);
     } catch ( ConfigException ce ) {
@@ -38,12 +45,18 @@ public class FileParser {
 
     logger = Loggers.logger();
     
-    Getopt opts = new Getopt("Sentences", args, "hi:o:");
+    Getopt opts = new Getopt("Sentences", args, "hpai:o:");
     int c;
     while ( (c = opts.getopt()) != -1 ) {
       switch ( c ) {
         case 'h':
           usage();
+        case 'p':
+          preserveCase = false;
+          break;
+        case 'a':
+          preservePunct = false;
+          break;
         case 'i':
           inputfile = new File(opts.getOptarg());
           break;
@@ -66,7 +79,7 @@ public class FileParser {
       usage();
     }
     
-    Vector<String> sentences = parse(inputfile);
+    Vector<String> sentences = parse(inputfile, preserveCase, preservePunct);
     if ( sentences == null ) System.exit(1);
     
     try {
@@ -76,7 +89,7 @@ public class FileParser {
     }
   }
   
-  private static Vector<String> parse(File file) {
+  private static Vector<String> parse(File file, boolean preserveCase, boolean preservePunct) {
     TextParser parser = new TextParser(file.toString());   
     
     try {
@@ -99,7 +112,7 @@ public class FileParser {
       return null;
     }
     
-    return parser.sentencesAsStr(true, true);
+    return parser.sentencesAsStr(preserveCase, preservePunct);
   }
 
   private static void write(File file, Vector<String> sentences) throws IOException {

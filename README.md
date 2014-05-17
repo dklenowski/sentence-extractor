@@ -21,7 +21,6 @@ Note, debugging is turned on, to turn off edit `main/resources/com/orbious/extra
 - Used to extract sentences from text documents.
 - Has been used successfully on Project Gutenberg texts.
 - Uses heuristic algorithms.
-- Used by [[http://bitbucket.org/davek/relationship-tree/|relationship-tree]]
 
 ## Introduction
 

@@ -4,11 +4,11 @@
 
 ### To kill the apps send a SIGTERM to the process
 
-Note, debugging is turned on, to turn off edit main/resources/com/orbious/extractor/log4j.xml
+Note, debugging is turned on, to turn off edit `main/resources/com/orbious/extractor/log4j.xml`
 
 ### To build the classpath
 
-  mvn dependency:build-classpath
+    mvn dependency:build-classpath
 
 ### To run apps
 
@@ -129,7 +129,7 @@ An example (see **TextParserTest.test_GenSentencesWiki()**)
         It is advisable to examine texts before extraction to see if any pre processing can be done .
         This can increase accuracy significantly .
 
-### The same text split into sentences using the python ntlk punkt parser
+#### The same text split into sentences using the python NLTK Punkt parser
 
 
         Used to extract sentences from text documents .
